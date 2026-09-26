@@ -713,14 +713,20 @@ def menu_push_wordpress():
     target_site = None
     if len(sites) == 1:
         target_site = sites[0]
-        print(f"Website Target: {CYAN}{BOLD}{target_site['name']}{RESET} ({target_site['wp_url']})")
+        type_tag = f"{CYAN}[Astro]{RESET}" if target_site.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
+        print(f"Website Target: {type_tag} {CYAN}{BOLD}{target_site['name']}{RESET} ({target_site.get('wp_url', '')})")
     else:
         active_id = wp.config.get("active_site_id")
         site_options = []
         default_site_idx = 0
         for i, s in enumerate(sites, 1):
             is_def = f" {GREEN}[Default]{RESET}" if s["id"] == active_id else ""
-            lbl = f"{BOLD}{s['name']}{RESET} ({s['wp_url']}) - User: {s['username']}{is_def}"
+            type_tag = f"{CYAN}[Astro]{RESET}" if s.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
+            if s.get("type") == "astro":
+                user_info = f" - Folder: {os.path.basename(s.get('content_dir', ''))}"
+            else:
+                user_info = f" - User: {s.get('username', 'admin')}"
+            lbl = f"{type_tag} {BOLD}{s['name']}{RESET} ({s.get('wp_url', '')}){user_info}{is_def}"
             site_options.append((str(i), lbl))
             if s["id"] == active_id:
                 default_site_idx = i - 1
@@ -732,7 +738,8 @@ def menu_push_wordpress():
         
         site_idx = int(site_choice) - 1
         target_site = sites[site_idx]
-        print(f"\nWebsite Target: {CYAN}{BOLD}{target_site['name']}{RESET} ({target_site['wp_url']})")
+        type_tag = f"{CYAN}[Astro]{RESET}" if target_site.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
+        print(f"\nWebsite Target: {type_tag} {CYAN}{BOLD}{target_site['name']}{RESET} ({target_site.get('wp_url', '')})")
 
     # 3. Test koneksi ke target website
     print(f"\n{CYAN}Menguji koneksi ke {target_site['wp_url']}...{RESET}")
