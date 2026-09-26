@@ -169,18 +169,21 @@ class GeminiClient:
             }
         }
 
-        preferred = self.get_preferred_model()
+        active_model = self.get_preferred_model()
         flash_names = [m[0] for m in DEFAULT_FLASH_MODELS]
         pro_names = [m[0] for m in DEFAULT_PRO_MODELS]
-        candidate_models = [preferred] + [m for m in flash_names + pro_names if m != preferred]
-
+        fallback_models = [m for m in flash_names + pro_names if m != active_model]
+        
+        current_model = active_model
+        fallback_model_idx = 0
+        
         total_keys = max(len(self.api_keys), 1)
+        actual_retries = max(max_retries, total_keys * 2)
         last_error = None
 
-        for attempt in range(max_retries):
-            model = candidate_models[attempt % len(candidate_models)]
+        for attempt in range(actual_retries):
             key = self.get_current_key()
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{current_model}:generateContent?key={key}"
             
             try:
                 resp = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=120)
@@ -190,7 +193,7 @@ class GeminiClient:
                     candidates = data.get("candidates", [])
                     if candidates and "content" in candidates[0]:
                         parts = candidates[0]["content"].get("parts", [])
-                        self.active_model = model
+                        self.active_model = current_model
                         return "".join([p.get("text", "") for p in parts]).strip()
                     return ""
                 
@@ -201,14 +204,20 @@ class GeminiClient:
                         print(f" [Auto-Failover: Key #{old_k} limit/error -> Beralih ke Key #{new_k}]", flush=True)
                     time.sleep(1)
 
+                elif resp.status_code == 404:
+                    # Model tidak ditemukan, baru ganti model alternatif
+                    if fallback_model_idx < len(fallback_models):
+                        current_model = fallback_models[fallback_model_idx]
+                        fallback_model_idx += 1
+                        last_error = f"Model diganti ke {current_model} (404 pada model sebelumnya)"
+                    else:
+                        last_error = f"Model {current_model} (HTTP 404)"
+                    time.sleep(1)
+
                 elif resp.status_code in [500, 503]:
                     rotated, old_k, new_k = self.rotate_key()
-                    last_error = f"Model {model} (HTTP {resp.status_code})"
+                    last_error = f"Model {current_model} (HTTP {resp.status_code})"
                     time.sleep(2)
-
-                elif resp.status_code == 404:
-                    last_error = f"Model {model} (HTTP 404)"
-                    time.sleep(1)
 
                 else:
                     last_error = f"HTTP {resp.status_code}: {resp.text[:150]}"
@@ -220,7 +229,7 @@ class GeminiClient:
                 last_error = f"Error ({str(e)})"
                 time.sleep(2)
         
-        raise Exception(f"Gagal memanggil Gemini API setelah {max_retries} percobaan ({last_error})")
+        raise Exception(f"Gagal memanggil Gemini API setelah {actual_retries} percobaan ({last_error})")
 
     def generate_json(self, prompt, system_instruction=None, temperature=0.3):
         json_instruction = (
