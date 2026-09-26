@@ -156,14 +156,17 @@ Kembalikan format JSON:
 
     def generate_content_brief(self, item, silo_plan, language="Bahasa Indonesia", business_profile=None, client=None):
         """
-        Menghasilkan Content Brief & Outline mendalam untuk satu artikel terpilih.
+        Menyusun Content Brief tingkat lanjut dengan Dynamic Content Archetype Engine:
+        AI secara cerdas memilih 1 dari 8 format anatomi konten yang paling sesuai dengan search intent,
+        sehingga format artikel tidak pernah monoton/template.
         """
         from wp_publisher import WordPressPublisher
 
         ai_client = client or self.client
         system_instruction = (
-            "Anda adalah Senior Content Strategist & Lead SEO Editor. "
-            "Tugas Anda adalah menyusun Content Brief komprehensif berstandar enterprise."
+            "Anda adalah Senior Content Strategist & Lead SEO Architect tingkat dunia. "
+            "Tugas Anda adalah menyusun Content Brief komprehensif dan menentukan Arketipe Anatomi Konten "
+            "yang paling relevan agar gaya sajian artikel selalu dinamis, variatif, dan memiliki nilai guna tinggi."
         )
 
         profile = business_profile or silo_plan.get("business_profile")
@@ -188,6 +191,17 @@ Susun Content Brief & Outline lengkap untuk topik berikut:
 Daftar artikel lain dalam Silo ini (untuk referensi internal link):
 {json.dumps(other_items, ensure_ascii=False, indent=2)}
 
+TUGAS KHUSUS ARKETIPE KONTEN:
+Pilih 1 'content_archetype' yang paling tepat untuk search intent topik ini:
+1. 'comparison_head_to_head': Jika topik membandingkan 2 metode/alat/opsi ("A vs B", "Perbedaan X dan Y", "Mana yang lebih baik").
+2. 'step_by_step_workflow': Jika topik mengenai alur kerja, prosedur teknis, atau syarat bertahap ("Cara Melakukan X", "Syarat Izin PBG").
+3. 'buyers_guide_pricing': Jika topik mengenai biaya, tarif, harga jasa, atau panduan memilih vendor terpercaya.
+4. 'problem_solution_diagnostic': Jika topik mengenai bahaya, risiko, diagnosis masalah teknis, tanda kerusakan, atau mitigasi darurat.
+5. 'ultimate_pillar_guide': WAJIB jika Peran Silo adalah 'Pillar' (Pusat Otoritas Silo & Navigasi Lengkap).
+6. 'deep_technical_explainer': Jika topik menjelaskan konsep teknis rumit, parameter/rumus, atau fungsi alat ke bahasa awam.
+7. 'actionable_listicle_insights': Jika topik berupa tips kunci, faktor penting, atau kumpulan wawasan praktis.
+8. 'legal_compliance_guide': Jika topik mengenai regulasi resmi pemerintah, standar SNI/ISO, atau aturan birokrasi.
+
 Format output JSON harus sebagai berikut:
 {{
   "item_id": {item['id']},
@@ -196,6 +210,12 @@ Format output JSON harus sebagai berikut:
   "meta_description": "Meta Description persuasif (140-155 karakter dengan CTA halus)",
   "url_slug": "slug-url-ramah-seo",
   "target_word_count": "1500 - 2000 kata",
+  "content_archetype": {{
+    "type": "comparison_head_to_head" / "step_by_step_workflow" / "buyers_guide_pricing" / "problem_solution_diagnostic" / "ultimate_pillar_guide" / "deep_technical_explainer" / "actionable_listicle_insights" / "legal_compliance_guide",
+    "format_label": "Nama Label Format yang Ramah Dibaca (misal: Head-to-Head Comparison Guide)",
+    "mandatory_visual_elements": ["Tabel Komparasi 6-8 Parameter", "Box Pros & Cons", "Matriks Rekomendasi Keputusan"],
+    "content_angle": "Sudut pandang penulisan spesifik agar unik dan tajam"
+  }},
   "secondary_keywords": ["keyword turunan 1", "keyword turunan 2", "keyword turunan 3"],
   "semantic_entities_lsi": ["entitas semantik 1", "istilah industri 2", "LSI 3", "LSI 4"],
   "internal_link_strategy": {{
@@ -212,7 +232,7 @@ Format output JSON harus sebagai berikut:
       "heading_tag": "H2",
       "heading_title": "Judul Sub-Bab H2",
       "key_talking_points": ["Poin bahasan A", "Poin bahasan B"],
-      "include_element": "Tabel perbandingan / Listicle / Blockquote tips / None"
+      "include_element": "Tabel / Checklist Box / Step Timeline / Pro-Tip Box / None"
     }}
   ],
   "faq_questions": [
@@ -227,7 +247,7 @@ Format output JSON harus sebagai berikut:
     def write_article_draft(self, brief, silo_plan, tone="Profesional, Informatif, dan Mengalir Natural", language="Bahasa Indonesia", business_profile=None, client=None):
         """
         Menulis draf lengkap artikel berkualitas tinggi sesuai brief, struktur Silo, dan kaidah SEO modern.
-        Menerapkan prinsip Zero Hallucination jika profil bisnis disediakan.
+        Menerapkan Dynamic Content Archetype Blueprint & Zero Hallucination jika profil bisnis disediakan.
         """
         from wp_publisher import WordPressPublisher
 
@@ -243,6 +263,69 @@ Format output JSON harus sebagai berikut:
         profile = business_profile or silo_plan.get("business_profile")
         grounding_prompt = WordPressPublisher.format_profile_grounding_prompt(profile)
 
+        # Ekstrak arahan arketipe konten
+        archetype = brief.get("content_archetype", {})
+        arch_type = archetype.get("type", "in_depth_explainer")
+        arch_label = archetype.get("format_label", "Panduan Informatif")
+        mandatory_elements = archetype.get("mandatory_visual_elements", [])
+        content_angle = archetype.get("content_angle", "")
+
+        archetype_instructions = ""
+        if arch_type == "comparison_head_to_head":
+            archetype_instructions = (
+                "🎯 PANDUAN FORMAT KHUSUS (HEAD-TO-HEAD COMPARISON):\n"
+                "- Wajib sertakan minimal 1 TABEL KOMPARASI LENGKAP (6-8 baris parameter perbandingan teknis, biaya, akurasi, waktu, dan skenario kecocokan).\n"
+                "- Wajib buat sub-bab 'Kelebihan & Kekurangan' untuk masing-masing opsi dalam format list/callout yang jelas.\n"
+                "- Sertakan panduan 'Kapan Harus Memilih Opsi A vs Opsi B' berdasarkan skenario nyata di lapangan.\n"
+                "- Berikan kesimpulan rekomendasi / verdict objektif di akhir.\n"
+            )
+        elif arch_type == "step_by_step_workflow":
+            archetype_instructions = (
+                "🎯 PANDUAN FORMAT KHUSUS (STEP-BY-STEP WORKFLOW):\n"
+                "- Sajikan alur kerja dengan format tahapan bernomor terstruktur (Tahap 1 ➔ Tahap 2 ➔ Tahap 3).\n"
+                "- Sertakan checklist dokumen / persiapan yang harus dilakukan sebelum memulai.\n"
+                "- Wajib sertakan Callout Box Peringatan: `> ⚠️ **Peringatan / Kesalahan Fatal yang Sering Terjadi:** ...`.\n"
+            )
+        elif arch_type == "buyers_guide_pricing":
+            archetype_instructions = (
+                "🎯 PANDUAN FORMAT KHUSUS (BUYER'S GUIDE & ESTIMASI BIAYA):\n"
+                "- Wajib sertakan TABEL ESTIMASI BIAYA / RENTANG TARIF dan faktor-faktor penentu biaya di lapangan.\n"
+                "- Berikan tips praktis cara memilih penyedia jasa terpercaya dan cara menghindari biaya tak terduga (hidden cost).\n"
+                "- Berikan simulasi perhitungan anggaran proyek secara logis dan realistis.\n"
+            )
+        elif arch_type == "problem_solution_diagnostic":
+            archetype_instructions = (
+                "🎯 PANDUAN FORMAT KHUSUS (PROBLEM-SOLUTION / DIAGNOSTIK):\n"
+                "- Wajib bahas 'Tanda & Gejala Lapangan' saat masalah terjadi.\n"
+                "- Lakukan analisis akar penyebab (Root Cause Analysis) secara teknis namun mudah dipahami.\n"
+                "- Berikan 'Langkah Tindakan Mitigasi Darurat & Solusi Pencegahan Permanen'.\n"
+            )
+        elif arch_type == "ultimate_pillar_guide":
+            archetype_instructions = (
+                "🎯 PANDUAN FORMAT KHUSUS (ULTIMATE PILLAR ENCYCLOPEDIA):\n"
+                "- Buat 'Executive Summary / Ringkasan Inti' di awal artikel.\n"
+                "- Bahas seluruh pilar fundamental secara komprehensif (Definisi, Regulasi SNI/ISO, Metode Utama, dan Evaluasi Hasil).\n"
+                "- Hubungkan seluruh topik pendukung dengan internal link yang kuat, alami, dan kaya konteks.\n"
+            )
+        elif arch_type == "deep_technical_explainer":
+            archetype_instructions = (
+                "🎯 PANDUAN FORMAT KHUSUS (DEEP TECHNICAL EXPLAINER):\n"
+                "- Terjemahkan rumus, parameter teknis, atau konsep rumit ke dalam analogi sederhana yang mudah dipahami orang awam.\n"
+                "- Sertakan box 'Fakta Kunci & Parameter Teknis' berformat ringkas.\n"
+            )
+        elif arch_type == "legal_compliance_guide":
+            archetype_instructions = (
+                "🎯 PANDUAN FORMAT KHUSUS (LEGAL & REGULATION COMPLIANCE):\n"
+                "- Sebutkan acuan regulasi resmi (SNI, Permen PUPR, atau Perda terkait).\n"
+                "- Buat TABEL / CHECKLIST DOKUMEN WAJIB untuk kepatuhan hukum / izin PBG/IMB.\n"
+            )
+        else:
+            archetype_instructions = (
+                "🎯 PANDUAN FORMAT KHUSUS (ACTIONABLE INSIGHTS):\n"
+                "- Bagi materi ke dalam poin-poin bernilai tinggi dengan ulasan mendalam.\n"
+                "- Gunakan callout box tips dan key takeaways di akhir setiap bagian.\n"
+            )
+
         prompt = f"""
 Tuliskan artikel lengkap dan mendalam dalam format Markdown murni berdasarkan Content Brief berikut:
 
@@ -251,17 +334,21 @@ Tuliskan artikel lengkap dan mendalam dalam format Markdown murni berdasarkan Co
 Tema Silo: {silo_plan.get('silo_theme', '')}
 Tone of Voice: {tone}
 Bahasa: {language}
+Format Arketipe Terpilih: {arch_label} ({arch_type})
+Sudut Pandang (Angle): {content_angle}
 
 {grounding_prompt}
 
-PANDUAN PENULISAN WAJIB:
+{archetype_instructions}
+
+PANDUAN PENULISAN UMUM:
 1. Mulai langsung dengan Judul H1 (# Judul Artikel).
-2. Paragraf Pembuka (Hook): Langsung jawab inti pertanyaan pembaca dalam 2 kalimat pertama. Berikan alasan mengapa artikel ini adalah panduan paling lengkap.
+2. Paragraf Pembuka (Hook): Langsung jawab inti pertanyaan pembaca dalam 2 kalimat pertama. Berikan alasan mengapa artikel ini adalah panduan paling berbobot.
 3. Struktur Konten: Ikuti seluruh outline H2 dan H3 pada brief. Bahas setiap poin secara mendalam dan berikan contoh nyata, tips praktis, atau data logis.
 4. Elemen Visual & Skimmable:
-   - Buat minimal 1 TABEL perbandingan atau ringkasan data dalam format Markdown.
+   - Buat minimal 1 TABEL dalam format Markdown sesuai arketipe di atas.
    - Gunakan bullet points atau numbered lists pada langkah-langkah / tips.
-   - Gunakan blockquote (`> 💡 **Pro Tip:** ...`) untuk tips krusial.
+   - Gunakan blockquote (`> 💡 **Pro Tip:** ...` atau `> ⚠️ **Catatan Penting:** ...`) untuk informasi krusial.
 5. Arsitektur Silo & Variasi Anchor Text (Anti-Overoptimization):
    - Sisipkan internal link ke artikel pilar atau cluster pendukung secara kontekstual di dalam paragraf.
    - WAJIB gunakan variasi anchor text (campuran exact keyword, sinonim LSI, dan frasa mengalir natural). Jangan gunakan kata kunci kaku berulang-ulang. Format: `[Variasi Anchor Text](slug-artikel)`.

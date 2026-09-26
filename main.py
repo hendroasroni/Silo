@@ -565,8 +565,8 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
         print(f"{BOLD}[{idx}/{len(selected_items)}] Memproses: #{item['id']} - {item['keyword']} ({item['role']}){RESET}")
         print(f"{BOLD}{CYAN}-------------------------------------------------------{RESET}")
 
-        # A. Brief
-        print(f"  📝 [1/3] Merancang Content Brief & Outline SEO...", end="", flush=True)
+        # A. Brief & Archetype
+        print(f"  📝 [1/4] Merancang Content Brief & Format Arketipe...", end="", flush=True)
         try:
             brief = silo_engine.generate_content_brief(
                 item,
@@ -575,13 +575,15 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
                 business_profile=silo_plan.get("business_profile"),
                 client=stage1_client
             )
-            print(f" {GREEN}OK{RESET} (Slug: `{brief.get('url_slug')}`, Target: {brief.get('target_word_count')})")
+            arch_data = brief.get("content_archetype", {})
+            arch_name = arch_data.get("format_label") or arch_data.get("type", "Standard Guide")
+            print(f" {GREEN}OK{RESET} (Format: {MAGENTA}{BOLD}{arch_name}{RESET}, Target: {brief.get('target_word_count')})")
         except Exception as e:
             print(f" {RED}FAILED ({e}){RESET}")
             continue
 
         # B. Write Draft
-        print(f"  ✍️  [2/3] Menulis Artikel Mendalam & Natural...", end="", flush=True)
+        print(f"  ✍️  [2/4] Menulis Draf Sesuai Arketipe Konten...", end="", flush=True)
         try:
             draft = silo_engine.write_article_draft(
                 brief,
