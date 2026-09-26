@@ -1,0 +1,23 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Local API Keys & Passwords (Keep private)
+apikey.txt
+kie_apikey.txt
+
+# Output directory for generated Silo markdown & images
+output/
+
+# Environment / IDE
+.env
+.venv/
+env/
+venv/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

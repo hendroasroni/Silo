@@ -1,0 +1,4 @@
+# Masukkan Google Gemini API Key Anda di bawah ini (satu per baris untuk multi-key rotation)
+# Dapatkan di: https://aistudio.google.com/app/apikey
+AIzaSyYourGeminiApiKeyHere_1
+# AIzaSyYourGeminiApiKeyHere_2

@@ -1,0 +1,3 @@
+# Masukkan Kie.ai API Key Anda di bawah ini (satu per baris)
+# Dapatkan di: https://kie.ai/
+kie_live_your_api_key_here
