@@ -9,6 +9,11 @@ __pycache__/
 apikey.txt
 kie_apikey.txt
 agnes_apikey.txt
+client_secret.json
+client_secret_*.json
+!client_secret.example.json
+youtube_tokens/
+youtube_token*.json
 
 # Output directory for generated Silo markdown & images
 output/

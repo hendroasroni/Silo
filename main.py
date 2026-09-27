@@ -19,6 +19,7 @@ from kie_image_api import KieImageClient, DEFAULT_KIE_MODELS, DEFAULT_IMAGE_STYL
 from kie_chat_api import KieChatClient
 from agnes_api import AgnesClient, DEFAULT_AGNES_TEXT_MODELS, DEFAULT_AGNES_IMAGE_MODELS
 from youtube_generator import YouTubeProfileManager, YouTubeGenerator, YOUTUBE_OUTPUT_DIR
+from youtube_live_api import YouTubeLiveClient
 from ai_pipeline import AIPipelineManager, AVAILABLE_ENGINES, STAGE_NAMES
 from silo_generator import SiloGenerator
 from wp_publisher import WordPressPublisher
@@ -2818,6 +2819,7 @@ def menu_change_model_flow(client):
 def menu_youtube():
     yt_profile_mgr = YouTubeProfileManager()
     pipeline_mgr = AIPipelineManager()
+    yt_live = YouTubeLiveClient()
 
     while True:
         clear_screen()
@@ -2825,19 +2827,25 @@ def menu_youtube():
         print_section("YOUTUBE CREATOR & METADATA SUITE")
 
         active_profile = yt_profile_mgr.get_active_profile()
+        ch_id = active_profile.get("id", "default")
+        has_token = yt_live.has_saved_token(ch_id)
+        oauth_status = f"{GREEN}[OAuth Terhubung]{RESET}" if has_token else f"{YELLOW}[OAuth Belum Login]{RESET}"
+
         ai_client = pipeline_mgr.get_client_for_stage(1)
         engine_name = pipeline_mgr.get_stage_display_name(1)
 
-        print(f"🎬 {BOLD}Channel Aktif:{RESET} {GREEN}{BOLD}{active_profile.get('name')}{RESET} (Niche: {active_profile.get('niche')})")
+        print(f"🎬 {BOLD}Channel Aktif:{RESET} {GREEN}{BOLD}{active_profile.get('name')}{RESET} (Niche: {active_profile.get('niche')}) {oauth_status}")
         print(f"🎯 {BOLD}Tagline      :{RESET} {DIM}{active_profile.get('branding_tagline')}{RESET}")
         print(f"🤖 {BOLD}AI Engine    :{RESET} {CYAN}{engine_name}{RESET}\n")
 
         options = [
             ("1", "🎬 Generate Metadata Video Baru (Judul, Deskripsi, Tags, Thumbnail Concept)"),
-            ("2", "🔄 Optimasi / Regenerasi Video Lama (Dongkrak CTR & Traffic Video Publish)"),
-            ("3", "📢 Optimasi Profil Channel (Halaman About Bio & Channel Keywords Studio)"),
-            ("4", "⚙️ Kelola Profil Identitas Channel (Ganti / Tambah / Edit Channel)"),
-            ("5", "📂 Lihat Riwayat File Metadata Video YouTube Tersimpan"),
+            ("2", "🔄 Optimasi / Regenerasi Video Manual (Berdasarkan Judul/Topik Lama)"),
+            ("3", "🔴 Kelola & Update Live Video Channel (Tarik Video Live, AI Refresh & Push Langsung)"),
+            ("4", "📢 Optimasi Profil Channel (Halaman About Bio & Channel Keywords Studio)"),
+            ("5", "🔐 Pengaturan OAuth & Koneksi Akun Google YouTube"),
+            ("6", "⚙️ Kelola Profil Identitas Channel (Ganti / Tambah / Edit Channel)"),
+            ("7", "📂 Lihat Riwayat File Metadata Video YouTube Tersimpan"),
             ("0", "Kembali ke Menu Utama")
         ]
 
@@ -2849,10 +2857,14 @@ def menu_youtube():
         elif choice == "2":
             menu_yt_optimize_existing_video(ai_client, active_profile)
         elif choice == "3":
-            menu_yt_optimize_channel(ai_client, yt_profile_mgr, active_profile)
+            menu_yt_manage_live_videos(ai_client, yt_live, active_profile)
         elif choice == "4":
-            menu_yt_manage_profiles(yt_profile_mgr)
+            menu_yt_optimize_channel(ai_client, yt_profile_mgr, active_profile)
         elif choice == "5":
+            menu_yt_oauth_settings(yt_live, active_profile, yt_profile_mgr)
+        elif choice == "6":
+            menu_yt_manage_profiles(yt_profile_mgr)
+        elif choice == "7":
             menu_yt_view_history()
 
 def menu_yt_generate_new_video(ai_client, active_profile):
@@ -3082,6 +3094,305 @@ def menu_yt_optimize_channel(ai_client, yt_profile_mgr, active_profile):
         print(f"\n{GREEN}✔ Profil Channel berhasil diperbarui dengan keywords baru!{RESET}")
 
     press_any_key()
+
+def menu_yt_oauth_settings(yt_live, active_profile, yt_profile_mgr):
+    while True:
+        clear_screen()
+        print_banner()
+        print_section("PENGATURAN OAUTH & KONEKSI AKUN GOOGLE YOUTUBE")
+
+        ch_id = active_profile.get("id", "default")
+        has_token = yt_live.has_saved_token(ch_id)
+        has_secret = yt_live.is_secret_file_present()
+
+        print(f"🎬 {BOLD}Channel Lokal:{RESET} {GREEN}{BOLD}{active_profile.get('name')}{RESET} (ID: {ch_id})\n")
+
+        if not has_secret:
+            print(f"{YELLOW}⚠️  File 'client_secret.json' belum ditemukan di root folder.{RESET}")
+            print(f"{DIM}Cara mendapatkan client_secret.json:{RESET}")
+            print(f" 1. Buka Google Cloud Console: {CYAN}https://console.cloud.google.com/{RESET}")
+            print(f" 2. Buat project baru dan aktifkan {BOLD}YouTube Data API v3{RESET}.")
+            print(f" 3. Di menu 'Credentials' ➔ Buat 'OAuth client ID' (Application type: Desktop App).")
+            print(f" 4. Unduh JSON kredensial dan simpan di folder Silo dengan nama {BOLD}'client_secret.json'{RESET}.\n")
+        else:
+            print(f"{GREEN}✔ File 'client_secret.json' terdeteksi.{RESET}")
+
+        if has_token:
+            print(f"{GREEN}✔ Status Koneksi: TERHUBUNG KE AKUN GOOGLE (OAuth Token Aktif){RESET}\n")
+            try:
+                ch_info = yt_live.get_channel_profile_live(ch_id)
+                print(f"📌 {BOLD}Info Live YouTube Channel:{RESET}")
+                print(f" • Nama Channel : {CYAN}{BOLD}{ch_info.get('title')}{RESET} ({ch_info.get('custom_url')})")
+                print(f" • Channel ID   : {ch_info.get('channel_id')}")
+                print(f" • Subscribers  : {GREEN}{ch_info.get('subscriber_count'):,}{RESET}")
+                print(f" • Total Video  : {ch_info.get('video_count'):,} Video")
+                print(f" • Total Views  : {ch_info.get('view_count'):,} Views\n")
+            except Exception as e:
+                print(f"{YELLOW}⚠️ Catatan: {e}{RESET}\n")
+        else:
+            print(f"{YELLOW}Status Koneksi: BELUM TERHUBUNG (Pilih menu 1 untuk login via OAuth){RESET}\n")
+
+        options = [
+            ("1", "🔑 Login & Hubungkan Akun Google / YouTube (OAuth 2.0)"),
+            ("2", "🔄 Sinkronkan Nama & Deskripsi Channel dari YouTube ke Profil Silo"),
+            ("3", "🔓 Putuskan Koneksi OAuth (Logout)"),
+            ("0", "Kembali")
+        ]
+
+        c = select_menu(options, title="PILIH AKSI OAUTH")
+        if c == "0":
+            break
+        elif c == "1":
+            print_section("LOGIN OAUTH GOOGLE YOUTUBE")
+            print(f"{CYAN}Membuka browser untuk otentikasi Google OAuth...{RESET}")
+            try:
+                ok, msg = yt_live.authenticate(channel_id=ch_id, force_new=True)
+                print(f"\n{GREEN}✔ {msg}{RESET}")
+                try:
+                    info = yt_live.get_channel_profile_live(ch_id)
+                    if info.get("title") and active_profile.get("name") in ["My YouTube Channel", "Default Channel", ""]:
+                        yt_profile_mgr.update_profile(ch_id, {"name": info.get("title")})
+                        print(f"{GREEN}✔ Nama channel lokal diperbarui menjadi '{info.get('title')}'!{RESET}")
+                except Exception:
+                    pass
+            except Exception as e:
+                print(f"\n{RED}✖ Gagal otentikasi: {e}{RESET}")
+            press_any_key()
+        elif c == "2":
+            try:
+                print(f"\n{CYAN}Mengambil data profil dari YouTube...{RESET}")
+                info = yt_live.get_channel_profile_live(ch_id)
+                up_dict = {
+                    "name": info.get("title"),
+                }
+                if info.get("description"):
+                    up_dict["branding_tagline"] = info.get("description").split("\n")[0][:100]
+                yt_profile_mgr.update_profile(ch_id, up_dict)
+                print(f"\n{GREEN}✔ Berhasil menyinkronkan profil channel '{info.get('title')}'!{RESET}")
+            except Exception as e:
+                print(f"\n{RED}✖ Gagal sinkronisasi: {e}{RESET}")
+            press_any_key()
+        elif c == "3":
+            ok, msg = yt_live.disconnect_channel(ch_id)
+            print(f"\n{GREEN}✔ {msg}{RESET}")
+            press_any_key()
+
+def menu_yt_manage_live_videos(ai_client, yt_live, active_profile):
+    ch_id = active_profile.get("id", "default")
+    if not yt_live.has_saved_token(ch_id):
+        print_section("KONEKSI YOUTUBE OAUTH DIBUTUHKAN")
+        print(f"{YELLOW}Channel '{active_profile.get('name')}' belum terhubung via OAuth Google.{RESET}")
+        conn = get_single_key("Hubungkan sekarang? [Y/N]: ", valid_keys=['y', 'n', '0'])
+        if conn.lower() == 'y':
+            try:
+                ok, msg = yt_live.authenticate(channel_id=ch_id)
+                print(f"\n{GREEN}✔ {msg}{RESET}")
+            except Exception as e:
+                print(f"\n{RED}✖ Gagal koneksi: {e}{RESET}")
+                press_any_key()
+                return
+        else:
+            return
+
+    while True:
+        clear_screen()
+        print_banner()
+        print_section(f"KELOLA & UPDATE LIVE VIDEO YOUTUBE - [{active_profile.get('name')}]")
+        print(f"{DIM}Mengambil daftar video terbaru langsung dari channel Anda...{RESET}\n")
+
+        try:
+            videos, next_page = yt_live.list_my_videos(channel_id=ch_id, max_results=25)
+        except Exception as e:
+            print(f"{RED}✖ Gagal mengambil daftar video: {e}{RESET}")
+            press_any_key()
+            break
+
+        if not videos:
+            print(f"{YELLOW}Tidak ditemukan video di channel ini.{RESET}")
+            press_any_key()
+            break
+
+        print(f"{BOLD}Daftar Video Live Channel ({len(videos)} Video Terbaru):{RESET}")
+        print(f"{BOLD}{'No':<4} {'Views':<9} {'Likes':<7} {'Status':<10} {'Judul Video'}{RESET}")
+        print("-" * 75)
+
+        for idx, v in enumerate(videos, 1):
+            st_color = GREEN if v.get("privacy_status") == "public" else (YELLOW if v.get("privacy_status") == "unlisted" else DIM)
+            st_str = f"{st_color}{v.get('privacy_status', 'public').capitalize()}{RESET}"
+            title_disp = (v.get("title", "")[:42] + '..') if len(v.get("title", "")) > 42 else v.get("title", "")
+            print(f"#{idx:<3} {v.get('view_count', 0):<9,} {v.get('like_count', 0):<7,} {st_str:<19} {BOLD}{title_disp}{RESET}")
+        print("-" * 75)
+
+        vid_options = [(str(i), f"{v.get('title')[:45]} ({v.get('view_count', 0):,} views)") for i, v in enumerate(videos, 1)]
+        vid_options.append(("0", "Kembali"))
+
+        c = select_menu(vid_options, title="PILIH VIDEO UNTUK DIKELOLA / DI-OPTIMASI")
+        if c == "0":
+            break
+
+        chosen_vid = videos[int(c) - 1]
+        process_single_live_video_flow(ai_client, yt_live, chosen_vid, active_profile)
+
+def process_single_live_video_flow(ai_client, yt_live, video, active_profile):
+    ch_id = active_profile.get("id", "default")
+    v_id = video.get("video_id")
+
+    while True:
+        clear_screen()
+        print_banner()
+        print_section(f"KELOLA LIVE VIDEO: {video.get('title')}")
+
+        print(f"🎬 {BOLD}Judul Saat Ini :{RESET} {GREEN}{BOLD}{video.get('title')}{RESET}")
+        print(f"🌐 {BOLD}URL Video      :{RESET} {CYAN}{video.get('video_url')}{RESET}")
+        print(f"📊 {BOLD}Statistik      :{RESET} {video.get('view_count', 0):,} Views | {video.get('like_count', 0):,} Likes | {video.get('comment_count', 0):,} Komentar")
+        print(f"🔒 {BOLD}Status Publik  :{RESET} {video.get('privacy_status', 'public').upper()}")
+        print(f"🏷️  {BOLD}Tags Saat Ini  :{RESET} {', '.join(video.get('tags', [])) if video.get('tags') else '(Tidak ada tag)'}\n")
+
+        options = [
+            ("1", "🤖 AI Optimasi & Regenerasi Judul, Deskripsi & Tags (Analisis CTR & Live Push)"),
+            ("2", "✏️ Edit Langsung Judul Video Live"),
+            ("3", "📝 Edit Langsung Deskripsi Video Live"),
+            ("4", "🏷️ Edit Langsung Tags Video Live"),
+            ("5", "🖼️ Upload Custom Thumbnail Baru ke Video Live (Pilih File Gambar)"),
+            ("6", "🌐 Buka Video di Browser (YouTube.com)"),
+            ("0", "Kembali")
+        ]
+
+        choice = select_menu(options, title="AKSI LIVE VIDEO")
+        if choice == "0":
+            break
+        elif choice == "1":
+            print_section(f"AI OPTIMASI VIDEO: {video.get('title')}")
+            issue = input(f"{BOLD}Keluhan / Masalah Video [misal: 'CTR rendah, view mandek']: {RESET}").strip()
+            print(f"\n{CYAN}Sedang membedah dan meregenerasi variasi judul, deskripsi & tags baru...{RESET}")
+            try:
+                yt_gen = YouTubeGenerator(ai_client=ai_client)
+                data = yt_gen.optimize_existing_video(
+                    old_title=video.get("title"),
+                    old_description=video.get("description"),
+                    current_issue=issue,
+                    channel_profile=active_profile
+                )
+            except Exception as e:
+                print(f"{RED}✖ Gagal optimasi video: {e}{RESET}")
+                press_any_key()
+                continue
+
+            clear_screen()
+            print_banner()
+            print_section("HASIL REGENERASI AI (SIAP UPDATE KE LIVE YOUTUBE)")
+
+            analysis = data.get("analysis", {})
+            print(f"\n🔍 {BOLD}ANALISIS KELEMAHAN JUDUL LAMA:{RESET}")
+            print(f"  {YELLOW}{analysis.get('old_title_weakness')}{RESET}")
+            print(f"  {CYAN}Strategi:{RESET} {analysis.get('improvement_strategy')}\n")
+
+            new_titles = data.get("new_titles", [])
+            print(f"📌 {BOLD}5 PILIHAN JUDUL BARU (HIGH CTR):{RESET}")
+            for idx, t in enumerate(new_titles, 1):
+                print(f"  {BOLD}[{idx}] [{t.get('type')}]{RESET} ➔ {GREEN}{BOLD}{t.get('title')}{RESET}")
+            
+            new_desc = data.get("new_description", {}).get("full_formatted_description", "")
+            new_tags = data.get("new_tags_comma_separated", "")
+
+            print(f"\n🏷️  {BOLD}TAGS BARU:{RESET} {DIM}{new_tags}{RESET}")
+
+            # Pilihan Push Live
+            print_section("PILIHAN PENERAPAN")
+            print(f" • Ketik angka {GREEN}1 - {len(new_titles)}{RESET} untuk menerapkan judul tersebut dan {BOLD}UPDATE LIVE LANGSUNG KE YOUTUBE{RESET}")
+            print(f" • Ketik {CYAN}S{RESET} untuk simpan ke file teks lokal saja")
+            print(f" • Ketik {RED}0{RESET} untuk batal")
+
+            apply_sel = input(f"\n{BOLD}Pilihan Anda:{RESET} ").strip()
+            if apply_sel.isdigit() and 1 <= int(apply_sel) <= len(new_titles):
+                chosen_idx = int(apply_sel) - 1
+                chosen_title = new_titles[chosen_idx].get("title")
+
+                confirm = get_single_key(f"\n{YELLOW}Konfirmasi: Update video '{v_id}' di YouTube dengan judul '{chosen_title}'? [Y/N]: {RESET}", valid_keys=['y', 'n', '0'])
+                if confirm.lower() == 'y':
+                    print(f"\n{CYAN}Mengirim update ke server YouTube Data API...{RESET}")
+                    ok_u, res_u = yt_live.update_video_metadata(
+                        video_id=v_id,
+                        title=chosen_title,
+                        description=new_desc if new_desc else None,
+                        tags=new_tags if new_tags else None,
+                        channel_id=ch_id
+                    )
+                    if ok_u:
+                        print(f"\n{GREEN}{BOLD}🎉 SUKSES! Video YouTube telah diperbarui secara LIVE!{RESET}")
+                        print(f" 🎬 Judul Baru : {GREEN}{chosen_title}{RESET}")
+                        video["title"] = chosen_title
+                        if new_desc: video["description"] = new_desc
+                        if new_tags: video["tags"] = [t.strip() for t in new_tags.split(",")]
+                    else:
+                        print(f"\n{RED}✖ Gagal update live YouTube: {res_u}{RESET}")
+            elif apply_sel.upper() == "S":
+                txt_p, _ = yt_gen.save_video_pack(data, active_profile.get("name"), f"LIVE_{video.get('title')}")
+                print(f"\n{GREEN}✔ Paket optimasi disimpan di: {txt_p}{RESET}")
+
+            press_any_key()
+
+        elif choice == "2":
+            print_section("EDIT JUDUL VIDEO LIVE")
+            print(f"Judul lama: {CYAN}{video.get('title')}{RESET}\n")
+            new_t = input(f"{BOLD}Masukkan Judul Baru:{RESET} ").strip()
+            if new_t and new_t != "0":
+                print(f"\n{CYAN}Mengupdate judul di YouTube...{RESET}")
+                ok_u, res_u = yt_live.update_video_metadata(video_id=v_id, title=new_t, channel_id=ch_id)
+                if ok_u:
+                    print(f"{GREEN}✔ Judul video live berhasil diperbarui!{RESET}")
+                    video["title"] = new_t
+                else:
+                    print(f"{RED}✖ Gagal: {res_u}{RESET}")
+                press_any_key()
+
+        elif choice == "3":
+            print_section("EDIT DESKRIPSI VIDEO LIVE")
+            print(f"{DIM}Ketik deskripsi baru (atau 0 untuk batal):{RESET}\n")
+            new_d = input(f"{BOLD}Deskripsi Baru:{RESET} ").strip()
+            if new_d and new_d != "0":
+                print(f"\n{CYAN}Mengupdate deskripsi di YouTube...{RESET}")
+                ok_u, res_u = yt_live.update_video_metadata(video_id=v_id, description=new_d, channel_id=ch_id)
+                if ok_u:
+                    print(f"{GREEN}✔ Deskripsi video live berhasil diperbarui!{RESET}")
+                    video["description"] = new_d
+                else:
+                    print(f"{RED}✖ Gagal: {res_u}{RESET}")
+                press_any_key()
+
+        elif choice == "4":
+            print_section("EDIT TAGS VIDEO LIVE")
+            print(f"Tags saat ini: {CYAN}{', '.join(video.get('tags', []))}{RESET}\n")
+            new_tags_input = input(f"{BOLD}Tags Baru (pisahkan dengan koma):{RESET} ").strip()
+            if new_tags_input and new_tags_input != "0":
+                print(f"\n{CYAN}Mengupdate tags di YouTube...{RESET}")
+                ok_u, res_u = yt_live.update_video_metadata(video_id=v_id, tags=new_tags_input, channel_id=ch_id)
+                if ok_u:
+                    print(f"{GREEN}✔ Tags video live berhasil diperbarui!{RESET}")
+                    video["tags"] = [t.strip() for t in new_tags_input.split(",")]
+                else:
+                    print(f"{RED}✖ Gagal: {res_u}{RESET}")
+                press_any_key()
+
+        elif choice == "5":
+            print_section("UPLOAD CUSTOM THUMBNAIL KE VIDEO LIVE")
+            img_path = input(f"{BOLD}Path file gambar thumbnail (WebP / JPG / PNG):{RESET} ").strip().strip('"').strip("'")
+            if img_path and img_path != "0" and os.path.exists(img_path):
+                print(f"\n{CYAN}Mengunggah thumbnail ke video '{v_id}'...{RESET}")
+                ok_t, res_t = yt_live.update_video_thumbnail(video_id=v_id, image_path=img_path, channel_id=ch_id)
+                if ok_t:
+                    print(f"\n{GREEN}{BOLD}🎉 SUKSES! Custom Thumbnail berhasil dipasang ke video YouTube!{RESET}")
+                else:
+                    print(f"\n{RED}✖ Gagal upload thumbnail: {res_t}{RESET}")
+            else:
+                if img_path != "0":
+                    print(f"{RED}File gambar tidak ditemukan di path: {img_path}{RESET}")
+            press_any_key()
+
+        elif choice == "6":
+            webbrowser.open(video.get("video_url"))
+            print(f"\n{GREEN}✔ Membuka video di browser...{RESET}")
+            press_any_key()
 
 def menu_yt_manage_profiles(yt_profile_mgr):
     while True:
