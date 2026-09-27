@@ -1,8 +1,0 @@
-{
-  "model": "z-image",
-  "api_base_url": "https://api.kie.ai",
-  "aspect_ratio": "16:9",
-  "quality": "standard",
-  "image_mode": "mesh_gradient",
-  "image_style": "photo"
-}

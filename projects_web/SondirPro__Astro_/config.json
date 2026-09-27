@@ -1,0 +1,10 @@
+{
+  "id": "astro_sondirpro",
+  "type": "astro",
+  "name": "SondirPro (Astro)",
+  "wp_url": "https://sondirpro.com",
+  "content_dir": "C:\\Users\\Hendro\\astro-sondirpro\\src\\content\\blog",
+  "image_dir": "C:\\Users\\Hendro\\astro-sondirpro\\public\\images\\silo",
+  "auto_git": false,
+  "default_status": "publish"
+}

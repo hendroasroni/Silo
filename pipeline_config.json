@@ -1,5 +1,0 @@
-{
-  "stage_1": "gemini:default",
-  "stage_2": "gemini:default",
-  "stage_3": "kie:gpt-6-luna"
-}

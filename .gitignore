@@ -15,6 +15,18 @@ client_secret_*.json
 youtube_tokens/
 youtube_token*.json
 
+# Config Directory Keys & Secrets
+config/*.txt
+config/*.json
+!config/examples/
+!config/examples/**
+
+# Channel Private Tokens & Secrets
+channels_youtube/*/token.json
+channels_youtube/*/client_secret.json
+channels_youtube/*/videos/
+channels_youtube/*/thumbnails/
+
 # Output directory for generated Silo markdown & images
 output/
 output_youtube/

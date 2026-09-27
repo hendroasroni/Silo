@@ -1,0 +1,802 @@
+{
+  "silo_plan": {
+    "seed_keyword": "jasa sondir tanah jogja",
+    "silo_theme": "Layanan Pengujian Tanah dan Geoteknik Profesional di Yogyakarta",
+    "topical_authority_goal": "Membangun otoritas topikal mutlak di bidang jasa penyelidikan tanah (soil test/sondir) di wilayah Yogyakarta guna mendominasi SERP lokal dan mengonversi prospek konstruksi.",
+    "items": [
+      {
+        "id": 1,
+        "keyword": "jasa sondir tanah jogja",
+        "suggested_title": "Jasa Sondir Tanah Jogja Terbaik & Berpengalaman - Laporan Akurat",
+        "role": "Pillar",
+        "search_intent": "Transactional",
+        "competition_level": "Medium",
+        "target_audience": "Kontraktor, developer properti, pemilik rumah pribadi, dan arsitek di Yogyakarta.",
+        "silo_role_description": "Bertindak sebagai pusat otoritas (hub) yang menerima link equity dari semua artikel cluster dan mengarahkan pengguna ke konversi akhir.",
+        "recommendation_rank": 1,
+        "recommendation_reason": "Merupakan halaman konversi utama yang menargetkan keyword dengan volume pencarian dan intensitas komersial tertinggi.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 2,
+        "keyword": "harga jasa sondir tanah jogja",
+        "suggested_title": "Biaya & Harga Jasa Sondir Tanah Jogja Terbaru (Estimasi Per Titik)",
+        "role": "Cluster",
+        "search_intent": "Commercial",
+        "competition_level": "Medium",
+        "target_audience": "Developer, kontraktor, dan individu yang sedang menyusun anggaran pembangunan di Jogja.",
+        "silo_role_description": "Menjawab pertanyaan sensitif harga, menyalurkan traffic berniat beli tinggi langsung ke Pillar Page.",
+        "recommendation_rank": 2,
+        "recommendation_reason": "Pertanyaan harga adalah salah satu pemicu konversi terbesar setelah pencarian jasa utama.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 3,
+        "keyword": "sondir tanah untuk IMB jogja",
+        "suggested_title": "Syarat Sondir Tanah untuk Pengurusan IMB / PBG di Yogyakarta",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Pemilik bangunan baru, developer, dan biro jasa pengurusan perizinan di Jogja.",
+        "silo_role_description": "Menghubungkan kebutuhan regulasi lokal dengan layanan pengujian tanah, mengarahkan pembaca ke Pillar Page untuk memesan jasa.",
+        "recommendation_rank": 3,
+        "recommendation_reason": "Regulasi IMB/PBG adalah pendorong utama mengapa orang mencari jasa sondir tanah secara legal.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 4,
+        "keyword": "perbedaan sondir dan boring",
+        "suggested_title": "Perbedaan Sondir Tanah (CPT) vs Boring (SPT): Mana yang Anda Butuhkan?",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Mahasiswa teknik, kontraktor pemula, arsitek, dan pemilik proyek konstruksi skala menengah-besar.",
+        "silo_role_description": "Edukasi teknis yang membandingkan dua metode uji tanah utama, mengarahkan pembaca ke Pillar Page jika mereka membutuhkan salah satu atau kedua layanan tersebut.",
+        "recommendation_rank": 4,
+        "recommendation_reason": "Membantu mengedukasi klien yang ragu tentang jenis pengujian tanah yang tepat untuk proyek mereka.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 5,
+        "keyword": "cara membaca hasil sondir tanah",
+        "suggested_title": "Panduan Praktis: Cara Membaca Laporan Hasil Sondir Tanah (Grafik CPT)",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Arsitek, insinyur sipil junior, pengawas proyek, dan pemilik rumah yang ingin memahami hasil uji tanah mereka.",
+        "silo_role_description": "Membangun kredibilitas teknis (E-E-A-T) yang kuat dan mengarahkan pembaca ke jasa profesional jika mereka membutuhkan interpretasi ahli.",
+        "recommendation_rank": 5,
+        "recommendation_reason": "Topik edukatif mendalam yang sangat disukai Google untuk menilai keahlian (Topical Authority) sebuah website.",
+        "is_recommended_default": false
+      },
+      {
+        "id": 6,
+        "keyword": "karakteristik tanah di yogyakarta",
+        "suggested_title": "Mengenal Karakteristik Tanah di Yogyakarta dan Potensi Kerawanan Konstruksi",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Perencana kota, developer perumahan, dan kontraktor lokal DIY.",
+        "silo_role_description": "Menghubungkan aspek geografis lokal Jogja (seperti tanah pasir vulkanik Merapi atau tanah lempung Bantul) dengan pentingnya uji sondir sebelum membangun.",
+        "recommendation_rank": 6,
+        "recommendation_reason": "Sangat relevan untuk SEO lokal (Local SEO) guna mengaitkan entitas geografis Yogyakarta dengan layanan sondir.",
+        "is_recommended_default": false
+      },
+      {
+        "id": 7,
+        "keyword": "alat sondir tanah",
+        "suggested_title": "Mengenal Alat Sondir Tanah (Cone Penetrometer) dan Cara Kerjanya di Lapangan",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Mahasiswa, praktisi konstruksi, dan klien yang ingin tahu proses kerja di lapangan.",
+        "silo_role_description": "Melengkapi cakupan topik (topical coverage) tentang instrumen pengujian tanah, mengalirkan link equity ke Pillar Page.",
+        "recommendation_rank": 7,
+        "recommendation_reason": "Melengkapi cakupan semantik dari topik utama 'sondir tanah' agar dianggap sebagai otoritas penuh oleh Google.",
+        "is_recommended_default": false
+      }
+    ]
+  },
+  "articles": [
+    {
+      "item_id": 1,
+      "item": {
+        "id": 1,
+        "keyword": "jasa sondir tanah jogja",
+        "suggested_title": "Jasa Sondir Tanah Jogja Terbaik & Berpengalaman - Laporan Akurat",
+        "role": "Pillar",
+        "search_intent": "Transactional",
+        "competition_level": "Medium",
+        "target_audience": "Kontraktor, developer properti, pemilik rumah pribadi, dan arsitek di Yogyakarta.",
+        "silo_role_description": "Bertindak sebagai pusat otoritas (hub) yang menerima link equity dari semua artikel cluster dan mengarahkan pengguna ke konversi akhir.",
+        "recommendation_rank": 1,
+        "recommendation_reason": "Merupakan halaman konversi utama yang menargetkan keyword dengan volume pencarian dan intensitas komersial tertinggi.",
+        "is_recommended_default": true
+      },
+      "brief": {
+        "item_id": 1,
+        "primary_keyword": "jasa sondir tanah jogja",
+        "meta_title": "Jasa Sondir Tanah Jogja Terbaik & Akurat - Layanan Geoteknik",
+        "meta_description": "Layanan jasa sondir tanah Jogja profesional & berpengalaman. Hasil pengujian CPT akurat untuk syarat PBG/IMB. Hubungi kami untuk konsultasi gratis!",
+        "url_slug": "jasa-sondir-tanah-jogja",
+        "target_word_count": "1800 - 2500 kata",
+        "secondary_keywords": [
+          "uji sondir tanah yogyakarta",
+          "jasa pengujian tanah jogja",
+          "sondir tanah pbg jogja",
+          "biaya uji geoteknik jogja",
+          "jasa uji CPT jogja"
+        ],
+        "semantic_entities_lsi": [
+          "Dutch Cone Penetrometer (CPT)",
+          "Daya dukung tanah (qc)",
+          "Hambatan pelekat (fs)",
+          "Penyelidikan tanah geoteknik",
+          "Persetujuan Bangunan Gedung (PBG)",
+          "Dinas Pekerjaan Umum DIY",
+          "Fondasi dangkal dan dalam",
+          "Tanah aluvial vulkanik Merapi"
+        ],
+        "internal_link_strategy": {
+          "target_pillar_link": "Halaman ini bertindak sebagai Pillar Page utama.",
+          "target_cluster_links": [
+            "Link ke Cluster ID 2 untuk pembahasan rincian estimasi harga per titik.",
+            "Link ke Cluster ID 3 untuk penjelasan regulasi pengurusan PBG/IMB setempat.",
+            "Link ke Cluster ID 4 untuk komparasi teknik pengujian CPT vs SPT Boring.",
+            "Link ke Cluster ID 5 untuk panduan membaca laporan dan grafik hasil sondir.",
+            "Link ke Cluster ID 6 untuk analisis struktur dan potensi risiko tanah di DIY.",
+            "Link ke Cluster ID 7 untuk pengenalan spesifikasi alat Cone Penetrometer."
+          ],
+          "suggested_anchor_texts": [
+            "biaya jasa sondir tanah jogja",
+            "sondir tanah untuk IMB jogja",
+            "perbedaan sondir dan boring",
+            "cara membaca hasil sondir tanah",
+            "karakteristik tanah di yogyakarta",
+            "alat sondir tanah"
+          ]
+        },
+        "outline": [
+          {
+            "heading_tag": "H2",
+            "heading_title": "Pentingnya Pengujian Sondir Tanah Sebelum Konstruksi di Jogja",
+            "key_talking_points": [
+              "Risiko kegagalan struktur akibat beban bangunan di tanah lunak/vulkanik DIY",
+              "Pentingnya mengetahui perlawanan penetrasi konus (qc) dan hambatan pelekat (fs)",
+              "Dampak finansial dan keamanan jika mengabaikan uji geoteknik awal"
+            ],
+            "include_element": "Blockquote tips"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Karakteristik Lapisan Tanah di Wilayah Yogyakarta & Peran Sondir",
+            "key_talking_points": [
+              "Gambaran umum struktur tanah vulkanik pasiran vs tanah lempung ekspansif di DIY",
+              "Mengapa pengujian lokasi spesifik sangat dibutuhkan di Sleman, Bantul, dan Kota Jogja"
+            ],
+            "include_element": "Listicle"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Layanan Jasa Sondir Tanah Jogja Profesional & Akurat",
+            "key_talking_points": [
+              "Cakupan layanan pengujian CPT (Dutch Cone Penetrometer) standar SNI",
+              "Penyusunan laporan analisis geoteknik resmi oleh engineer berpengalaman",
+              "Dukungan dokumen legalitas untuk Pengurusan PBG / IMB di Kabupaten/Kota DIY"
+            ],
+            "include_element": "Listicle"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Sondir (CPT) vs Boring (SPT): Mana Pengujian yang Anda Butuhkan?",
+            "key_talking_points": [
+              "Perbedaan mendasar metode kerja sondir mekanis/hidrolis dengan boring teknis",
+              "Kapan menggunakan sondir saja dan kapan harus dikombinasikan dengan sertifikasi boring"
+            ],
+            "include_element": "Tabel perbandingan"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Prosedur & Alur Kerja Pengujian Sondir Tanah di Lapangan",
+            "key_talking_points": [
+              "Persiapan lahan dan penentuan titik uji strategis",
+              "Proses penekanan stang sondir hingga mencapai tanah keras (qc >= 200 kg/cm2)",
+              "Pencatatan data interval 20 cm dan pengolahan grafik hasil laboratorium"
+            ],
+            "include_element": "Listicle"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Estimasi Biaya Jasa Sondir Tanah di Jogja & Faktor Penentunya",
+            "key_talking_points": [
+              "Kisaran biaya acuan per titik uji di area Yogyakarta dan sekitarnya",
+              "Faktor penentu harga: jumlah titik, topografi lokasi, aksesibilitas alat, dan urgensi"
+            ],
+            "include_element": "Blockquote tips"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Mengapa Memilih Layanan Jasa Sondir Tanah Kami di Yogyakarta?",
+            "key_talking_points": [
+              "Tim ahli geoteknik bersertifikat dan berpengalaman bertahun-tahun",
+              "Peralatan kalibrasi rutin untuk menjamin presisi data pengujian",
+              "Pengerjaan cepat, laporan rapi, dan kemudahan konsultasi pasca-uji"
+            ],
+            "include_element": "Listicle"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Pertanyaan Umum Seputar Jasa Sondir Tanah Jogja (FAQ)",
+            "key_talking_points": [
+              "Jawaban ringkas atas pertanyaan populer calon klien mengenai jasa sondir"
+            ],
+            "include_element": "None"
+          }
+        ],
+        "faq_questions": [
+          "Berapa titik sondir tanah yang dibutuhkan untuk bangunan rumah 2 lantai atau ruko?",
+          "Berapa lama proses pengerjaan uji sondir tanah di lapangan hingga laporan selesai?",
+          "Apakah hasil laporan sondir tanah dari tim Anda dijamin sah untuk kelengkapan berkas PBG / IMB di Jogja?"
+        ]
+      },
+      "curation_score": 98,
+      "editorial_critique": [
+        "Draf awal sudah sangat komprehensif dengan pembagian wilayah geologi Yogyakarta yang spesifik dan akurat secara teknis.",
+        "Telah dilakukan perbaikan pada beberapa kesalahan ketik (seperti kata 'амблес' menjadi 'ambles' dan 'detailed' menjadi 'detail').",
+        "Format tautan internal (silo links) telah disempurnakan menggunakan relative URL yang bersih dan mengalir secara natural dalam kalimat.",
+        "Struktur visual seperti tabel perbandingan CPT vs SPT dan diagram alur kerja lapangan dipertahankan karena sangat membantu keterbacaan (skimmable)."
+      ]
+    },
+    {
+      "item_id": 2,
+      "item": {
+        "id": 2,
+        "keyword": "harga jasa sondir tanah jogja",
+        "suggested_title": "Biaya & Harga Jasa Sondir Tanah Jogja Terbaru (Estimasi Per Titik)",
+        "role": "Cluster",
+        "search_intent": "Commercial",
+        "competition_level": "Medium",
+        "target_audience": "Developer, kontraktor, dan individu yang sedang menyusun anggaran pembangunan di Jogja.",
+        "silo_role_description": "Menjawab pertanyaan sensitif harga, menyalurkan traffic berniat beli tinggi langsung ke Pillar Page.",
+        "recommendation_rank": 2,
+        "recommendation_reason": "Pertanyaan harga adalah salah satu pemicu konversi terbesar setelah pencarian jasa utama.",
+        "is_recommended_default": true
+      },
+      "brief": {
+        "item_id": 2,
+        "primary_keyword": "harga jasa sondir tanah jogja",
+        "meta_title": "Harga Jasa Sondir Tanah Jogja Terbaru (Estimasi Per Titik)",
+        "meta_description": "Cek estimasi harga jasa sondir tanah Jogja terbaru per titik. Dapatkan rincian biaya transparan, faktor penentu, dan tips memilih vendor tepercaya di sini.",
+        "url_slug": "harga-jasa-sondir-tanah-jogja",
+        "target_word_count": "1500 - 2000 kata",
+        "content_archetype": {
+          "type": "buyers_guide_pricing",
+          "format_label": "Buyer's Guide & Pricing Matrix",
+          "mandatory_visual_elements": [
+            "Tabel Estimasi Biaya Sondir per Titik",
+            "Checklist Komponen Biaya (Inklusi & Eksklusi)",
+            "Matriks Perbandingan Biaya Sondir vs Boring"
+          ],
+          "content_angle": "Menyajikan panduan harga jasa sondir tanah di Yogyakarta secara transparan dan mendalam, membantu calon klien mengestimasi anggaran proyek konstruksi tanpa khawatir adanya biaya tersembunyi (hidden fees)."
+        },
+        "secondary_keywords": [
+          "biaya sondir tanah per titik jogja",
+          "tarif uji sondir yogyakarta",
+          "jasa sondir murah sleman bantul",
+          "harga pengujian cpt jogja"
+        ],
+        "semantic_entities_lsi": [
+          "Cone Penetration Test (CPT)",
+          "daya dukung tanah",
+          "biaya mobilisasi alat",
+          "kedalaman tanah keras",
+          "pengurusan PBG Jogja",
+          "laboratorium mekanika tanah"
+        ],
+        "internal_link_strategy": {
+          "target_pillar_link": "Menghubungkan ke artikel pilar utama (ID 1) untuk memberikan konteks layanan sondir secara menyeluruh di Jogja.",
+          "target_cluster_links": [
+            "Menghubungkan ke ID 3 untuk menjelaskan kaitan hasil sondir dengan biaya pengurusan IMB/PBG.",
+            "Menghubungkan ke ID 4 untuk membandingkan efisiensi biaya antara metode sondir dan boring.",
+            "Menghubungkan ke ID 6 untuk menjelaskan bagaimana karakteristik tanah Jogja memengaruhi kedalaman sondir dan biaya akhir."
+          ],
+          "anchor_variations": {
+            "exact_keyword": "jasa sondir tanah jogja",
+            "lsi_synonym": "pengujian Cone Penetration Test (CPT) di Yogyakarta",
+            "conversational_natural": "layanan penyelidikan tanah profesional di Jogja"
+          }
+        },
+        "outline": [
+          {
+            "heading_tag": "H2",
+            "heading_title": "Mengapa Uji Sondir Tanah Sangat Penting Sebelum Konstruksi di Jogja?",
+            "key_talking_points": [
+              "Pentingnya mengetahui daya dukung tanah (bearing capacity) sebelum mendirikan bangunan di Yogyakarta.",
+              "Variasi struktur tanah di Jogja (misalnya area Sleman yang berbatu vs Bantul yang berpasir/lempung) yang memengaruhi risiko kegagalan struktur.",
+              "Hubungan hasil sondir dengan legalitas perizinan gedung (PBG/IMB)."
+            ],
+            "include_element": "Pro-Tip Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Estimasi Harga Jasa Sondir Tanah Jogja Terbaru",
+            "key_talking_points": [
+              "Rincian kisaran harga jasa sondir tanah per titik untuk wilayah Kota Jogja, Sleman, Bantul, Kulon Progo, dan Gunungkidul.",
+              "Penjelasan mengenai sistem paket (misal paket minimal 2 titik untuk rumah tinggal standar).",
+              "Transparansi mengenai apa saja yang sudah termasuk dalam harga standar tersebut."
+            ],
+            "include_element": "Tabel"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Faktor-Faktor yang Memengaruhi Biaya Sondir Tanah di Yogyakarta",
+            "key_talking_points": [
+              "Jumlah titik pengujian yang dibutuhkan sesuai dengan luas bangunan.",
+              "Kapasitas alat sondir yang digunakan (sondir ringan 2 ton vs sondir berat 5 ton).",
+              "Lokasi lahan dan aksesibilitas (biaya mobilisasi alat ke lokasi terpencil atau medan sulit).",
+              "Kondisi geologis lokal yang memengaruhi kedalaman tanah keras."
+            ],
+            "include_element": "Checklist Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Perbandingan Biaya: Sondir (CPT) vs Boring (SPT)",
+            "key_talking_points": [
+              "Mengapa biaya sondir tanah umumnya lebih ekonomis dibandingkan dengan metode boring (deep boring).",
+              "Kapan Anda cukup menggunakan sondir dan kapan proyek Anda wajib menggunakan boring.",
+              "Rekomendasi alokasi anggaran berdasarkan skala proyek (rumah tinggal vs gedung bertingkat)."
+            ],
+            "include_element": "Tabel"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Komponen yang Termasuk dalam Biaya Jasa Sondir",
+            "key_talking_points": [
+              "Pekerjaan lapangan (field penetration) oleh teknisi berpengalaman.",
+              "Pengolahan data lapangan dan penyusunan grafik hasil sondir (nilai perlawanan konus/qc).",
+              "Laporan resmi (hardcopy & softcopy) yang disahkan oleh ahli geoteknik/sipil berlisensi untuk syarat PBG."
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Tips Memilih Vendor Jasa Sondir Tanah Terpercaya di Jogja",
+            "key_talking_points": [
+              "Pastikan vendor memiliki legalitas usaha dan tim ahli geoteknik bersertifikat.",
+              "Pilihlah vendor yang menawarkan transparansi harga sejak awal tanpa biaya tersembunyi.",
+              "Periksa portofolio proyek pengujian tanah yang pernah mereka selesaikan di wilayah Yogyakarta."
+            ],
+            "include_element": "Checklist Box"
+          }
+        ],
+        "faq_questions": [
+          "Berapa rata-rata biaya jasa sondir tanah per titik di Jogja?",
+          "Apakah biaya sondir tanah sudah termasuk laporan untuk pengurusan PBG/IMB?",
+          "Berapa lama proses pengerjaan sondir tanah hingga laporan selesai?"
+        ]
+      },
+      "curation_score": 91,
+      "editorial_critique": [
+        "Draf sudah sangat dekat dengan search intent karena langsung membahas harga jasa sondir tanah Jogja per titik, perbedaan kapasitas alat, faktor pembentuk tarif, komponen biaya, serta FAQ.",
+        "Tabel harga memberikan orientasi anggaran yang praktis, tetapi angka tarif perlu diposisikan secara konsisten sebagai estimasi pasar, bukan tarif baku atau harga resmi.",
+        "Penjelasan mengenai CPT, q_c, hambatan pelekat, mobilisasi, akses lahan, dan perbedaan CPT dengan SPT memberikan nilai edukatif yang kuat bagi pembaca nonteknis.",
+        "Beberapa klaim teknis terlalu absolut, terutama pernyataan bahwa nilai q_c tertentu selalu berarti tanah keras, kedalaman 20–30 meter sebagai batas umum, serta anggapan bahwa hasil sondir atau soil report selalu menjadi dokumen mutlak untuk seluruh proses PBG. Klaim tersebut telah dilunakkan agar sesuai dengan kondisi proyek dan persyaratan yang berlaku.",
+        "Pernyataan bahwa sondir dapat menghemat biaya hingga puluhan juta rupiah atau lebih dari 70 persen dibanding boring terlalu spesifik tanpa data proyek dan sumber pembanding yang jelas, sehingga dihapus dari versi final.",
+        "Istilah SKA dan klaim tentang tanda tangan ahli tertentu diperhalus. Persyaratan kompetensi tenaga profesional dan dokumen teknis sebaiknya mengikuti ketentuan perizinan serta ruang lingkup pekerjaan yang berlaku pada proyek.",
+        "Beberapa pengulangan kata kunci exact-match terasa SEO-oriented dan mengurangi keluwesan bahasa. Versi final menggunakan variasi semantik seperti pengujian CPT, uji sondir, penyelidikan tanah, dan layanan sondir secara lebih natural.",
+        "Internal link dipertahankan tetapi ditempatkan dalam kalimat yang relevan secara semantik: layanan utama, PBG, perbandingan sondir-boring, dan karakteristik tanah Jogja.",
+        "Struktur final dibuat lebih skimmable dengan tabel, bullet point, checklist, FAQ, dan ringkasan biaya sehingga pembaca yang terutama mencari nominal dapat menemukan informasi utama dengan cepat."
+      ]
+    },
+    {
+      "item_id": 3,
+      "item": {
+        "id": 3,
+        "keyword": "sondir tanah untuk IMB jogja",
+        "suggested_title": "Syarat Sondir Tanah untuk Pengurusan IMB / PBG di Yogyakarta",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Pemilik bangunan baru, developer, dan biro jasa pengurusan perizinan di Jogja.",
+        "silo_role_description": "Menghubungkan kebutuhan regulasi lokal dengan layanan pengujian tanah, mengarahkan pembaca ke Pillar Page untuk memesan jasa.",
+        "recommendation_rank": 3,
+        "recommendation_reason": "Regulasi IMB/PBG adalah pendorong utama mengapa orang mencari jasa sondir tanah secara legal.",
+        "is_recommended_default": true
+      },
+      "brief": {
+        "item_id": 3,
+        "primary_keyword": "sondir tanah untuk IMB jogja",
+        "meta_title": "Syarat Sondir Tanah IMB/PBG Jogja: Aturan & Prosedur Terbaru",
+        "meta_description": "Butuh sondir tanah untuk IMB / PBG di Yogyakarta? Simak syarat lengkap, aturan hukum, dan prosedur pengujian tanah resmi di sini agar izin Anda cepat terbit.",
+        "url_slug": "syarat-sondir-tanah-imb-pbg-jogja",
+        "target_word_count": "1500 - 2000 kata",
+        "content_archetype": {
+          "type": "legal_compliance_guide",
+          "format_label": "Legal & Regulatory Compliance Guide",
+          "mandatory_visual_elements": [
+            "Checklist Dokumen Persyaratan PBG",
+            "Tabel Regulasi & Dasar Hukum Pengujian Tanah DIY",
+            "Step-by-Step Timeline Alur Birokrasi SIMBG"
+          ],
+          "content_angle": "Panduan praktis, legal, dan prosedural mengenai pengujian sondir tanah sebagai syarat mutlak kelolosan PBG (pengganti IMB) di wilayah Sleman, Bantul, dan Kota Yogyakarta guna menjamin keamanan struktur bangunan dari risiko gempa."
+        },
+        "secondary_keywords": [
+          "sondir tanah untuk pbg jogja",
+          "syarat pbg sleman sondir",
+          "uji tanah untuk imb bantul",
+          "biaya sondir tanah jogja untuk imb"
+        ],
+        "semantic_entities_lsi": [
+          "Persetujuan Bangunan Gedung (PBG)",
+          "Dinas Pekerjaan Umum Perumahan dan Kawasan Permukiman (DPUPKP)",
+          "SIMBG",
+          "daya dukung tanah",
+          "Cone Penetration Test (CPT)",
+          "SNI 2827:2008",
+          "Sleman",
+          "Bantul",
+          "Kota Yogyakarta"
+        ],
+        "internal_link_strategy": {
+          "target_pillar_link": "Hubungkan artikel ini ke Pillar Page 'jasa sondir tanah jogja' untuk memberikan konteks penyedia layanan pengujian tanah yang kredibel di DIY.",
+          "target_cluster_links": [
+            "Hubungkan ke Cluster 'harga jasa sondir tanah jogja' saat membahas estimasi anggaran pengurusan.",
+            "Hubungkan ke Cluster 'karakteristik tanah di yogyakarta' untuk menjelaskan mengapa struktur tanah Jogja memerlukan pengujian khusus.",
+            "Hubungkan ke Cluster 'cara membaca hasil sondir tanah' untuk membantu pembaca memahami dokumen laporan yang akan diserahkan ke dinas."
+          ],
+          "anchor_variations": {
+            "exact_keyword": "jasa sondir tanah jogja",
+            "lsi_synonym": "pengujian daya dukung tanah di Yogyakarta",
+            "conversational_natural": "layanan uji tanah profesional untuk wilayah DIY"
+          }
+        },
+        "outline": [
+          {
+            "heading_tag": "H2",
+            "heading_title": "Mengapa Sondir Tanah Menjadi Syarat Wajib IMB / PBG di Yogyakarta?",
+            "key_talking_points": [
+              "Peralihan sistem IMB (Izin Mendirikan Bangunan) menjadi PBG (Persetujuan Bangunan Gedung) berdasarkan UU Cipta Kerja.",
+              "Pentingnya aspek keselamatan struktur bangunan di Yogyakarta yang rawan terhadap aktivitas seismik/gempa bumi.",
+              "Fungsi hasil sondir tanah (Cone Penetration Test) dalam menentukan desain fondasi yang aman dan efisien."
+            ],
+            "include_element": "Pro-Tip Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Dasar Hukum Kewajiban Uji Sondir Tanah di Wilayah DIY",
+            "key_talking_points": [
+              "Peraturan Pemerintah No. 16 Tahun 2021 tentang Peraturan Pelaksanaan UU No. 28 Tahun 2002 tentang Bangunan Gedung.",
+              "Kebijakan lokal DPUPKP di Kabupaten Sleman, Bantul, dan Kota Yogyakarta mengenai lampiran teknis penyelidikan tanah.",
+              "Standar Nasional Indonesia (SNI 2827:2008) sebagai acuan metode pengujian sondir di lapangan."
+            ],
+            "include_element": "Tabel"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Kriteria Bangunan di Jogja yang Wajib Melampirkan Hasil Sondir",
+            "key_talking_points": [
+              "Bangunan bertingkat (mulai dari 2 lantai ke atas) wajib melampirkan hasil uji tanah.",
+              "Bangunan dengan bentang struktur yang lebar atau fungsi khusus (gudang, fasilitas umum, tempat ibadah).",
+              "Pengecualian atau kelonggaran untuk bangunan satu lantai dengan luasan kecil di zona tanah keras."
+            ],
+            "include_element": "Checklist Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Alur Pengajuan PBG Jogja Melalui Sistem SIMBG",
+            "key_talking_points": [
+              "Pendaftaran akun dan pengisian data teknis bangunan pada portal SIMBG (Sistem Informasi Manajemen Bangunan Gedung).",
+              "Tahap unggah dokumen teknis, termasuk gambar struktur, perhitungan pembebanan, dan laporan penyelidikan tanah (sondir/boring).",
+              "Proses verifikasi oleh Tim Profesi Ahli (TPA) atau Tim Teknis dari dinas terkait hingga penerbitan PBG."
+            ],
+            "include_element": "Step Timeline"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Berapa Titik Sondir yang Dibutuhkan untuk Syarat PBG?",
+            "key_talking_points": [
+              "Aturan umum penentuan jumlah titik sondir berdasarkan luas tapak bangunan.",
+              "Rekomendasi minimal 2 titik pengujian untuk validasi silang (cross-check) stratigrafi tanah.",
+              "Kasus khusus di mana pengujian boring (SPT) harus dikombinasikan dengan sondir (CPT)."
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Tips Memilih Jasa Sondir Tanah Terpercaya untuk Pengurusan PBG di Jogja",
+            "key_talking_points": [
+              "Pastikan penyedia jasa memiliki alat yang terkalibrasi dan tim teknis berpengalaman.",
+              "Laporan hasil sondir wajib ditandatangani oleh Ahli Geoteknik yang memiliki Sertifikat Keahlian (SKA/SKK) resmi.",
+              "Hindari laporan fiktif atau 'tembakan' karena berisiko tinggi ditolak saat sidang pleno SIMBG."
+            ],
+            "include_element": "Pro-Tip Box"
+          }
+        ],
+        "faq_questions": [
+          "Apakah semua bangunan rumah tinggal di Jogja wajib melakukan sondir tanah untuk mendapatkan PBG?",
+          "Berapa lama proses pengerjaan sondir tanah di lapangan hingga laporan teknisnya selesai?",
+          "Apakah hasil sondir tanah dari Sleman bisa disamakan parameternya dengan wilayah Bantul?"
+        ]
+      },
+      "curation_score": 0,
+      "editorial_critique": []
+    },
+    {
+      "item_id": 4,
+      "item": {
+        "id": 4,
+        "keyword": "perbedaan sondir dan boring",
+        "suggested_title": "Perbedaan Sondir Tanah (CPT) vs Boring (SPT): Mana yang Anda Butuhkan?",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Mahasiswa teknik, kontraktor pemula, arsitek, dan pemilik proyek konstruksi skala menengah-besar.",
+        "silo_role_description": "Edukasi teknis yang membandingkan dua metode uji tanah utama, mengarahkan pembaca ke Pillar Page jika mereka membutuhkan salah satu atau kedua layanan tersebut.",
+        "recommendation_rank": 4,
+        "recommendation_reason": "Membantu mengedukasi klien yang ragu tentang jenis pengujian tanah yang tepat untuk proyek mereka.",
+        "is_recommended_default": true
+      },
+      "brief": {
+        "item_id": 4,
+        "primary_keyword": "perbedaan sondir dan boring",
+        "meta_title": "Perbedaan Sondir vs Boring: Panduan Lengkap Pilih Uji Tanah",
+        "meta_description": "Pahami perbedaan mendalam antara sondir (CPT) dan boring (SPT). Temukan metode pengujian tanah yang paling tepat untuk keamanan fondasi bangunan Anda di sini.",
+        "url_slug": "perbedaan-sondir-dan-boring",
+        "target_word_count": "1500 - 2000 kata",
+        "secondary_keywords": [
+          "sondir vs boring",
+          "perbedaan cpt dan spt",
+          "kapan pakai boring tanah",
+          "kelebihan dan kekurangan sondir",
+          "biaya boring vs sondir"
+        ],
+        "semantic_entities_lsi": [
+          "Cone Penetration Test",
+          "Standard Penetration Test",
+          "Daya dukung tanah",
+          "Mekanika tanah",
+          "Soil Investigation",
+          "Sampel tanah disturbed",
+          "Undisturbed sample",
+          "Fondasi bored pile",
+          "Laboratorium mekanika tanah"
+        ],
+        "internal_link_strategy": {
+          "target_pillar_link": "Hubungkan ke artikel pilar 'Jasa Sondir Tanah Jogja Terbaik & Berpengalaman' (ID 1) sebagai solusi layanan utama.",
+          "target_cluster_links": [
+            "Link ke artikel 'Harga Jasa Sondir Tanah Jogja' (ID 2) saat membahas aspek biaya.",
+            "Link ke artikel 'Karakteristik Tanah di Yogyakarta' (ID 6) saat membahas kondisi geologis lokal.",
+            "Link ke artikel 'Alat Sondir Tanah' (ID 7) pada bagian penjelasan teknis CPT."
+          ],
+          "anchor_variations": {
+            "exact_keyword": "perbedaan sondir dan boring",
+            "lsi_synonym": "perbandingan metode CPT dan SPT",
+            "conversational_natural": "memilih antara uji sondir atau boring untuk konstruksi"
+          }
+        },
+        "outline": [
+          {
+            "heading_tag": "H2",
+            "heading_title": "Pentingnya Penyelidikan Tanah Sebelum Konstruksi",
+            "key_talking_points": [
+              "Mengapa data tanah krusial untuk keamanan struktur",
+              "Risiko kegagalan fondasi akibat data tanah yang tidak akurat",
+              "Peran penyelidikan tanah dalam efisiensi biaya material"
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Apa Itu Sondir Tanah (Cone Penetration Test - CPT)?",
+            "key_talking_points": [
+              "Definisi dan prinsip kerja alat sondir",
+              "Data yang dihasilkan: perlawanan penetrasi konus (qc) dan hambatan lekat (fs)",
+              "Kelebihan sondir: cepat, ekonomis, dan data kontinu"
+            ],
+            "include_element": "Blockquote tips"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Apa Itu Boring Tanah (Standard Penetration Test - SPT)?",
+            "key_talking_points": [
+              "Definisi dan prosedur pengeboran dalam (deep boring)",
+              "Pengambilan sampel tanah (disturbed & undisturbed) untuk uji lab",
+              "Pentingnya nilai N-SPT untuk menentukan jenis lapisan tanah"
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Tabel Perbandingan: Perbedaan Sondir dan Boring Secara Detail",
+            "key_talking_points": [
+              "Parameter pembanding: Kedalaman, jenis data, pengambilan sampel, dan biaya",
+              "Kesesuaian untuk jenis bangunan (rumah tinggal vs gedung tinggi)",
+              "Kemampuan menembus lapisan tanah keras (lensa batuan)"
+            ],
+            "include_element": "Tabel perbandingan"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Kapan Anda Membutuhkan Sondir dan Kapan Harus Boring?",
+            "key_talking_points": [
+              "Kriteria penggunaan sondir untuk bangunan ringan hingga menengah (1-3 lantai)",
+              "Kriteria penggunaan boring untuk gedung bertingkat, jembatan, atau tower",
+              "Kombinasi keduanya untuk hasil analisis geoteknik yang komprehensif"
+            ],
+            "include_element": "Listicle"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Relevansi Pemilihan Metode dengan Karakteristik Tanah di Yogyakarta",
+            "key_talking_points": [
+              "Variasi tanah di Jogja: dari endapan vulkanik Merapi hingga karst di Gunungkidul",
+              "Mengapa area tertentu di Yogyakarta memerlukan boring lebih dalam",
+              "Hubungan pemilihan metode dengan syarat IMB/PBG di wilayah DIY"
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Kesimpulan: Mana yang Harus Anda Pilih?",
+            "key_talking_points": [
+              "Ringkasan pemilihan berdasarkan budget dan kebutuhan teknis",
+              "Rekomendasi konsultasi dengan ahli geoteknik profesional"
+            ],
+            "include_element": "None"
+          }
+        ],
+        "faq_questions": [
+          "Apakah sondir saja cukup untuk membangun rumah 2 lantai?",
+          "Berapa kedalaman maksimal yang bisa dicapai oleh alat sondir?",
+          "Mengapa biaya boring lebih mahal dibandingkan biaya sondir?",
+          "Apakah hasil boring bisa digunakan untuk menggantikan data sondir dalam pengurusan IMB?"
+        ]
+      },
+      "curation_score": 82,
+      "editorial_critique": [
+        "Draf sudah sangat kuat dalam membedakan prinsip CPT dan SPT, menjelaskan output data, kelebihan-kekurangan, penggunaan sampel, serta manfaat kombinasi metode. Struktur heading juga sudah mengikuti pola pencarian informasional yang relevan dengan keyword utama.",
+        "Masalah terbesar adalah beberapa klaim teknis terlalu absolut atau menyederhanakan istilah. Boring bukan sinonim dari SPT atau core drilling; boring adalah pekerjaan pengeboran yang dapat dikombinasikan dengan SPT, pengambilan sampel, atau coring. Kedalaman CPT tidak tepat jika dipatok 10–30 m sebagai batas umum, dan refusal tidak semestinya ditentukan hanya oleh angka qc tertentu karena kondisi alat, tanah, dan prosedur turut menentukan. ASTM menjelaskan SPT sebagai pengujian penetrasi sekaligus pengambilan sampel menggunakan split-barrel sampler, sedangkan pengambilan sampel relatif tidak terganggu memerlukan metode sampling yang sesuai dan tidak selalu tersedia pada setiap boring. ",
+        "Pernyataan bahwa rumah dua lantai umumnya cukup dengan sondir, gedung di atas empat lantai mutlak wajib boring, atau boring pasti diterima untuk PBG terlalu kategoris. Kebutuhan penyelidikan harus ditentukan berdasarkan karakteristik tanah, jenis dan konfigurasi struktur, risiko geoteknik, kedalaman fondasi, ketentuan proyek, serta persyaratan regulator yang berlaku.",
+        "Bagian mengenai kondisi geologi Yogyakarta telah dipertahankan dalam bentuk yang lebih hati-hati agar tidak menggeneralisasi seluruh kabupaten/kota. Klaim seperti satu metode sebagai satu-satunya cara pemeriksaan atau karakteristik tanah yang berlaku untuk seluruh wilayah sebaiknya tidak digunakan tanpa data geologi dan investigasi tapak spesifik.",
+        "Internal linking telah diarahkan secara natural ke artikel pilar dan tiga artikel cluster sesuai Content Brief. Link tidak dipaksakan pada setiap paragraf dan anchor dibuat tetap relevan dengan konteks.",
+        "Versi final menghapus diagram ASCII yang kurang efektif untuk artikel web, memperbaiki terminologi CPT/SPT, membedakan data in-situ dari sampel laboratorium, memperjelas bahwa pemilihan metode bukan sekadar berdasarkan jumlah lantai, dan menambahkan checklist praktis untuk membantu pembaca berdiskusi dengan konsultan geoteknik."
+      ]
+    },
+    {
+      "item_id": 5,
+      "item": {
+        "id": 5,
+        "keyword": "cara membaca hasil sondir tanah",
+        "suggested_title": "Panduan Praktis: Cara Membaca Laporan Hasil Sondir Tanah (Grafik CPT)",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Arsitek, insinyur sipil junior, pengawas proyek, dan pemilik rumah yang ingin memahami hasil uji tanah mereka.",
+        "silo_role_description": "Membangun kredibilitas teknis (E-E-A-T) yang kuat dan mengarahkan pembaca ke jasa profesional jika mereka membutuhkan interpretasi ahli.",
+        "recommendation_rank": 5,
+        "recommendation_reason": "Topik edukatif mendalam yang sangat disukai Google untuk menilai keahlian (Topical Authority) sebuah website.",
+        "is_recommended_default": false
+      },
+      "brief": {
+        "item_id": 5,
+        "primary_keyword": "cara membaca hasil sondir tanah",
+        "meta_title": "Cara Membaca Hasil Sondir Tanah & Grafik CPT (Panduan Lengkap)",
+        "meta_description": "Bingung membaca laporan sondir? Pelajari cara membaca hasil sondir tanah, grafik CPT, nilai qc, dan fs secara praktis untuk fondasi aman di sini!",
+        "url_slug": "cara-membaca-hasil-sondir-tanah",
+        "target_word_count": "1500 - 2000 kata",
+        "content_archetype": {
+          "type": "deep_technical_explainer",
+          "format_label": "Deep Technical Explainer & Interpretation Guide",
+          "mandatory_visual_elements": [
+            "Tabel Parameter Nilai qc & fs",
+            "Ilustrasi Pembacaan Grafik CPT",
+            "Box Studi Kasus Interpretasi Tanah Yogyakarta",
+            "Pro-Tip Box Keamanan Fondasi"
+          ],
+          "content_angle": "Menjelaskan grafik CPT (Cone Penetration Test) yang rumit menjadi panduan visual langkah-demi-langkah yang mudah dipahami oleh kontraktor, arsitek, maupun pemilik rumah di Yogyakarta tanpa kehilangan akurasi ilmiah geoteknik."
+        },
+        "secondary_keywords": [
+          "membaca grafik sondir",
+          "nilai qc sondir",
+          "laporan cone penetration test",
+          "interpretasi hasil sondir",
+          "hambatan pelekat fs"
+        ],
+        "semantic_entities_lsi": [
+          "Cone Penetrometer Test CPT",
+          "perlawanan konus qc",
+          "hambatan lekat fs",
+          "friction ratio Rf",
+          "kedalaman tanah keras",
+          "daya dukung tanah",
+          "fondasi dangkal",
+          "fondasi dalam bore pile",
+          "SNI 2827:2008"
+        ],
+        "internal_link_strategy": {
+          "target_pillar_link": "Hubungkan ke artikel pilar utama 'jasa sondir tanah jogja' (ID 1) sebagai solusi penyedia jasa pengujian tanah profesional di Yogyakarta.",
+          "target_cluster_links": [
+            "Hubungkan ke 'perbedaan sondir dan boring' (ID 4) saat membahas alternatif pengujian tanah.",
+            "Hubungkan ke 'karakteristik tanah di yogyakarta' (ID 6) saat membahas interpretasi jenis tanah di wilayah Jogja.",
+            "Hubungkan ke 'alat sondir tanah' (ID 7) saat menjelaskan bagaimana data qc dan fs diperoleh dari lapangan."
+          ],
+          "anchor_variations": {
+            "exact_keyword": "jasa sondir tanah jogja",
+            "lsi_synonym": "perbedaan pengujian sondir dan boring",
+            "conversational_natural": "karakteristik lapisan tanah di wilayah Yogyakarta"
+          }
+        },
+        "outline": [
+          {
+            "heading_tag": "H2",
+            "heading_title": "Mengapa Penting Memahami Cara Membaca Hasil Sondir Tanah?",
+            "key_talking_points": [
+              "Pentingnya data sondir untuk menentukan jenis fondasi bangunan yang aman",
+              "Risiko kegagalan struktur (penurunan bangunan) jika salah menginterpretasikan data CPT",
+              "Hubungan hasil sondir dengan pemenuhan syarat administratif pengurusan PBG/IMB"
+            ],
+            "include_element": "Pro-Tip Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Mengenal Parameter Utama dalam Laporan Sondir (CPT)",
+            "key_talking_points": [
+              "Perlawanan Konus (qc / Cone Resistance): Mengukur kekuatan ujung tanah menahan beban",
+              "Hambatan Pelekat (fs / Sleeve Friction): Mengukur gesekan antara tanah dengan selubung konus",
+              "Friction Ratio (Rf): Rasio untuk mengklasifikasikan jenis tanah (lempung, lanau, atau pasir)",
+              "Kedalaman penetrasi total hingga mencapai tanah keras (refusal)"
+            ],
+            "include_element": "Tabel Parameter Nilai qc & fs"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Langkah Demi Langkah Cara Membaca Grafik Sondir Tanah",
+            "key_talking_points": [
+              "Memahami sumbu vertikal (Y) sebagai indikator kedalaman tanah dalam satuan meter",
+              "Memahami sumbu horizontal (X) sebagai indikator nilai perlawanan konus (qc) dalam kg/cm2",
+              "Cara membaca garis grafik qc (biasanya berwarna merah atau solid) dan grafik total hambatan pelekat",
+              "Mengidentifikasi lonjakan grafik yang menandakan transisi dari tanah lunak ke lapisan tanah keras"
+            ],
+            "include_element": "Step Timeline"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Interpretasi Hasil Sondir untuk Penentuan Jenis Fondasi",
+            "key_talking_points": [
+              "Kriteria tanah untuk fondasi dangkal (footplate/strous pile) jika tanah keras ditemukan di kedalaman dangkal",
+              "Kriteria tanah wajib fondasi dalam (bore pile/tiang pancang) jika tanah keras berada di kedalaman > 10 meter",
+              "Studi kasus variasi kedalaman tanah keras di wilayah Yogyakarta (misal: daerah Sleman utara yang berbatu vs Bantul selatan yang berpasir/lempung)"
+            ],
+            "include_element": "Box Studi Kasus Interpretasi Tanah Yogyakarta"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Keterbatasan Hasil Sondir yang Perlu Anda Ketahui",
+            "key_talking_points": [
+              "Sondir tidak bisa menembus lapisan batu atau kerikil padat (menyebabkan refusal semu)",
+              "Mengapa proyek gedung bertingkat tinggi memerlukan kombinasi sondir dengan core drilling (boring)",
+              "Pentingnya kalibrasi alat sondir sesuai standar SNI 2827:2008 agar data grafik akurat"
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Kesimpulan: Serahkan Analisis Akhir pada Ahli Geoteknik",
+            "key_talking_points": [
+              "Membaca grafik secara mandiri membantu pemahaman awal, namun perhitungan struktur wajib divalidasi ahli",
+              "Rekomendasi menggunakan jasa pengujian tanah profesional untuk mendapatkan laporan berstempel resmi"
+            ],
+            "include_element": "Checklist Box"
+          }
+        ],
+        "faq_questions": [
+          "Berapa nilai qc minimum pada grafik sondir untuk dikategorikan sebagai tanah keras?",
+          "Apakah hasil laporan sondir tanah memiliki masa kedaluwarsa?",
+          "Apa perbedaan utama antara grafik qc (perlawanan konus) dan grafik fs (hambatan pelekat)?"
+        ]
+      },
+      "curation_score": 0,
+      "editorial_critique": []
+    }
+  ]
+}

@@ -14,15 +14,19 @@ if sys.stdout.encoding != 'utf-8':
     except Exception:
         pass
 
-from gemini_api import GeminiClient, DEFAULT_FLASH_MODELS, DEFAULT_PRO_MODELS
-from kie_image_api import KieImageClient, DEFAULT_KIE_MODELS, DEFAULT_IMAGE_STYLES, IMAGE_STYLE_DESCS, clean_text_for_rendering
-from kie_chat_api import KieChatClient
-from agnes_api import AgnesClient, DEFAULT_AGNES_TEXT_MODELS, DEFAULT_AGNES_IMAGE_MODELS
-from youtube_generator import YouTubeProfileManager, YouTubeGenerator, YOUTUBE_OUTPUT_DIR
-from youtube_live_api import YouTubeLiveClient
-from ai_pipeline import AIPipelineManager, AVAILABLE_ENGINES, STAGE_NAMES
-from silo_generator import SiloGenerator
-from wp_publisher import WordPressPublisher
+from core.ai import (
+    GeminiClient, DEFAULT_FLASH_MODELS, DEFAULT_PRO_MODELS,
+    KieImageClient, DEFAULT_KIE_MODELS, DEFAULT_IMAGE_STYLES, IMAGE_STYLE_DESCS, clean_text_for_rendering,
+    KieChatClient,
+    AgnesClient, DEFAULT_AGNES_TEXT_MODELS, DEFAULT_AGNES_IMAGE_MODELS,
+    AIPipelineManager, AVAILABLE_ENGINES, STAGE_NAMES
+)
+from core.youtube import (
+    YouTubeProfileManager, YouTubeGenerator, YOUTUBE_OUTPUT_DIR, CHANNELS_BASE_DIR,
+    get_channel_dir, clean_channel_slug, YouTubeLiveClient
+)
+from core.silo import SiloGenerator, WordPressPublisher, slugify
+from core.config_utils import get_config_path, get_project_root, get_config_dir, CONFIG_DIR
 
 # ANSI color styling
 CYAN = "\033[96m"
@@ -93,13 +97,14 @@ def read_raw_key():
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
-def select_menu(options, title=None, default_index=0, help_hint=None):
+def select_menu(options, title=None, default_index=0, help_hint=None, footer=None):
     """
     Komponen pemilih menu interaktif:
     - Navigasi tombol Panah [↑ / ↓]
     - Konfirmasi pilihan dengan tombol [ENTER]
     - Pintasan cepat tekan angka/huruf langsung
     - Tombol '0' atau ESC untuk kembali/batal
+    - Mendukung footer status opsional di bawah menu
     """
     if not options:
         return "0"
@@ -131,6 +136,15 @@ def select_menu(options, title=None, default_index=0, help_hint=None):
                 rendered_lines.append(f"    [{k}]  {lbl}")
 
         rendered_lines.append(f"{DIM}{'-' * 60}{RESET}")
+        
+        if footer:
+            if isinstance(footer, list):
+                for f_line in footer:
+                    rendered_lines.append(f_line)
+            else:
+                rendered_lines.append(footer)
+            rendered_lines.append(f"{DIM}{'-' * 60}{RESET}")
+
         if help_hint:
             rendered_lines.append(help_hint)
         else:
@@ -247,9 +261,9 @@ def parse_user_selection(input_str, total_items, default_ids=None):
     return sorted(list(selected))
 
 # ==========================================
-# MENU 1: GENERATE SILO ARTICLES (NEW & RESUME)
+# SILO CREATION & RESUME FLOWS (PROJECT-CENTRIC)
 # ==========================================
-def menu_generate_silo():
+def menu_generate_silo(target_site=None):
     clear_screen()
     print_banner()
 
@@ -260,36 +274,48 @@ def menu_generate_silo():
         print(f"{GREEN}✔ API Key terhubung! ({total_keys} Key aktif) | Model: {BOLD}{active_model}{RESET}\n")
     except Exception as e:
         print(f"{RED}✖ Error Inisialisasi API: {e}{RESET}")
-        print(f"{YELLOW}Pastikan file 'apikey.txt' berisi API Key Gemini yang valid (Menu [5]).{RESET}")
+        print(f"{YELLOW}Pastikan file 'apikey.txt' berisi API Key Gemini yang valid.{RESET}")
         press_any_key()
         return
 
     silo_engine = SiloGenerator(client)
+    wp = WordPressPublisher()
+    
+    silos_base_dir = wp.get_site_silos_dir(target_site) if target_site else "output"
 
-    # Check existing Silo projects
-    existing_silos = silo_engine.list_existing_silos("output")
+    # Check existing Silo projects in this website's workspace
+    existing_silos = silo_engine.list_existing_silos(silos_base_dir)
     incomplete_silos = [s for s in existing_silos if s["pending_count"] > 0]
+
+    site_label = f" di {target_site.get('name')}" if target_site else ""
 
     if incomplete_silos:
         options = [
-            ("1", "Buat Silo Baru (Keyword Baru)"),
+            ("1", f"Buat Silo Baru{site_label}"),
             ("2", f"Lanjutkan Proyek Silo ({len(incomplete_silos)} Belum Selesai)"),
-            ("0", "Kembali ke Menu Utama")
+            ("0", "Kembali")
         ]
-        choice = select_menu(options, title="PILIH MODUS SILO")
+        choice = select_menu(options, title=f"PILIH MODUS SILO{site_label.upper()}")
         if choice == "0":
             return
         elif choice == "2":
-            resume_existing_silo_flow(silo_engine, incomplete_silos, client)
+            resume_existing_silo_flow(silo_engine, incomplete_silos, client, silos_base_dir=silos_base_dir, target_site=target_site)
             return
 
-    create_new_silo_flow(silo_engine, client)
+    create_new_silo_flow(silo_engine, client, target_site=target_site, silos_base_dir=silos_base_dir)
 
-def create_new_silo_flow(silo_engine, client):
+def create_new_silo_flow(silo_engine, client, target_site=None, silos_base_dir=None):
     active_model = client.get_working_model()
+    wp = WordPressPublisher()
 
-    print_section("LANGKAH 1: Input Keyword & Konteks Website")
-    print(f"{DIM}Ketik '0' untuk membatalkan dan kembali ke Menu Utama.{RESET}\n")
+    if target_site and not silos_base_dir:
+        silos_base_dir = wp.get_site_silos_dir(target_site)
+    elif not silos_base_dir:
+        silos_base_dir = "output"
+
+    site_tag = f" untuk [{target_site.get('name')}]" if target_site else ""
+    print_section(f"LANGKAH 1: Input Keyword & Konteks Website{site_tag}")
+    print(f"{DIM}Ketik '0' untuk membatalkan dan kembali.{RESET}\n")
     seed_kw = input(f"{BOLD}Masukkan Keyword Utama (Seed Keyword):{RESET} ").strip()
     if seed_kw == "0":
         return
@@ -324,49 +350,55 @@ def create_new_silo_flow(silo_engine, client):
     tone = tone_input if tone_input else "Informatif, Mengalir Natural & Profesional, Solutif, Bebas Klise AI"
 
     # LANGKAH 1.5: Profil Bisnis & Grounding Knowledge
-    print_section("LANGKAH 1.5: Pilih Profil Bisnis & Grounding Knowledge")
-    wp = WordPressPublisher()
-    sites = wp.get_sites()
-
-    profile_options = []
-    for i, s in enumerate(sites, 1):
-        prof = s.get("profile", {})
-        brand = prof.get("brand_name", "")
-        type_tag = "[Astro]" if s.get("type") == "astro" else "[WP]"
-        if brand:
-            prof_tag = f"{GREEN}[Profil: {brand}]{RESET}"
-        else:
-            prof_tag = f"{DIM}(Profil Belum Diisi){RESET}"
-        profile_options.append((str(i), f"{type_tag} {s['name']} {prof_tag}"))
-
-    profile_options.append(("K", "📝 Catatan Ringkas Cepat / Quick Context (1 Baris)"))
-    profile_options.append(("0", "🌐 Standar Industri Obyektif (Tanpa Profil / Edukasi Netral)"))
-
-    p_choice = select_menu(profile_options, title="PILIH PROFIL GROUNDING WEBSITE")
     business_profile = {}
-
-    if p_choice == "0":
-        print(f"\n{CYAN}ℹ️ Mode Standar Industri Obyektif aktif (Estimasi pasar & edukatif netral).{RESET}")
-        business_profile = {}
-    elif p_choice.upper() == "K":
-        print_section("INPUT CATATAN RINGKAS (QUICK CONTEXT)")
-        quick_note = input(f"{BOLD}Masukkan catatan/fakta singkat (misal: 'Spesialis sondir area Jawa Tengah, tarif mulai 1,5 jt, WA: 0812345678'):{RESET}\n").strip()
-        if quick_note:
-            business_profile = {"brand_name": "", "custom_notes": quick_note}
-            print(f"{GREEN}✔ Catatan ringkas disimpan untuk grounding Silo ini.{RESET}")
+    if target_site:
+        business_profile = wp.get_business_profile(target_site.get("id"))
+        if business_profile and any(business_profile.values()):
+            b_name = business_profile.get("brand_name", target_site.get("name"))
+            print(f"\n{GREEN}✔ Menggunakan Profil Bisnis Terhubung: '{BOLD}{b_name}{RESET}{GREEN}' (Zero Hallucination Grounding){RESET}")
+        else:
+            print(f"\n{DIM}ℹ️ Profil bisnis untuk web ini belum diisi. Berjalan dalam mode Standar Industri Obyektif.{RESET}")
     else:
-        try:
-            site_idx = int(p_choice) - 1
-            selected_site = sites[site_idx]
-            business_profile = selected_site.get("profile", {})
-            if business_profile and any(business_profile.values()):
-                b_name = business_profile.get("brand_name", selected_site["name"])
-                print(f"\n{GREEN}✔ Profil bisnis '{b_name}' aktif untuk Silo ini! (Zero Hallucination Grounding){RESET}")
+        print_section("LANGKAH 1.5: Pilih Profil Bisnis & Grounding Knowledge")
+        sites = wp.get_sites()
+        profile_options = []
+        for i, s in enumerate(sites, 1):
+            prof = s.get("profile", {})
+            brand = prof.get("brand_name", "")
+            type_tag = "[Astro]" if s.get("type") == "astro" else "[WP]"
+            if brand:
+                prof_tag = f"{GREEN}[Profil: {brand}]{RESET}"
             else:
-                print(f"\n{YELLOW}⚠️ Website '{selected_site['name']}' belum memiliki data profil lengkap.{RESET}")
-                print(f"{CYAN}Silo akan tetap berjalan dengan mode Standar Industri Obyektif.{RESET}")
-        except Exception:
+                prof_tag = f"{DIM}(Profil Belum Diisi){RESET}"
+            profile_options.append((str(i), f"{type_tag} {s['name']} {prof_tag}"))
+
+        profile_options.append(("K", "📝 Catatan Ringkas Cepat / Quick Context (1 Baris)"))
+        profile_options.append(("0", "🌐 Standar Industri Obyektif (Tanpa Profil / Edukasi Netral)"))
+
+        p_choice = select_menu(profile_options, title="PILIH PROFIL GROUNDING WEBSITE")
+
+        if p_choice == "0":
+            print(f"\n{CYAN}ℹ️ Mode Standar Industri Obyektif aktif (Estimasi pasar & edukatif netral).{RESET}")
             business_profile = {}
+        elif p_choice.upper() == "K":
+            print_section("INPUT CATATAN RINGKAS (QUICK CONTEXT)")
+            quick_note = input(f"{BOLD}Masukkan catatan/fakta singkat (misal: 'Spesialis sondir area Jawa Tengah, tarif mulai 1,5 jt, WA: 0812345678'):{RESET}\n").strip()
+            if quick_note:
+                business_profile = {"brand_name": "", "custom_notes": quick_note}
+                print(f"{GREEN}✔ Catatan ringkas disimpan untuk grounding Silo ini.{RESET}")
+        else:
+            try:
+                site_idx = int(p_choice) - 1
+                selected_site = sites[site_idx]
+                business_profile = selected_site.get("profile", {})
+                if business_profile and any(business_profile.values()):
+                    b_name = business_profile.get("brand_name", selected_site["name"])
+                    print(f"\n{GREEN}✔ Profil bisnis '{b_name}' aktif untuk Silo ini! (Zero Hallucination Grounding){RESET}")
+                else:
+                    print(f"\n{YELLOW}⚠️ Website '{selected_site['name']}' belum memiliki data profil lengkap.{RESET}")
+                    print(f"{CYAN}Silo akan tetap berjalan dengan mode Standar Industri Obyektif.{RESET}")
+            except Exception:
+                business_profile = {}
 
     # Riset Silo
     pipeline_mgr = AIPipelineManager()
@@ -385,21 +417,24 @@ def create_new_silo_flow(silo_engine, client):
             business_profile=business_profile,
             client=stage1_client
         )
+        if target_site:
+            silo_plan["target_site_id"] = target_site.get("id")
+            silo_plan["target_site_name"] = target_site.get("name")
         # AUTO-SAVE SILO PLAN IMMEDIATELY! (Meskipun belum membuat artikel, plan tersimpan aman)
-        silo_engine.save_silo_project(silo_plan, new_articles=[])
+        silo_engine.save_silo_project(silo_plan, new_articles=[], output_base_dir=silos_base_dir)
     except Exception as e:
         print(f"{RED}✖ Gagal melakukan riset keyword: {e}{RESET}")
         press_any_key()
         return
 
-    process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids=[], language=language, tone=tone, client=client)
+    process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids=[], language=language, tone=tone, client=client, silos_base_dir=silos_base_dir, target_site=target_site)
 
-def resume_existing_silo_flow(silo_engine, incomplete_silos, client):
+def resume_existing_silo_flow(silo_engine, incomplete_silos, client, silos_base_dir="output", target_site=None):
     options = []
     for i, s in enumerate(incomplete_silos, 1):
         lbl = f"{s['silo_theme']} - {GREEN}{s['completed_count']}/{s['total_topics']} Selesai{RESET} ({YELLOW}{s['pending_count']} Pending{RESET})"
         options.append((str(i), lbl))
-    options.append(("0", "Kembali ke Menu Utama"))
+    options.append(("0", "Kembali"))
 
     c = select_menu(options, title="PILIH PROYEK SILO")
     if c == "0":
@@ -420,12 +455,12 @@ def resume_existing_silo_flow(silo_engine, incomplete_silos, client):
     if action == "0":
         return
     elif action == "2":
-        expand_silo_flow(silo_engine, silo_plan, completed_ids, client)
+        expand_silo_flow(silo_engine, silo_plan, completed_ids, client, silos_base_dir=silos_base_dir, target_site=target_site)
         return
 
-    process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids=completed_ids, language="Bahasa Indonesia", tone="Informatif, Mengalir Natural & Profesional, Solutif, Bebas Klise AI", client=client)
+    process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids=completed_ids, language="Bahasa Indonesia", tone="Informatif, Mengalir Natural & Profesional, Solutif, Bebas Klise AI", client=client, silos_base_dir=silos_base_dir, target_site=target_site)
 
-def expand_silo_flow(silo_engine, silo_plan, completed_ids, client):
+def expand_silo_flow(silo_engine, silo_plan, completed_ids, client, silos_base_dir="output", target_site=None):
     print_section("UBAH / TAMBAH JUMLAH CLUSTER SILO")
     existing_items = silo_plan.get("items", [])
     existing_clusters = [i for i in existing_items if i["role"].lower() != "pillar"]
@@ -458,15 +493,16 @@ def expand_silo_flow(silo_engine, silo_plan, completed_ids, client):
     try:
         updated_plan = silo_engine.expand_silo_clusters(silo_plan, new_target_count=new_count)
         print(f"{GREEN}✔ Sukses memperbarui Silo Plan menjadi {new_count} cluster! (Tersimpan di metadata & blueprint){RESET}\n")
+        silo_engine.save_silo_project(updated_plan, new_articles=[], output_base_dir=silos_base_dir)
     except Exception as e:
         print(f"{RED}✖ Gagal memperbarui cluster: {e}{RESET}")
         press_any_key()
         return
 
     # Lanjut ke pemilihan pembuatan artikel
-    process_silo_items_generation(silo_engine, updated_plan, completed_existing_ids=completed_ids, language="Bahasa Indonesia", tone="Informatif, Mengalir Natural & Profesional, Solutif, Bebas Klise AI", client=client)
+    process_silo_items_generation(silo_engine, updated_plan, completed_existing_ids=completed_ids, language="Bahasa Indonesia", tone="Informatif, Mengalir Natural & Profesional, Solutif, Bebas Klise AI", client=client, silos_base_dir=silos_base_dir, target_site=target_site)
 
-def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids, language, tone, client):
+def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids, language, tone, client, silos_base_dir="output", target_site=None):
     pipeline_mgr = AIPipelineManager()
     stage1_client = pipeline_mgr.get_client_for_stage(1, default_gemini_client=client)
     stage2_client = pipeline_mgr.get_client_for_stage(2, default_gemini_client=client)
@@ -626,9 +662,8 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
         # D. Featured Image Generator (Kie.ai AI Photo + Mesh Gradient Fallback)
         kie_client = KieImageClient()
         slug = brief.get("url_slug", f"article_{item['id']}")
-        from silo_generator import slugify
         silo_folder_name = slugify(silo_plan.get("seed_keyword", silo_plan.get("silo_theme", "silo")))
-        img_save_path = os.path.join("output", silo_folder_name, "images", f"{slug}.webp")
+        img_save_path = os.path.join(silos_base_dir or "output", silo_folder_name, "images", f"{slug}.webp")
         category_label = silo_plan.get("silo_theme", "Silo Pillar" if item.get("role", "").lower() == "pillar" else "Silo Cluster")
 
         print(f"  🖼️  [4/4] Generate Featured Image...", end="", flush=True)
@@ -661,7 +696,7 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
         print(f"{RED}Tidak ada artikel yang berhasil dibuat.{RESET}")
     else:
         try:
-            output_dir, saved_files = silo_engine.save_silo_project(silo_plan, new_completed)
+            output_dir, saved_files = silo_engine.save_silo_project(silo_plan, new_completed, output_base_dir=silos_base_dir or "output")
             print(f"\n{GREEN}{BOLD}🎉 ARTIKEL BERHASIL DITAMBAHKAN KE SILO!{RESET}")
             print(f"📁 Direktori: {CYAN}{output_dir}{RESET}\n")
             print(f"{BOLD}File artikel baru & blueprint yang diperbarui:{RESET}")
@@ -677,19 +712,19 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
 
 # ==========================================
 # MENU 2: PUSH TO WORDPRESS (GLOBAL UNSENT)
-# ==========================================
-def menu_push_wordpress():
+def menu_push_wordpress(target_site=None):
     clear_screen()
     print_banner()
-    print_section("KIRIM ARTIKEL KE WORDPRESS (HANYA ARTIKEL BELUM DIKIRIM)")
+    site_title = f" KE [{target_site.get('name')}]" if target_site else ""
+    print_section(f"KIRIM ARTIKEL{site_title} (HANYA ARTIKEL BELUM DIKIRIM)")
 
     wp = WordPressPublisher()
     sites = wp.get_sites()
 
-    if not sites:
-        print(f"{YELLOW}⚠️  Belum ada website WordPress yang didaftarkan.{RESET}")
-        print(f" [{CYAN}1{RESET}] Tambah Website WordPress Sekarang")
-        print(f" [{CYAN}0{RESET}] Kembali ke Menu Utama")
+    if not sites and not target_site:
+        print(f"{YELLOW}⚠️  Belum ada website yang didaftarkan.{RESET}")
+        print(f" [{CYAN}1{RESET}] Tambah Website Sekarang")
+        print(f" [{CYAN}0{RESET}] Kembali")
         c = get_single_key(f"\nPilih [1/0]: ", valid_keys=['1', '0'])
         if c == "1":
             menu_add_website_flow(wp)
@@ -699,50 +734,60 @@ def menu_push_wordpress():
         else:
             return
 
-    # 1. Pindai artikel yang belum pernah dikirim secara GLOBAL
-    print(f"{CYAN}Memindai folder output untuk artikel yang belum pernah dikirim ke web manapun...{RESET}")
-    pending_articles, sent_articles = wp.scan_articles_global("output")
+    # 1. Pindai artikel yang belum pernah dikirim
+    scan_targets = []
+    if target_site:
+        scan_targets.append(wp.get_site_silos_dir(target_site))
+        scan_targets.append("output")
+    else:
+        scan_targets = None
 
-    print(f"• Total Artikel Sudah Terkirim (Global) : {BOLD}{GREEN}{len(sent_articles)}{RESET}")
-    print(f"• Total Artikel {BOLD}Belum Terkirim (Pending){RESET}   : {BOLD}{YELLOW}{len(pending_articles)}{RESET}\n")
+    print(f"{CYAN}Memindai folder artikel yang belum pernah dikirim...{RESET}")
+    pending_articles, sent_articles = wp.scan_articles_global(scan_targets)
+
+    print(f"• Total Artikel Sudah Terkirim : {BOLD}{GREEN}{len(sent_articles)}{RESET}")
+    print(f"• Total Artikel {BOLD}Belum Terkirim (Pending){RESET} : {BOLD}{YELLOW}{len(pending_articles)}{RESET}\n")
 
     if not pending_articles:
-        print(f"{YELLOW}Semua artikel di folder 'output/' sudah pernah dikirim ke web.{RESET}")
+        print(f"{YELLOW}Semua artikel yang ditemukan sudah pernah dikirim ke website.{RESET}")
         print(f"{DIM}Tidak ada artikel pending yang tersedia untuk dipublish.{RESET}")
         press_any_key()
         return
 
-    # 2. Pilih Target Website
-    target_site = None
-    if len(sites) == 1:
-        target_site = sites[0]
+    # 2. Tentukan Target Website
+    if not target_site:
+        if len(sites) == 1:
+            target_site = sites[0]
+            type_tag = f"{CYAN}[Astro]{RESET}" if target_site.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
+            print(f"Website Target: {type_tag} {CYAN}{BOLD}{target_site['name']}{RESET} ({target_site.get('wp_url', '')})")
+        else:
+            active_id = wp.config.get("active_site_id")
+            site_options = []
+            default_site_idx = 0
+            for i, s in enumerate(sites, 1):
+                is_def = f" {GREEN}[Default]{RESET}" if s["id"] == active_id else ""
+                type_tag = f"{CYAN}[Astro]{RESET}" if s.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
+                if s.get("type") == "astro":
+                    user_info = f" - Folder: {os.path.basename(s.get('content_dir', ''))}"
+                else:
+                    user_info = f" - User: {s.get('username', 'admin')}"
+                lbl = f"{type_tag} {BOLD}{s['name']}{RESET} ({s.get('wp_url', '')}){user_info}{is_def}"
+                site_options.append((str(i), lbl))
+                if s["id"] == active_id:
+                    default_site_idx = i - 1
+            site_options.append(("0", "Kembali"))
+
+            site_choice = select_menu(site_options, title="PILIH WEBSITE TARGET", default_index=default_site_idx)
+            if site_choice == "0":
+                return
+            
+            site_idx = int(site_choice) - 1
+            target_site = sites[site_idx]
+            type_tag = f"{CYAN}[Astro]{RESET}" if target_site.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
+            print(f"\nWebsite Target: {type_tag} {CYAN}{BOLD}{target_site['name']}{RESET} ({target_site.get('wp_url', '')})")
+    else:
         type_tag = f"{CYAN}[Astro]{RESET}" if target_site.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
         print(f"Website Target: {type_tag} {CYAN}{BOLD}{target_site['name']}{RESET} ({target_site.get('wp_url', '')})")
-    else:
-        active_id = wp.config.get("active_site_id")
-        site_options = []
-        default_site_idx = 0
-        for i, s in enumerate(sites, 1):
-            is_def = f" {GREEN}[Default]{RESET}" if s["id"] == active_id else ""
-            type_tag = f"{CYAN}[Astro]{RESET}" if s.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
-            if s.get("type") == "astro":
-                user_info = f" - Folder: {os.path.basename(s.get('content_dir', ''))}"
-            else:
-                user_info = f" - User: {s.get('username', 'admin')}"
-            lbl = f"{type_tag} {BOLD}{s['name']}{RESET} ({s.get('wp_url', '')}){user_info}{is_def}"
-            site_options.append((str(i), lbl))
-            if s["id"] == active_id:
-                default_site_idx = i - 1
-        site_options.append(("0", "Kembali ke Menu Utama"))
-
-        site_choice = select_menu(site_options, title="PILIH WEBSITE TARGET", default_index=default_site_idx)
-        if site_choice == "0":
-            return
-        
-        site_idx = int(site_choice) - 1
-        target_site = sites[site_idx]
-        type_tag = f"{CYAN}[Astro]{RESET}" if target_site.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
-        print(f"\nWebsite Target: {type_tag} {CYAN}{BOLD}{target_site['name']}{RESET} ({target_site.get('wp_url', '')})")
 
     # 3. Test koneksi ke target website
     print(f"\n{CYAN}Menguji koneksi ke {target_site['wp_url']}...{RESET}")
@@ -871,37 +916,50 @@ def menu_export_silo_wxr():
     print_banner()
     print_section("EXPORT SILO KE FORMAT WORDPRESS XML (WXR)")
 
-    output_dir = "output"
-    if not os.path.exists(output_dir):
-        print(f"{YELLOW}Belum ada folder 'output/' atau artikel Silo yang dibuat.{RESET}")
-        press_any_key()
-        return
+    # Cari semua folder Silo di projects_web dan output/
+    scan_dirs = []
+    wp = WordPressPublisher()
+    if os.path.exists(PROJECTS_WEB_DIR):
+        for s in wp.get_sites():
+            s_dir = wp.get_site_silos_dir(s)
+            if os.path.exists(s_dir):
+                scan_dirs.append((s_dir, s['name']))
+    if os.path.exists("output"):
+        scan_dirs.append(("output", "Legacy Output"))
 
-    # Cari semua folder Silo di output/
     silo_folders = []
-    for item in os.listdir(output_dir):
-        item_path = os.path.join(output_dir, item)
-        if os.path.isdir(item_path):
-            md_files = [f for f in os.listdir(item_path) if f.endswith(".md") and f != "SILO_BLUEPRINT.md"]
-            if md_files:
-                meta_file = os.path.join(item_path, "silo_metadata.json")
-                silo_title = item
-                if os.path.exists(meta_file):
-                    try:
-                        with open(meta_file, "r", encoding="utf-8") as f:
-                            m = json.load(f)
-                            silo_title = m.get("silo_theme", item)
-                    except Exception:
-                        pass
-                silo_folders.append({
-                    "path": item_path,
-                    "folder_name": item,
-                    "theme": silo_title,
-                    "article_count": len(md_files)
-                })
+    seen_paths = set()
+
+    for base_dir, site_name in scan_dirs:
+        for item in os.listdir(base_dir):
+            item_path = os.path.join(base_dir, item)
+            norm = os.path.normpath(item_path)
+            if norm in seen_paths:
+                continue
+            seen_paths.add(norm)
+
+            if os.path.isdir(item_path) and item not in ["temp_images", "images"]:
+                md_files = [f for f in os.listdir(item_path) if f.endswith(".md") and f != "SILO_BLUEPRINT.md"]
+                if md_files:
+                    meta_file = os.path.join(item_path, "silo_metadata.json")
+                    silo_title = item
+                    if os.path.exists(meta_file):
+                        try:
+                            with open(meta_file, "r", encoding="utf-8") as f:
+                                m = json.load(f)
+                                silo_title = m.get("silo_theme", item)
+                        except Exception:
+                            pass
+                    silo_folders.append({
+                        "path": item_path,
+                        "folder_name": item,
+                        "site_name": site_name,
+                        "theme": silo_title,
+                        "article_count": len(md_files)
+                    })
 
     if not silo_folders:
-        print(f"{YELLOW}Tidak ditemukan folder Silo yang berisi artikel di '{output_dir}/'.{RESET}")
+        print(f"{YELLOW}Tidak ditemukan folder Silo yang berisi artikel.{RESET}")
         press_any_key()
         return
 
@@ -979,7 +1037,329 @@ def menu_view_inventory():
     if total == 0:
         print(f"{DIM}Belum ada artikel yang dibuat. Gunakan Menu [1] untuk membuat artikel Silo baru.{RESET}")
 
-    press_any_key("Tekan tombol apa saja (atau 0) untuk kembali ke Menu Utama...")
+# ==========================================
+# MENU 1: WEBSITE PROJECTS (PROJECT-CENTRIC WORKSPACES)
+# ==========================================
+def menu_website_projects():
+    while True:
+        clear_screen()
+        print_banner()
+        print_section("🌐 WEBSITE PROJECTS & SILO WORKSPACES")
+
+        wp = WordPressPublisher()
+        sites = wp.get_sites()
+        active_id = wp.config.get("active_site_id")
+
+        if not sites:
+            print(f"{YELLOW}Belum ada website yang terdaftar.{RESET}\n")
+            print(f" [{CYAN}1{RESET}] ➕ Tambah Website Baru (WordPress / Astro)")
+            print(f" [{CYAN}0{RESET}] ↩️  Kembali ke Menu Utama")
+            c = get_single_key(f"\nPilih [1/0]: ", valid_keys=['1', '0'])
+            if c == "1":
+                menu_add_website_flow(wp)
+                continue
+            else:
+                break
+
+        print(f"{BOLD}Daftar Website Terdaftar ({len(sites)} Web):{RESET}")
+        print(f"{BOLD}{'No':<4} {'Tipe':<8} {'Nama Website':<22} {'URL / Path':<30} {'Status'}{RESET}")
+        print("-" * 75)
+        for i, s in enumerate(sites, 1):
+            badge = f"{GREEN}[Aktif]{RESET}" if s["id"] == active_id else ""
+            type_tag = f"{CYAN}[Astro]{RESET}" if s.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
+            s_name = (s["name"][:20] + '..') if len(s["name"]) > 20 else s["name"]
+            s_url = s.get("wp_url", "")
+            if s.get("type") == "astro":
+                s_url = (s.get("content_dir", "")[:28] + '..') if len(s.get("content_dir", "")) > 28 else s.get("content_dir", "")
+            else:
+                s_url = (s_url[:28] + '..') if len(s_url) > 28 else s_url
+            print(f"#{i:<3} {type_tag:<17} {BOLD}{s_name:<22}{RESET} {s_url:<30} {badge}")
+        print("")
+
+        options = []
+        for i, s in enumerate(sites, 1):
+            type_tag = f"[Astro]" if s.get("type") == "astro" else f"[WP]"
+            options.append((str(i), f"Buka Project: {type_tag} {BOLD}{s['name']}{RESET}"))
+        options.append(("A", "➕ Tambah Website Baru (WordPress / Astro)"))
+        options.append(("0", "↩️  Kembali ke Menu Utama"))
+
+        c = select_menu(options, title="PILIH PROJECT WEBSITE")
+        if c == "0":
+            break
+        elif c.upper() == "A":
+            menu_add_website_flow(wp)
+        else:
+            try:
+                idx = int(c) - 1
+                selected_site = sites[idx]
+                menu_website_dashboard(selected_site)
+            except Exception:
+                pass
+
+def menu_website_dashboard(site):
+    while True:
+        clear_screen()
+        print_banner()
+
+        wp = WordPressPublisher()
+        # Refresh site instance
+        site = wp.get_site(site["id"]) or site
+        ws_dir = wp.get_site_workspace(site)
+        silos_dir = wp.get_site_silos_dir(site)
+        site_type = "Static Astro" if site.get("type") == "astro" else "WordPress REST API"
+
+        try:
+            client = GeminiClient(key_file="apikey.txt")
+            silo_engine = SiloGenerator(client)
+            site_silos = silo_engine.list_existing_silos(silos_dir)
+        except Exception:
+            client = None
+            silo_engine = None
+            site_silos = []
+
+        total_silos = len(site_silos)
+        completed_articles = sum(s.get("completed_count", 0) for s in site_silos)
+        pending_articles = sum(s.get("pending_count", 0) for s in site_silos)
+
+        prof = wp.get_business_profile(site["id"])
+        brand_name = prof.get("brand_name", "-")
+
+        print_section(f"🌐 PROJECT WEBSITE: {site['name'].upper()}")
+        print(f"📌 {BOLD}Tipe Website  :{RESET} {CYAN}{site_type}{RESET}")
+        print(f"🌐 {BOLD}URL / Target  :{RESET} {site.get('wp_url', site.get('content_dir', ''))}")
+        print(f"🏢 {BOLD}Profil Bisnis :{RESET} {GREEN if brand_name != '-' else YELLOW}{brand_name}{RESET}")
+        print(f"📁 {BOLD}Workspace     :{RESET} {DIM}{ws_dir}{RESET}")
+        print(f"📊 {BOLD}Koleksi Silo  :{RESET} {BOLD}{total_silos} Silo{RESET} ({GREEN}{completed_articles} Artikel Selesai{RESET}, {YELLOW}{pending_articles} Pending{RESET})\n")
+
+        options = [
+            ("1", "🎯 Riset & Buat Arsitektur Silo Baru (Khusus web ini)"),
+            ("2", f"📁 Kelola & Lanjutkan Silo Web Ini ({total_silos} Silo)"),
+            ("3", "🚀 Publish Artikel ke Web Ini"),
+            ("4", "🔴 Kelola Post Live di Web Ini (WordPress)"),
+            ("5", "🏢 Profil Bisnis & Knowledge Grounding Web Ini"),
+            ("6", "🔑 Pengaturan Kredensial & Uji Koneksi Web Ini"),
+            ("0", "↩️  Kembali ke Daftar Website")
+        ]
+
+        choice = select_menu(options, title=f"DASHBOARD PROJECT: {site['name']}")
+        if choice == "0":
+            break
+        elif choice == "1":
+            if not client:
+                print(f"{RED}Gemini API Client belum terhubung.{RESET}")
+                press_any_key()
+                continue
+            create_new_silo_flow(silo_engine, client, target_site=site, silos_base_dir=silos_dir)
+        elif choice == "2":
+            if not client:
+                print(f"{RED}Gemini API Client belum terhubung.{RESET}")
+                press_any_key()
+                continue
+            menu_manage_site_silos(site, silo_engine, client)
+        elif choice == "3":
+            menu_push_wordpress(target_site=site)
+        elif choice == "4":
+            if site.get("type") == "astro":
+                print(f"{CYAN}Website ini adalah website statis Astro. Kelola konten langsung melalui folder Content Astro.{RESET}")
+                press_any_key()
+            else:
+                menu_manage_live_wp(wp, target_site=site)
+        elif choice == "5":
+            manage_single_site_profile_flow(wp, site)
+        elif choice == "6":
+            menu_single_site_settings(wp, site)
+
+def menu_manage_site_silos(site, silo_engine, client):
+    wp = WordPressPublisher()
+    silos_dir = wp.get_site_silos_dir(site)
+
+    while True:
+        clear_screen()
+        print_banner()
+        print_section(f"KELOLA SILO: {site['name']}")
+
+        silos = silo_engine.list_existing_silos(silos_dir)
+        if not silos:
+            print(f"{YELLOW}Belum ada proyek Silo di website ini.{RESET}\n")
+            print(f" [{CYAN}1{RESET}] Buat Silo Baru Sekarang")
+            print(f" [{CYAN}0{RESET}] Kembali")
+            c = get_single_key(f"\nPilih [1/0]: ", valid_keys=['1', '0'])
+            if c == "1":
+                create_new_silo_flow(silo_engine, client, target_site=site, silos_base_dir=silos_dir)
+                continue
+            else:
+                break
+
+        print(f"{BOLD}Daftar Proyek Silo ({len(silos)} Silo):{RESET}")
+        print(f"{BOLD}{'No':<4} {'Tema Silo / Keyword':<30} {'Selesai':<10} {'Pending':<10} {'Total Item'}{RESET}")
+        print("-" * 65)
+        for i, s in enumerate(silos, 1):
+            seed_disp = (s['seed_keyword'][:28] + '..') if len(s['seed_keyword']) > 28 else s['seed_keyword']
+            done_tag = f"{GREEN}{s['completed_count']}{RESET}"
+            pend_tag = f"{YELLOW}{s['pending_count']}{RESET}" if s['pending_count'] > 0 else f"{DIM}0{RESET}"
+            print(f"#{i:<3} {BOLD}{seed_disp:<30}{RESET} {done_tag:<18} {pend_tag:<18} {s['total_topics']}")
+        print("")
+
+        options = []
+        for i, s in enumerate(silos, 1):
+            status = f"({YELLOW}{s['pending_count']} Pending{RESET})" if s['pending_count'] > 0 else f"({GREEN}Lengkap{RESET})"
+            options.append((str(i), f"{s['silo_theme']} {status}"))
+        options.append(("N", "➕ Buat Silo Baru di Web Ini"))
+        options.append(("0", "↩️  Kembali"))
+
+        c = select_menu(options, title="PILIH SILO UNTUK DIKELOLA")
+        if c == "0":
+            break
+        elif c.upper() == "N":
+            create_new_silo_flow(silo_engine, client, target_site=site, silos_base_dir=silos_dir)
+        else:
+            try:
+                selected_silo = silos[int(c) - 1]
+                silo_plan = selected_silo["silo_plan"]
+                completed_ids = selected_silo["completed_ids"]
+                pending_items = selected_silo["pending_items"]
+
+                act_options = [
+                    ("1", f"Tulis Sisa Cluster ({len(pending_items)} artikel tersisa)"),
+                    ("2", "Ubah / Tambah Jumlah Cluster"),
+                    ("0", "Kembali")
+                ]
+                act = select_menu(act_options, title=f"SILO: {selected_silo['silo_theme']}")
+                if act == "1":
+                    process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids=completed_ids, language="Bahasa Indonesia", tone="Informatif, Mengalir Natural & Profesional, Solutif, Bebas Klise AI", client=client, silos_base_dir=silos_dir, target_site=site)
+                elif act == "2":
+                    expand_silo_flow(silo_engine, silo_plan, completed_ids, client, silos_base_dir=silos_dir, target_site=site)
+            except Exception:
+                pass
+
+def menu_single_site_settings(wp, site):
+    while True:
+        clear_screen()
+        print_banner()
+        print_section(f"PENGATURAN KREDENSIAL: {site['name']}")
+        print(f"🌐 {BOLD}URL / Target:{RESET} {site.get('wp_url', site.get('content_dir', ''))}\n")
+
+        options = [
+            ("1", "🧪 Uji Koneksi Website Ini"),
+            ("2", "✏️ Edit Kredensial / Konfigurasi Web Ini"),
+            ("3", "⭐ Jadikan Website Default"),
+            ("4", "🗑️ Hapus Website Ini"),
+            ("0", "↩️  Kembali")
+        ]
+
+        c = select_menu(options, title=f"KREDENSIAL: {site['name']}")
+        if c == "0":
+            break
+        elif c == "1":
+            print(f"\n{CYAN}Menguji koneksi ke {site.get('wp_url', site.get('content_dir', ''))}...{RESET}")
+            ok, msg = wp.test_connection(site)
+            if ok:
+                print(f"{GREEN}✔ {msg}{RESET}")
+            else:
+                print(f"{RED}✖ {msg}{RESET}")
+            press_any_key()
+        elif c == "2":
+            menu_edit_single_site_data(wp, site)
+            site = wp.get_site(site["id"]) or site
+        elif c == "3":
+            wp.set_active_site(site["id"])
+            print(f"\n{GREEN}✔ Website '{site['name']}' sekarang menjadi website default.{RESET}")
+            press_any_key()
+        elif c == "4":
+            confirm = get_single_key(f"\n{RED}Yakin ingin MENGHAPUS website '{site['name']}' dari daftar? [Y/N atau 0]: {RESET}", valid_keys=['y', 'n', '0'])
+            if confirm.lower() == 'y':
+                wp.delete_site(site["id"])
+                print(f"\n{GREEN}✔ Website '{site['name']}' berhasil dihapus.{RESET}")
+                press_any_key()
+                break
+
+def menu_edit_single_site_data(wp, site):
+    print_section(f"EDIT DATA WEBSITE: {site['name']}")
+    print(f"{DIM}Tekan Enter jika tidak ingin mengubah nilai yang ada. Ketik '0' untuk batal.{RESET}\n")
+
+    new_name = input(f"{BOLD}Nama Website [{site['name']}]:{RESET} ").strip()
+    if new_name == "0":
+        return
+    if new_name:
+        site["name"] = new_name
+
+    if site.get("type") == "astro":
+        cur_dir = site.get("content_dir", "")
+        new_dir = input(f"{BOLD}Folder Content Blog [{cur_dir}]:{RESET} ").strip()
+        if new_dir == "0":
+            return
+        if new_dir:
+            site["content_dir"] = os.path.abspath(new_dir.strip('"').strip("'"))
+
+        cur_img = site.get("image_dir", "")
+        new_img = input(f"{BOLD}Folder Public Images [{cur_img}]:{RESET} ").strip()
+        if new_img == "0":
+            return
+        if new_img:
+            site["image_dir"] = os.path.abspath(new_img.strip('"').strip("'"))
+    else:
+        cur_url = site.get("wp_url", "")
+        new_url = input(f"{BOLD}URL WordPress [{cur_url}]:{RESET} ").strip()
+        if new_url == "0":
+            return
+        if new_url:
+            if not new_url.startswith("http://") and not new_url.startswith("https://"):
+                new_url = "https://" + new_url
+            site["wp_url"] = new_url.rstrip("/")
+
+        cur_user = site.get("username", "")
+        new_user = input(f"{BOLD}Username Admin [{cur_user}]:{RESET} ").strip()
+        if new_user == "0":
+            return
+        if new_user:
+            site["username"] = new_user
+
+        cur_pass = site.get("app_password", "")
+        masked = cur_pass[:4] + "****" if cur_pass else ""
+        new_pass = input(f"{BOLD}Application Password [{masked}]:{RESET} ").strip()
+        if new_pass == "0":
+            return
+        if new_pass:
+            site["app_password"] = new_pass
+
+    wp.update_site(site["id"], site)
+    print(f"\n{GREEN}✔ Data website berhasil diperbarui!{RESET}")
+    press_any_key()
+
+# ==========================================
+# MENU 3: GLOBAL ARTICLES HUB
+# ==========================================
+def menu_global_articles_hub():
+    while True:
+        clear_screen()
+        print_banner()
+        print_section("📄 GLOBAL ARTICLES & EXPORT HUB")
+
+        wp = WordPressPublisher()
+        pending, sent = wp.scan_articles_global()
+        total = len(pending) + len(sent)
+
+        print(f"📊 {BOLD}Statistik Konten Lintas Website:{RESET}")
+        print(f" • Total Artikel Tersimpan : {BOLD}{total} Artikel{RESET}")
+        print(f" • Pending (Belum Terbit)  : {YELLOW}{BOLD}{len(pending)} Artikel{RESET}")
+        print(f" • Published (Sudah Terbit): {GREEN}{BOLD}{len(sent)} Artikel{RESET}\n")
+
+        options = [
+            ("1", f"🔍 Inventori & Pencarian Seluruh Artikel ({total} Artikel)"),
+            ("2", "📦 Export Universal WordPress WXR (.XML)"),
+            ("3", "🚀 Kirim Artikel Pending Lintas Website"),
+            ("0", "↩️  Kembali ke Menu Utama")
+        ]
+
+        c = select_menu(options, title="GLOBAL ARTICLES HUB")
+        if c == "0":
+            break
+        elif c == "1":
+            menu_view_inventory()
+        elif c == "2":
+            menu_export_silo_wxr()
+        elif c == "3":
+            menu_push_wordpress()
 
 # ==========================================
 # MENU: CONFIGURE MULTI-SITE & LIVE WP MANAGER
@@ -1455,13 +1835,14 @@ def select_wp_site_if_multiple(wp, action_title="PILIH WEBSITE TARGET"):
         return None
     return sites[int(c) - 1]
 
-def menu_manage_live_wp(wp=None):
+def menu_manage_live_wp(wp=None, target_site=None):
     if wp is None:
         wp = WordPressPublisher()
 
-    target_site = select_wp_site_if_multiple(wp, "PILIH WEBSITE WORDPRESS")
-    if not target_site:
-        return
+    if target_site is None:
+        target_site = select_wp_site_if_multiple(wp, "PILIH WEBSITE WORDPRESS")
+        if not target_site:
+            return
 
     status_filter = "any"
     search_keyword = ""
@@ -1697,7 +2078,6 @@ def menu_single_post_detail(wp, target_site, post_summary):
                 
                 kw_use = rm_kw if (rm_kw and rm_kw != "-") else title
                 cat_use = cat_names[0] if cat_names else "WordPress Article"
-                from silo_generator import slugify
                 clean_slug = slug if (slug and slug != "-") else slugify(title)
                 
                 temp_dir = os.path.join("output", "temp_images")
@@ -2816,6 +3196,25 @@ def menu_change_model_flow(client):
 # ==========================================
 # MENU: YOUTUBE CREATOR & METADATA SUITE
 # ==========================================
+def select_target_channel(yt_profile_mgr, title="PILIH CHANNEL TUJUAN"):
+    profiles = yt_profile_mgr.get_profiles()
+    if len(profiles) <= 1:
+        return yt_profile_mgr.get_active_profile()
+    
+    active_p = yt_profile_mgr.get_active_profile()
+    opts = []
+    for idx, p in enumerate(profiles, 1):
+        badge = f" {CYAN}[Fokus]{RESET}" if p.get("id") == active_p.get("id") else ""
+        opts.append((str(idx), f"{p.get('name')} ({p.get('niche')}){badge}"))
+    opts.append(("0", "Batal"))
+
+    c = select_menu(opts, title=title)
+    if c == "0":
+        return None
+    elif c.isdigit() and 1 <= int(c) <= len(profiles):
+        return profiles[int(c) - 1]
+    return active_p
+
 def menu_youtube():
     yt_profile_mgr = YouTubeProfileManager()
     pipeline_mgr = AIPipelineManager()
@@ -2824,28 +3223,31 @@ def menu_youtube():
     while True:
         clear_screen()
         print_banner()
-        print_section("YOUTUBE CREATOR & METADATA SUITE")
+        print_section("YOUTUBE CREATOR & MULTI-CHANNEL SUITE")
 
+        profiles = yt_profile_mgr.get_profiles()
         active_profile = yt_profile_mgr.get_active_profile()
-        ch_id = active_profile.get("id", "default")
-        has_token = yt_live.has_saved_token(ch_id)
-        oauth_status = f"{GREEN}[OAuth Terhubung]{RESET}" if has_token else f"{YELLOW}[OAuth Belum Login]{RESET}"
-
         ai_client = pipeline_mgr.get_client_for_stage(1)
         engine_name = pipeline_mgr.get_stage_display_name(1)
 
-        print(f"🎬 {BOLD}Channel Aktif:{RESET} {GREEN}{BOLD}{active_profile.get('name')}{RESET} (Niche: {active_profile.get('niche')}) {oauth_status}")
-        print(f"🎯 {BOLD}Tagline      :{RESET} {DIM}{active_profile.get('branding_tagline')}{RESET}")
-        print(f"🤖 {BOLD}AI Engine    :{RESET} {CYAN}{engine_name}{RESET}\n")
+        print(f"🎬 {BOLD}Daftar Channel Terdaftar ({len(profiles)} Channel Aktif & Siap Digunakan):{RESET}")
+        for idx, p in enumerate(profiles, 1):
+            p_id = p.get("id", "default")
+            has_tok = yt_live.has_saved_token(p_id)
+            tok_badge = f"{GREEN}🟢 OAuth Live{RESET}" if has_tok else f"{YELLOW}🟡 Belum Login{RESET}"
+            fokus_tag = f" {CYAN}{BOLD}[Fokus]{RESET}" if p.get("id") == active_profile.get("id") else ""
+            print(f"  #{idx} {BOLD}{p.get('name')}{RESET}{fokus_tag} ➔ {DIM}{p.get('niche')}{RESET} | {tok_badge}")
+
+        print(f"\n🤖 {BOLD}AI Engine    :{RESET} {CYAN}{engine_name}{RESET}\n")
 
         options = [
-            ("1", "🎬 Generate Metadata Video Baru (Judul, Deskripsi, Tags, Thumbnail Concept)"),
-            ("2", "🔄 Optimasi / Regenerasi Video Manual (Berdasarkan Judul/Topik Lama)"),
-            ("3", "🔴 Kelola & Update Live Video Channel (Tarik Video Live, AI Refresh & Push Langsung)"),
-            ("4", "📢 Optimasi Profil Channel (Halaman About Bio & Channel Keywords Studio)"),
-            ("5", "🔐 Pengaturan OAuth & Koneksi Akun Google YouTube"),
-            ("6", "⚙️ Kelola Profil Identitas Channel (Ganti / Tambah / Edit Channel)"),
-            ("7", "📂 Lihat Riwayat File Metadata Video YouTube Tersimpan"),
+            ("1", "🎬 Generate Metadata Video Baru (Pilih Channel ➔ Judul, Deskripsi, Tags, Thumb)"),
+            ("2", "🚀 Upload Video Lokal ke YouTube (Pilih Channel ➔ Resumable Upload + Thumbnail)"),
+            ("3", "🔴 Kelola Live Video Channel (Pilih Channel ➔ Update/Regenerate Metadata & Hapus)"),
+            ("4", "📢 Optimasi & Update Deskripsi Channel (Halaman About & Channel Keywords)"),
+            ("5", "👥 Manajemen Multi-Channel (Tambah Channel Baru, Edit, Ganti Fokus)"),
+            ("6", "🔐 Pengaturan OAuth & Koneksi Akun Google Channel"),
+            ("7", "📂 Buka Folder Fisik Channel (Workspace: videos/, thumbnails/, metadata/)"),
             ("0", "Kembali ke Menu Utama")
         ]
 
@@ -2853,19 +3255,31 @@ def menu_youtube():
         if choice == "0":
             break
         elif choice == "1":
-            menu_yt_generate_new_video(ai_client, active_profile)
+            target_p = select_target_channel(yt_profile_mgr, title="PILIH CHANNEL UNTUK GENERATE METADATA")
+            if target_p:
+                menu_yt_generate_new_video(ai_client, target_p)
         elif choice == "2":
-            menu_yt_optimize_existing_video(ai_client, active_profile)
+            target_p = select_target_channel(yt_profile_mgr, title="PILIH CHANNEL TUJUAN UPLOAD VIDEO")
+            if target_p:
+                menu_yt_upload_video(ai_client, yt_live, target_p, yt_profile_mgr)
         elif choice == "3":
-            menu_yt_manage_live_videos(ai_client, yt_live, active_profile)
+            target_p = select_target_channel(yt_profile_mgr, title="PILIH CHANNEL UNTUK KELOLA VIDEO LIVE")
+            if target_p:
+                menu_yt_manage_live_videos(ai_client, yt_live, target_p)
         elif choice == "4":
-            menu_yt_optimize_channel(ai_client, yt_profile_mgr, active_profile)
+            target_p = select_target_channel(yt_profile_mgr, title="PILIH CHANNEL UNTUK OPTIMASI ABOUT")
+            if target_p:
+                menu_yt_optimize_channel(ai_client, yt_profile_mgr, target_p, yt_live)
         elif choice == "5":
-            menu_yt_oauth_settings(yt_live, active_profile, yt_profile_mgr)
+            menu_yt_manage_profiles(yt_profile_mgr, yt_live)
         elif choice == "6":
-            menu_yt_manage_profiles(yt_profile_mgr)
+            target_p = select_target_channel(yt_profile_mgr, title="PILIH CHANNEL UNTUK PENGATURAN OAUTH")
+            if target_p:
+                menu_yt_oauth_settings(yt_live, target_p, yt_profile_mgr)
         elif choice == "7":
-            menu_yt_view_history()
+            target_p = select_target_channel(yt_profile_mgr, title="PILIH FOLDER WORKSPACE CHANNEL")
+            if target_p:
+                menu_yt_view_history(target_p)
 
 def menu_yt_generate_new_video(ai_client, active_profile):
     print_section(f"GENERATE METADATA VIDEO BARU - [{active_profile.get('name')}]")
@@ -2950,6 +3364,287 @@ def menu_yt_generate_new_video(ai_client, active_profile):
 
     press_any_key()
 
+def menu_yt_upload_video(ai_client, yt_live, active_profile, yt_profile_mgr):
+    ch_id = active_profile.get("id", "default")
+    if not yt_live.has_saved_token(ch_id):
+        print_section("KONEKSI YOUTUBE OAUTH DIBUTUHKAN")
+        print(f"{YELLOW}Channel '{active_profile.get('name')}' belum terhubung via OAuth Google.{RESET}")
+        print(f"{DIM}Upload video memerlukan izin YouTube API yang sudah login.{RESET}\n")
+        conn = get_single_key(f"{BOLD}Hubungkan akun Google channel ini sekarang? [Y/N]:{RESET} ", valid_keys=['y', 'n', '0'])
+        if conn.lower() == 'y':
+            try:
+                ok, msg = yt_live.authenticate_auto(channel_id=ch_id)
+                if not ok:
+                    print(f"\n{RED}✖ Gagal koneksi: {msg}{RESET}")
+                    press_any_key()
+                    return
+                print(f"\n{GREEN}✔ {msg}{RESET}")
+            except Exception as e:
+                print(f"\n{RED}✖ Gagal koneksi: {e}{RESET}")
+                press_any_key()
+                return
+        else:
+            return
+
+    ch_dir = get_channel_dir(active_profile)
+    videos_dir = os.path.join(ch_dir, "videos")
+    thumbs_dir = os.path.join(ch_dir, "thumbnails")
+
+    print_section(f"UPLOAD VIDEO LOKAL KE YOUTUBE - [{active_profile.get('name')}]")
+    print(f"📁 {BOLD}Folder Video Channel:{RESET} {CYAN}{os.path.abspath(videos_dir)}{RESET}\n")
+
+    # Scan video files inside channel videos/ folder
+    local_videos = []
+    if os.path.exists(videos_dir):
+        for f in os.listdir(videos_dir):
+            if f.lower().endswith(('.mp4', '.mov', '.mkv', '.avi', '.webm')):
+                f_path = os.path.join(videos_dir, f)
+                try:
+                    f_size = os.path.getsize(f_path) / (1024 * 1024)
+                    local_videos.append((f, f_path, f_size))
+                except Exception:
+                    pass
+
+    vid_path = None
+    if local_videos:
+        print(f"{BOLD}Ditemukan {len(local_videos)} file video di folder 'videos/':{RESET}")
+        vid_menu = []
+        for idx, (fn, fp, sz) in enumerate(local_videos, 1):
+            fn_disp = (fn[:40] + '..') if len(fn) > 40 else fn
+            vid_menu.append((str(idx), f"{fn_disp:<42} ({sz:.2f} MB)"))
+        vid_menu.append(("M", "Drag & Drop / Ketik Path File Video Lain secara Manual"))
+        vid_menu.append(("O", "📂 Buka Folder 'videos/' di File Explorer"))
+        vid_menu.append(("0", "Batal"))
+
+        v_sel = select_menu(vid_menu, title="PILIH FILE VIDEO UNTUK DI-UPLOAD")
+        if v_sel == "0":
+            return
+        elif v_sel.upper() == "O":
+            try:
+                os.startfile(os.path.abspath(videos_dir))
+                print(f"\n{GREEN}✔ Membuka folder 'videos/'. Silakan copy file video Anda ke folder tersebut lalu pilih upload lagi.{RESET}")
+            except Exception:
+                pass
+            press_any_key()
+            return
+        elif v_sel.upper() == "M":
+            v_input = input(f"\n{BOLD}Drag & Drop / Masukkan Path File Video Lokal:{RESET} ").strip().strip('"').strip("'")
+            if v_input and v_input != "0":
+                vid_path = v_input
+            else:
+                return
+        elif v_sel.isdigit() and 1 <= int(v_sel) <= len(local_videos):
+            vid_path = local_videos[int(v_sel) - 1][1]
+    else:
+        print(f"{DIM}Tip: Anda bisa meletakkan file video (.mp4/.mov/.mkv) di folder '{videos_dir}'.{RESET}\n")
+        v_input = input(f"{BOLD}Drag & Drop / Masukkan Path File Video Lokal (atau 0 untuk batal):{RESET} ").strip().strip('"').strip("'")
+        if v_input and v_input != "0":
+            vid_path = v_input
+        else:
+            return
+
+    if not vid_path or not os.path.exists(vid_path):
+        print(f"\n{RED}✖ File video tidak ditemukan di: {vid_path}{RESET}")
+        press_any_key()
+        return
+
+    file_size_mb = os.path.getsize(vid_path) / (1024 * 1024)
+    print(f"\n📁 {CYAN}File Terpilih:{RESET} {os.path.basename(vid_path)} ({file_size_mb:.2f} MB)\n")
+
+    # Pilihan sumber metadata
+    meta_opts = [
+        ("1", "🤖 Buat Metadata Otomatis dengan AI (Judul, Deskripsi, Tags dari Topik Video) ⭐"),
+        ("2", "✍️ Input Manual (Ketik Sendiri Judul, Deskripsi & Tags)"),
+        ("3", "📄 Muat dari File Metadata TXT yang Sudah Ada"),
+        ("0", "Batal")
+    ]
+    meta_choice = select_menu(meta_opts, title="PILIH SUMBER METADATA VIDEO")
+    if meta_choice == "0":
+        return
+
+    final_title = ""
+    final_desc = ""
+    final_tags = ""
+
+    if meta_choice == "1":
+        print_section("AI METADATA GENERATOR UNTUK UPLOAD")
+        topic = input(f"{BOLD}Topik / Isi Pokok Video Ini:{RESET} ").strip()
+        if topic == "0" or not topic:
+            topic = os.path.splitext(os.path.basename(vid_path))[0]
+        
+        key_points = input(f"{BOLD}Poin Kunci [Opsional, tekan Enter untuk lewati]:{RESET} ").strip()
+        focus_kw = input(f"{BOLD}Focus Keyword [Opsional, tekan Enter untuk lewati]:{RESET} ").strip()
+
+        print(f"\n{CYAN}Sedang merancang metadata terbaik untuk upload video...{RESET}")
+        try:
+            yt_gen = YouTubeGenerator(ai_client=ai_client)
+            generated_pack = yt_gen.generate_new_video_metadata(
+                video_topic=topic,
+                key_points=key_points,
+                focus_keyword=focus_kw,
+                channel_profile=active_profile
+            )
+            titles = generated_pack.get("titles", [])
+            print(f"\n📌 {BOLD}Pilih Judul untuk Video Ini:{RESET}")
+            for idx, t in enumerate(titles, 1):
+                print(f"  {BOLD}[{idx}] [{t.get('type')}]{RESET} ➔ {GREEN}{t.get('title')}{RESET}")
+            
+            t_sel = input(f"\n{BOLD}Pilih nomor judul (1-{len(titles)}) [Default: 1]:{RESET} ").strip()
+            sel_idx = int(t_sel) - 1 if t_sel.isdigit() and 1 <= int(t_sel) <= len(titles) else 0
+            final_title = titles[sel_idx].get("title") if titles else topic
+
+            desc_obj = generated_pack.get("description", {})
+            final_desc = desc_obj.get("full_formatted_description", "")
+            final_tags = generated_pack.get("tags_comma_separated", "")
+
+            # Simpan pack ke folder fisik channel
+            yt_gen.save_video_pack(generated_pack, active_profile.get("name"), topic)
+        except Exception as e:
+            print(f"{RED}✖ Gagal generate metadata AI: {e}{RESET}")
+            final_title = os.path.splitext(os.path.basename(vid_path))[0]
+            final_desc = active_profile.get("default_links_cta", "")
+
+    elif meta_choice == "2":
+        print_section("INPUT METADATA MANUAL")
+        default_title = os.path.splitext(os.path.basename(vid_path))[0]
+        t_in = input(f"{BOLD}Judul Video [{default_title}]:{RESET} ").strip()
+        final_title = t_in if t_in else default_title
+        
+        print(f"{DIM}Ketik deskripsi video (atau tekan Enter untuk menggunakan CTA default channel):{RESET}")
+        d_in = input(f"{BOLD}Deskripsi:{RESET} ").strip()
+        final_desc = d_in if d_in else active_profile.get("default_links_cta", "")
+
+        tags_in = input(f"{BOLD}Tags Video (pisahkan dengan koma):{RESET} ").strip()
+        final_tags = tags_in if tags_in else active_profile.get("channel_keywords", "")
+
+    elif meta_choice == "3":
+        print_section("MUAT METADATA DARI FILE TXT")
+        txt_path = input(f"{BOLD}Path file metadata .txt:{RESET} ").strip().strip('"').strip("'")
+        if os.path.exists(txt_path):
+            try:
+                with open(txt_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                m_title = re.search(r"⭐ REKOMENDASI UTAMA:\s*(.+)", content)
+                if not m_title:
+                    m_title = re.search(r"#1\s*\[.*?\]\s*:\s*(.+)", content)
+                final_title = m_title.group(1).strip() if m_title else os.path.splitext(os.path.basename(vid_path))[0]
+
+                m_tags = re.search(r"TAGS VIDEO.*?\n(.+)", content)
+                if m_tags:
+                    final_tags = m_tags.group(1).strip()
+
+                m_desc = re.search(r"\[Teks Lengkap Deskripsi\]:\n(.*?)(?=\n-{10,}|\Z)", content, re.DOTALL)
+                if m_desc:
+                    final_desc = m_desc.group(1).strip()
+                else:
+                    final_desc = content[:2000]
+                print(f"{GREEN}✔ Berhasil memuat metadata dari file!{RESET}")
+            except Exception as e:
+                print(f"{RED}✖ Gagal membaca file: {e}{RESET}")
+                return
+        else:
+            print(f"{RED}✖ File tidak ditemukan.{RESET}")
+            press_any_key()
+            return
+
+    # Pilih Privacy Status
+    privacy_opts = [
+        ("1", "🌍 Public (Langsung Terbit untuk Semua Penonton)"),
+        ("2", "🔗 Unlisted (Tidak Publik - Hanya yang Memiliki Tautan)"),
+        ("3", "🔒 Private (Pribadi - Hanya Anda yang Bisa Melihat)"),
+        ("0", "Batal")
+    ]
+    p_sel = select_menu(privacy_opts, title="PILIH STATUS PRIVASI VIDEO")
+    if p_sel == "0": return
+    privacy_map = {"1": "public", "2": "unlisted", "3": "private"}
+    privacy_status = privacy_map.get(p_sel, "public")
+
+    # Custom Thumbnail
+    print_section("CUSTOM THUMBNAIL (OPSIONAL)")
+    local_thumbs = []
+    if os.path.exists(thumbs_dir):
+        for f in os.listdir(thumbs_dir):
+            if f.lower().endswith(('.webp', '.jpg', '.jpeg', '.png')):
+                local_thumbs.append((f, os.path.join(thumbs_dir, f)))
+
+    thumb_path = None
+    if local_thumbs:
+        print(f"{BOLD}Ditemukan {len(local_thumbs)} gambar di folder 'thumbnails/':{RESET}")
+        t_menu = [(str(idx), fn) for idx, (fn, fp) in enumerate(local_thumbs, 1)]
+        t_menu.append(("M", "Pilih File Gambar Lain (Drag & Drop Manual)"))
+        t_menu.append(("N", "Tanpa Custom Thumbnail (Gunakan Frame Default YouTube)"))
+        t_sel = select_menu(t_menu, title="PILIH THUMBNAIL")
+        if t_sel.upper() == "M":
+            t_in = input(f"{BOLD}Path File Custom Thumbnail:{RESET} ").strip().strip('"').strip("'")
+            if t_in and os.path.exists(t_in):
+                thumb_path = t_in
+        elif t_sel.isdigit() and 1 <= int(t_sel) <= len(local_thumbs):
+            thumb_path = local_thumbs[int(t_sel) - 1][1]
+    else:
+        t_in = input(f"{BOLD}Path File Custom Thumbnail (WebP / JPG / PNG) [Enter jika tidak ada]:{RESET} ").strip().strip('"').strip("'")
+        if t_in and os.path.exists(t_in):
+            thumb_path = t_in
+
+    # Ringkasan sebelum Upload
+    clear_screen()
+    print_banner()
+    print_section("KONFIRMASI UPLOAD VIDEO KE YOUTUBE")
+    print(f"🎬 {BOLD}Channel Tujuan :{RESET} {GREEN}{active_profile.get('name')}{RESET} (ID: {ch_id})")
+    print(f"📁 {BOLD}File Video     :{RESET} {os.path.basename(vid_path)} ({file_size_mb:.2f} MB)")
+    print(f"📌 {BOLD}Judul          :{RESET} {CYAN}{BOLD}{final_title}{RESET}")
+    print(f"🔒 {BOLD}Status Privasi :{RESET} {GREEN}{privacy_status.upper()}{RESET}")
+    if thumb_path:
+        print(f"🖼️  {BOLD}Thumbnail      :{RESET} {thumb_path}")
+    print(f"🏷️  {BOLD}Tags           :{RESET} {DIM}{final_tags[:70]}...{RESET}")
+    print("-" * 65)
+
+    confirm = get_single_key(f"\n{BOLD}Mulai proses upload sekarang? [Y/N]:{RESET} ", valid_keys=['y', 'n', '0'])
+    if confirm.lower() != 'y':
+        print(f"\n{YELLOW}Upload dibatalkan.{RESET}")
+        press_any_key()
+        return
+
+    print(f"\n{CYAN}Memulai live resumable upload ke YouTube... Mohon jangan tutup jendela ini.{RESET}\n")
+
+    def upload_progress(pct):
+        bar_len = 30
+        filled = int(bar_len * pct / 100)
+        bar = "█" * filled + "░" * (bar_len - filled)
+        sys.stdout.write(f"\r  {CYAN}Upload Progress: [{bar}] {pct}%{RESET}")
+        sys.stdout.flush()
+
+    ok_up, res_up = yt_live.upload_video(
+        file_path=vid_path,
+        title=final_title,
+        description=final_desc,
+        tags=final_tags,
+        privacy_status=privacy_status,
+        thumbnail_path=thumb_path,
+        channel_id=ch_id,
+        progress_callback=upload_progress
+    )
+
+    print("\n")
+    if ok_up:
+        v_url = res_up.get("video_url", "")
+        v_id = res_up.get("video_id", "")
+        thumb_note = res_up.get("thumb_msg", "")
+        print(f"{GREEN}{BOLD}🎉 BERHASIL! Video telah sukses di-upload ke YouTube!{RESET}")
+        print(f" • Video ID  : {BOLD}{v_id}{RESET}")
+        print(f" • Tautan    : {CYAN}{BOLD}{v_url}{RESET}{thumb_note}")
+        print(f" • Status    : {GREEN}{privacy_status.upper()}{RESET}\n")
+
+        open_b = get_single_key(f"{BOLD}Buka video di browser sekarang? [Y/N]:{RESET} ", valid_keys=['y', 'n', '0', '\r', '\n'])
+        if open_b.lower() == 'y':
+            try:
+                webbrowser.open(v_url)
+            except Exception:
+                pass
+    else:
+        print(f"{RED}✖ Gagal mengunggah video: {res_up}{RESET}")
+
+    press_any_key()
+
 def menu_yt_optimize_existing_video(ai_client, active_profile):
     print_section(f"OPTIMASI / REGENERASI VIDEO PUBLISH - [{active_profile.get('name')}]")
     print(f"{DIM}Ketik '0' untuk membatalkan.{RESET}\n")
@@ -3028,7 +3723,7 @@ def menu_yt_optimize_existing_video(ai_client, active_profile):
 
     press_any_key()
 
-def menu_yt_optimize_channel(ai_client, yt_profile_mgr, active_profile):
+def menu_yt_optimize_channel(ai_client, yt_profile_mgr, active_profile, yt_live=None):
     print_section("OPTIMASI PROFIL CHANNEL (ABOUT & KEYWORDS)")
     print(f"{DIM}Membuat copywriting halaman About dan Channel Keywords untuk YouTube Studio.{RESET}\n")
 
@@ -3082,7 +3777,7 @@ def menu_yt_optimize_channel(ai_client, yt_profile_mgr, active_profile):
     for pl in res.get("suggested_playlists", []):
         print(f"  • {BOLD}{pl.get('playlist_name')}{RESET}: {DIM}{pl.get('description')}{RESET}")
 
-    apply_choice = get_single_key(f"\n{BOLD}Simpan Channel Keywords & Tagline ini ke Profil Channel aktif? [Y/N]:{RESET} ", valid_keys=['y', 'n', '0'])
+    apply_choice = get_single_key(f"\n{BOLD}Simpan Channel Keywords & Tagline ini ke Profil Channel lokal? [Y/N]:{RESET} ", valid_keys=['y', 'n', '0'])
     if apply_choice.lower() == 'y':
         update_data = {
             "channel_keywords": res.get("channel_keywords_comma_separated", ""),
@@ -3091,7 +3786,18 @@ def menu_yt_optimize_channel(ai_client, yt_profile_mgr, active_profile):
         if taglines:
             update_data["branding_tagline"] = taglines[0]
         yt_profile_mgr.update_profile(active_profile.get("id"), update_data)
-        print(f"\n{GREEN}✔ Profil Channel berhasil diperbarui dengan keywords baru!{RESET}")
+        print(f"\n{GREEN}✔ Profil Channel lokal berhasil diperbarui dengan keywords baru!{RESET}")
+
+    ch_id = active_profile.get("id", "default")
+    if yt_live and yt_live.has_saved_token(ch_id):
+        push_choice = get_single_key(f"\n{BOLD}🚀 Update & Push Deskripsi (About) ini LANGSUNG ke YouTube Channel secara LIVE? [Y/N]:{RESET} ", valid_keys=['y', 'n', '0'])
+        if push_choice.lower() == 'y':
+            print(f"\n{CYAN}Mengirim update deskripsi channel ke YouTube Data API...{RESET}")
+            ok_p, res_p = yt_live.update_channel_description(res.get("about_bio_long", ""), channel_id=ch_id)
+            if ok_p:
+                print(f"{GREEN}{BOLD}🎉 SUKSES! Halaman About channel YouTube telah diperbarui secara LIVE!{RESET}")
+            else:
+                print(f"{RED}✖ Gagal update live deskripsi channel: {res_p}{RESET}")
 
     press_any_key()
 
@@ -3201,7 +3907,7 @@ def menu_yt_manage_live_videos(ai_client, yt_live, active_profile):
         conn = get_single_key("Hubungkan sekarang? [Y/N]: ", valid_keys=['y', 'n', '0'])
         if conn.lower() == 'y':
             try:
-                ok, msg = yt_live.authenticate(channel_id=ch_id)
+                ok, msg = yt_live.authenticate_auto(channel_id=ch_id)
                 print(f"\n{GREEN}✔ {msg}{RESET}")
             except Exception as e:
                 print(f"\n{RED}✖ Gagal koneksi: {e}{RESET}")
@@ -3270,7 +3976,8 @@ def process_single_live_video_flow(ai_client, yt_live, video, active_profile):
             ("3", "📝 Edit Langsung Deskripsi Video Live"),
             ("4", "🏷️ Edit Langsung Tags Video Live"),
             ("5", "🖼️ Upload Custom Thumbnail Baru ke Video Live (Pilih File Gambar)"),
-            ("6", "🌐 Buka Video di Browser (YouTube.com)"),
+            ("6", "🗑️ Hapus Video Ini Secara Permanen dari YouTube"),
+            ("7", "🌐 Buka Video di Browser (YouTube.com)"),
             ("0", "Kembali")
         ]
 
@@ -3313,7 +4020,6 @@ def process_single_live_video_flow(ai_client, yt_live, video, active_profile):
 
             print(f"\n🏷️  {BOLD}TAGS BARU:{RESET} {DIM}{new_tags}{RESET}")
 
-            # Pilihan Push Live
             print_section("PILIHAN PENERAPAN")
             print(f" • Ketik angka {GREEN}1 - {len(new_titles)}{RESET} untuk menerapkan judul tersebut dan {BOLD}UPDATE LIVE LANGSUNG KE YOUTUBE{RESET}")
             print(f" • Ketik {CYAN}S{RESET} untuk simpan ke file teks lokal saja")
@@ -3406,30 +4112,122 @@ def process_single_live_video_flow(ai_client, yt_live, video, active_profile):
             press_any_key()
 
         elif choice == "6":
+            print_section(f"HAPUS VIDEO PERMANEN: {video.get('title')}")
+            print(f"{RED}{BOLD}⚠️  PERINGATAN KERAS:{RESET}")
+            print(f"{RED}Tindakan ini akan menghapus video #{v_id} secara permanen dari server YouTube dan TIDAK DAPAT DIBATALKAN!{RESET}\n")
+            
+            confirm_str = input(f"{BOLD}Ketik {RED}'HAPUS'{RESET} {BOLD}untuk mengonfirmasi penghapusan permanen (atau ketik apapun untuk batal):{RESET} ").strip()
+            if confirm_str == "HAPUS":
+                print(f"\n{CYAN}Mengirim perintah penghapusan video ke YouTube API...{RESET}")
+                ok_del, res_del = yt_live.delete_video(v_id, channel_id=ch_id)
+                if ok_del:
+                    print(f"\n{GREEN}✔ {res_del}{RESET}")
+                    press_any_key()
+                    break
+                else:
+                    print(f"\n{RED}✖ {res_del}{RESET}")
+                    press_any_key()
+            else:
+                print(f"\n{YELLOW}Penghapusan video dibatalkan.{RESET}")
+                press_any_key()
+
+        elif choice == "7":
             webbrowser.open(video.get("video_url"))
             print(f"\n{GREEN}✔ Membuka video di browser...{RESET}")
             press_any_key()
 
-def menu_yt_manage_profiles(yt_profile_mgr):
+def _handle_new_connected_channel(ch_info, yt_profile_mgr):
+    real_id = ch_info.get("channel_id")
+    ch_title = ch_info.get("title", "YouTube Channel")
+    ch_desc = ch_info.get("description", "")
+    custom_url = ch_info.get("custom_url", "")
+    subs = ch_info.get("subscriber_count", 0)
+    vids = ch_info.get("video_count", 0)
+    views = ch_info.get("view_count", 0)
+
+    print(f"\n{GREEN}{BOLD}🎉 BERHASIL LOGIN KE GOOGLE YOUTUBE!{RESET}")
+    print(f" • Nama Channel : {CYAN}{BOLD}{ch_title}{RESET} ({custom_url or '@channel'})")
+    print(f" • Channel ID   : {BOLD}{real_id}{RESET}")
+    print(f" • Statistik    : {GREEN}{subs:,}{RESET} Subscribers | {vids:,} Video | {views:,} Views\n")
+
+    existing = yt_profile_mgr.get_profile_by_id(real_id)
+    if existing:
+        yt_profile_mgr.update_profile(real_id, {
+            "name": ch_title,
+        })
+        print(f"{GREEN}✔ Channel '{ch_title}' sudah terdaftar di Silo. Profil & Token OAuth telah diperbarui!{RESET}")
+        make_act = get_single_key(f"\n{BOLD}Jadikan sebagai Channel Aktif sekarang? [Y/N] [Default: Y]:{RESET} ", valid_keys=['y', 'n', '0', '\r', '\n'])
+        if make_act.lower() in ['y', '\r', '\n', '']:
+            yt_profile_mgr.set_active_profile(real_id)
+            print(f"\n{GREEN}✔ Channel '{ch_title}' kini aktif!{RESET}")
+        return
+
+    first_line_desc = ""
+    if ch_desc:
+        first_line_desc = ch_desc.split("\n")[0][:100].strip()
+
+    print(f"{DIM}Silakan lengkapi identitas niche channel di bawah (Tekan Enter untuk menggunakan default):{RESET}\n")
+
+    niche = input(f"{BOLD}Niche / Topik Industri [Edukasi & Bisnis]:{RESET} ").strip()
+    niche = niche if niche else "Edukasi & Bisnis"
+
+    audience = input(f"{BOLD}Target Penonton [Penonton Umum & Praktisi]:{RESET} ").strip()
+    audience = audience if audience else "Penonton Umum & Praktisi"
+
+    tone = input(f"{BOLD}Tone of Voice [Informatif, Menarik & Profesional]:{RESET} ").strip()
+    tone = tone if tone else "Informatif, Menarik & Profesional"
+
+    tagline = input(f"{BOLD}Tagline Branding [{first_line_desc or 'Wawasan Praktis & Solusi Nyata'}]:{RESET} ").strip()
+    tagline = tagline if tagline else (first_line_desc or "Wawasan Praktis & Solusi Nyata")
+
+    cta = input(f"{BOLD}Default Links / CTA Footer [Enter jika belum ada]:{RESET} ").strip()
+
+    new_prof = {
+        "id": real_id,
+        "name": ch_title,
+        "niche": niche,
+        "target_audience": audience,
+        "tone_of_voice": tone,
+        "branding_tagline": tagline,
+        "default_links_cta": cta,
+        "channel_keywords": "",
+        "is_default": False
+    }
+
+    yt_profile_mgr.add_profile(new_prof)
+    print(f"\n{GREEN}✔ Channel '{ch_title}' berhasil ditambahkan ke Silo Creator Suite!{RESET}")
+
+    make_act = get_single_key(f"\n{BOLD}Jadikan channel ini sebagai Channel Aktif sekarang? [Y/N] [Default: Y]:{RESET} ", valid_keys=['y', 'n', '0', '\r', '\n'])
+    if make_act.lower() in ['y', '\r', '\n', '']:
+        yt_profile_mgr.set_active_profile(real_id)
+        print(f"\n{GREEN}✔ Channel '{ch_title}' kini menjadi Channel Aktif!{RESET}")
+
+def menu_yt_manage_profiles(yt_profile_mgr, yt_live=None):
+    if yt_live is None:
+        yt_live = YouTubeLiveClient()
+
     while True:
         clear_screen()
         print_banner()
         print_section("KELOLA PROFIL IDENTITAS CHANNEL YOUTUBE")
 
         profiles = yt_profile_mgr.get_profiles()
-        print(f"{BOLD}Daftar Channel Terdaftar ({len(profiles)} Channel):{RESET}")
-        print(f"{BOLD}{'No':<4} {'Nama Channel':<26} {'Niche':<24} {'Status'}{RESET}")
-        print("-" * 65)
+        print(f"{BOLD}Daftar Channel Terdaftar ({len(profiles)} Channel Aktif & Siap Digunakan):{RESET}")
+        print(f"{BOLD}{'No':<4} {'Nama Channel':<24} {'Niche':<24} {'Status OAuth':<22} {'Peran'}{RESET}")
+        print("-" * 80)
         for i, p in enumerate(profiles, 1):
-            is_def = f"{GREEN}[Aktif]{RESET}" if p.get("is_default") else f"{DIM}(Tersimpan){RESET}"
-            p_name = (p.get("name", "")[:24] + '..') if len(p.get("name", "")) > 24 else p.get("name", "")
+            p_id = p.get("id", "default")
+            has_tok = yt_live.has_saved_token(p_id)
+            tok_status = f"{GREEN}🟢 OAuth Live{RESET}" if has_tok else f"{YELLOW}🟡 Belum Login{RESET}"
+            is_def = f"{CYAN}[Fokus]{RESET}" if p.get("is_default") else f"{DIM}[Aktif]{RESET}"
+            p_name = (p.get("name", "")[:22] + '..') if len(p.get("name", "")) > 22 else p.get("name", "")
             p_niche = (p.get("niche", "")[:22] + '..') if len(p.get("niche", "")) > 22 else p.get("niche", "")
-            print(f"#{i:<3} {BOLD}{p_name:<26}{RESET} {p_niche:<24} {is_def}")
-        print("-" * 65)
+            print(f"#{i:<3} {BOLD}{p_name:<24}{RESET} {p_niche:<24} {tok_status:<31} {is_def}")
+        print("-" * 80)
 
         options = [
-            ("1", "Pilih Channel Aktif"),
-            ("2", "Tambah Profil Channel Baru"),
+            ("1", "Ganti Fokus Channel (Pilih Target Cepat)"),
+            ("2", "Tambah Channel YouTube Baru (1-Click Google Login / Manual) ⭐"),
             ("3", "Edit Profil Channel"),
             ("4", "Hapus Profil Channel"),
             ("0", "Kembali")
@@ -3441,41 +4239,72 @@ def menu_yt_manage_profiles(yt_profile_mgr):
         elif choice == "1":
             p_opts = [(str(i), f"{p.get('name')} ({p.get('niche')})") for i, p in enumerate(profiles, 1)]
             p_opts.append(("0", "Batal"))
-            sel = select_menu(p_opts, title="PILIH CHANNEL AKTIF")
+            sel = select_menu(p_opts, title="PILIH CHANNEL UNTUK FOKUS KERJA")
             if sel != "0":
                 target_p = profiles[int(sel) - 1]
                 yt_profile_mgr.set_active_profile(target_p["id"])
-                print(f"\n{GREEN}✔ Channel aktif diubah ke '{target_p.get('name')}'!{RESET}")
+                print(f"\n{GREEN}✔ Fokus channel diarahkan ke '{target_p.get('name')}'!{RESET}")
                 press_any_key()
         elif choice == "2":
-            print_section("TAMBAH PROFIL CHANNEL YOUTUBE BARU")
-            print(f"{DIM}Ketik '0' untuk batal.{RESET}\n")
-            name = input(f"{BOLD}Nama Channel:{RESET} ").strip()
-            if name == "0" or not name: continue
-            niche = input(f"{BOLD}Niche / Topik Industri:{RESET} ").strip()
-            if niche == "0" or not niche: continue
-            audience = input(f"{BOLD}Target Penonton:{RESET} ").strip()
-            if audience == "0": continue
-            tone = input(f"{BOLD}Gaya Bicara / Tone [Default: Informatif, Praktis & Profesional]:{RESET} ").strip()
-            if tone == "0": continue
-            tagline = input(f"{BOLD}Tagline Branding / Slogan:{RESET} ").strip()
-            if tagline == "0": continue
-            cta = input(f"{BOLD}Link Standar & CTA Footer [Website / WA / Sosmed]:{RESET} ").strip()
-            if cta == "0": continue
+            clear_screen()
+            print_banner()
+            print_section("TAMBAH CHANNEL YOUTUBE BARU")
+            add_opts = [
+                ("1", "🚀 Login Google Otomatis (1-Click Browser - Auto Tarik Profil & Identitas) ⭐ [Rekomendasi]"),
+                ("2", "📋 Login Google Manual (Paste URL / Kode di CLI - Auto Tarik Identitas)"),
+                ("3", "✍️ Input Manual Saja (Buat Profil Draft Tanpa Login)"),
+                ("0", "Batal")
+            ]
+            add_c = select_menu(add_opts, title="PILIH CARA PENAMBAHAN CHANNEL")
+            if add_c == "0":
+                continue
+            elif add_c == "1":
+                print_section("HUBUNGKAN CHANNEL VIA 1-CLICK BROWSER")
+                try:
+                    ok_c, ch_info = yt_live.connect_new_channel_auto()
+                    if ok_c:
+                        _handle_new_connected_channel(ch_info, yt_profile_mgr)
+                except Exception as e:
+                    print(f"\n{RED}✖ Gagal menghubungkan channel: {e}{RESET}")
+                press_any_key()
+            elif add_c == "2":
+                print_section("HUBUNGKAN CHANNEL VIA MANUAL PASTE")
+                try:
+                    ok_c, ch_info = yt_live.connect_new_channel_manual()
+                    if ok_c:
+                        _handle_new_connected_channel(ch_info, yt_profile_mgr)
+                except Exception as e:
+                    print(f"\n{RED}✖ Gagal menghubungkan channel: {e}{RESET}")
+                press_any_key()
+            elif add_c == "3":
+                print_section("TAMBAH PROFIL CHANNEL MANUAL")
+                print(f"{DIM}Ketik '0' untuk batal.{RESET}\n")
+                name = input(f"{BOLD}Nama Channel:{RESET} ").strip()
+                if name == "0" or not name: continue
+                niche = input(f"{BOLD}Niche / Topik Industri:{RESET} ").strip()
+                if niche == "0" or not niche: continue
+                audience = input(f"{BOLD}Target Penonton:{RESET} ").strip()
+                if audience == "0": continue
+                tone = input(f"{BOLD}Gaya Bicara / Tone [Default: Informatif, Praktis & Profesional]:{RESET} ").strip()
+                if tone == "0": continue
+                tagline = input(f"{BOLD}Tagline Branding / Slogan:{RESET} ").strip()
+                if tagline == "0": continue
+                cta = input(f"{BOLD}Link Standar & CTA Footer [Website / WA / Sosmed]:{RESET} ").strip()
+                if cta == "0": continue
 
-            new_prof = {
-                "name": name,
-                "niche": niche,
-                "target_audience": audience if audience else "Umum",
-                "tone_of_voice": tone if tone else "Informatif, Praktis & Profesional",
-                "branding_tagline": tagline if tagline else "",
-                "default_links_cta": cta if cta else "",
-                "channel_keywords": "",
-                "is_default": False
-            }
-            yt_profile_mgr.add_profile(new_prof)
-            print(f"\n{GREEN}✔ Channel '{name}' berhasil ditambahkan!{RESET}")
-            press_any_key()
+                new_prof = {
+                    "name": name,
+                    "niche": niche,
+                    "target_audience": audience if audience else "Umum",
+                    "tone_of_voice": tone if tone else "Informatif, Praktis & Profesional",
+                    "branding_tagline": tagline if tagline else "",
+                    "default_links_cta": cta if cta else "",
+                    "channel_keywords": "",
+                    "is_default": False
+                }
+                yt_profile_mgr.add_profile(new_prof)
+                print(f"\n{GREEN}✔ Channel '{name}' berhasil ditambahkan!{RESET}")
+                press_any_key()
         elif choice == "3":
             p_opts = [(str(i), f"{p.get('name')} ({p.get('niche')})") for i, p in enumerate(profiles, 1)]
             p_opts.append(("0", "Batal"))
@@ -3524,51 +4353,101 @@ def menu_yt_manage_profiles(yt_profile_mgr):
                         print(f"\n{RED}✖ {msg}{RESET}")
                     press_any_key()
 
-def menu_yt_view_history():
-    print_section("RIWAYAT FILE METADATA YOUTUBE TERSIMPAN")
-    if not os.path.exists(YOUTUBE_OUTPUT_DIR):
-        print(f"{YELLOW}Belum ada metadata video yang pernah digenerate.{RESET}")
-        press_any_key()
-        return
+def menu_yt_view_history(active_profile=None):
+    ch_dir = get_channel_dir(active_profile)
+    ch_name = active_profile.get("name", "Channel") if active_profile else "Channel"
+    videos_dir = os.path.join(ch_dir, "videos")
+    thumbs_dir = os.path.join(ch_dir, "thumbnails")
+    meta_dir = os.path.join(ch_dir, "metadata_packs")
 
-    files_list = []
-    for root, dirs, files in os.walk(YOUTUBE_OUTPUT_DIR):
-        for f in files:
-            if f.endswith(".txt"):
-                f_path = os.path.join(root, f)
-                ch_name = os.path.basename(root)
-                files_list.append((f, f_path, ch_name))
+    while True:
+        clear_screen()
+        print_banner()
+        print_section(f"WORKSPACE FOLDER CHANNEL: {ch_name}")
+        print(f"📁 {BOLD}Lokasi Fisik:{RESET} {CYAN}{os.path.abspath(ch_dir)}{RESET}\n")
 
-    if not files_list:
-        print(f"{YELLOW}Belum ada file metadata video di folder '{YOUTUBE_OUTPUT_DIR}/'.{RESET}")
-        press_any_key()
-        return
+        v_count = len([f for f in os.listdir(videos_dir) if os.path.isfile(os.path.join(videos_dir, f))]) if os.path.exists(videos_dir) else 0
+        t_count = len([f for f in os.listdir(thumbs_dir) if os.path.isfile(os.path.join(thumbs_dir, f))]) if os.path.exists(thumbs_dir) else 0
+        m_count = len([f for f in os.listdir(meta_dir) if f.endswith('.txt')]) if os.path.exists(meta_dir) else 0
 
-    # Sort descending by filename timestamp
-    files_list.sort(key=lambda x: x[0], reverse=True)
+        print(f" • 🎬 {BOLD}Folder Video (videos/)           :{RESET} {GREEN}{v_count} file{RESET} (Letakkan video mentah di sini)")
+        print(f" • 🖼️  {BOLD}Folder Thumbnail (thumbnails/)   :{RESET} {GREEN}{t_count} file{RESET} (Letakkan cover/gambar di sini)")
+        print(f" • 📄 {BOLD}Paket Metadata (metadata_packs/) :{RESET} {GREEN}{m_count} file{RESET} (File judul/deskripsi tersimpan)\n")
 
-    print(f"{BOLD}{'No':<4} {'Channel':<18} {'Nama File Metadata':<45}{RESET}")
-    print("-" * 70)
-    for idx, (fname, fpath, ch) in enumerate(files_list[:20], 1):
-        fn_disp = (fname[:42] + '..') if len(fname) > 42 else fname
-        print(f"#{idx:<3} {CYAN}{ch:<18}{RESET} {fn_disp:<45}")
-    print("-" * 70)
+        options = [
+            ("1", f"📂 Buka Folder Channel Ini di File Explorer (Windows Explorer)"),
+            ("2", f"🎬 Buka Subfolder Video ({os.path.basename(videos_dir)}/)"),
+            ("3", f"🖼️ Buka Subfolder Thumbnail ({os.path.basename(thumbs_dir)}/)"),
+            ("4", f"📄 Buka & Lihat File Metadata ({os.path.basename(meta_dir)}/)"),
+            ("5", "🌐 Buka Root Folder Semua Channel (channels_youtube/)"),
+            ("0", "Kembali")
+        ]
 
-    options = [(str(i), f"Buka #{i}: {fname}") for i, (fname, _, _) in enumerate(files_list[:15], 1)]
-    options.append(("0", "Kembali"))
+        c = select_menu(options, title="PILIH AKSI WORKSPACE")
+        if c == "0":
+            break
+        elif c == "1":
+            try:
+                os.startfile(os.path.abspath(ch_dir))
+                print(f"\n{GREEN}✔ Membuka folder channel di File Explorer...{RESET}")
+            except Exception as e:
+                print(f"{RED}✖ Gagal: {e}{RESET}")
+            press_any_key()
+        elif c == "2":
+            try:
+                os.startfile(os.path.abspath(videos_dir))
+                print(f"\n{GREEN}✔ Membuka subfolder 'videos/' di File Explorer...{RESET}")
+            except Exception as e:
+                print(f"{RED}✖ Gagal: {e}{RESET}")
+            press_any_key()
+        elif c == "3":
+            try:
+                os.startfile(os.path.abspath(thumbs_dir))
+                print(f"\n{GREEN}✔ Membuka subfolder 'thumbnails/' di File Explorer...{RESET}")
+            except Exception as e:
+                print(f"{RED}✖ Gagal: {e}{RESET}")
+            press_any_key()
+        elif c == "4":
+            meta_files = []
+            if os.path.exists(meta_dir):
+                for f in os.listdir(meta_dir):
+                    if f.endswith('.txt'):
+                        meta_files.append((f, os.path.join(meta_dir, f)))
+            meta_files.sort(key=lambda x: x[0], reverse=True)
 
-    c = select_menu(options, title="PILIH FILE METADATA UNTUK DIBUKA")
-    if c != "0":
-        target_fpath = files_list[int(c) - 1][1]
-        try:
-            if os.name == 'nt':
-                os.startfile(target_fpath)
-            else:
-                webbrowser.open(f"file:///{os.path.abspath(target_fpath).replace('\\', '/')}")
-            print(f"\n{GREEN}✔ Membuka {target_fpath}...{RESET}")
-        except Exception as e:
-            print(f"{RED}✖ Gagal membuka file: {e}{RESET}")
-        press_any_key()
+            if not meta_files:
+                print(f"\n{YELLOW}Belum ada file metadata yang digenerate untuk channel ini.{RESET}")
+                press_any_key()
+                continue
+
+            print_section(f"DAFTAR FILE METADATA CHANNEL: {ch_name}")
+            m_opts = [(str(i), fn) for i, (fn, fp) in enumerate(meta_files[:15], 1)]
+            m_opts.append(("O", "📂 Buka Folder metadata_packs/ di File Explorer"))
+            m_opts.append(("0", "Kembali"))
+
+            m_choice = select_menu(m_opts, title="PILIH FILE METADATA UNTUK DIBUKA")
+            if m_choice == "0":
+                continue
+            elif m_choice.upper() == "O":
+                try:
+                    os.startfile(os.path.abspath(meta_dir))
+                except Exception:
+                    pass
+            elif m_choice.isdigit() and 1 <= int(m_choice) <= len(meta_files):
+                target_fp = meta_files[int(m_choice) - 1][1]
+                try:
+                    os.startfile(target_fp)
+                    print(f"\n{GREEN}✔ Membuka {target_fp}...{RESET}")
+                except Exception as e:
+                    print(f"{RED}✖ Gagal membuka file: {e}{RESET}")
+                press_any_key()
+        elif c == "5":
+            try:
+                os.startfile(os.path.abspath(CHANNELS_BASE_DIR))
+                print(f"\n{GREEN}✔ Membuka root folder channels_youtube/ di File Explorer...{RESET}")
+            except Exception as e:
+                print(f"{RED}✖ Gagal: {e}{RESET}")
+            press_any_key()
 
 # ==========================================
 # MAIN ENTRYPOINT
@@ -3581,7 +4460,7 @@ def main():
         clear_screen()
         print_banner()
 
-        # Status Bar
+        # Compact Status Badge Data
         wp = WordPressPublisher()
         sites = wp.get_sites()
         active_site = wp.get_active_site()
@@ -3595,61 +4474,56 @@ def main():
         kie_model = kie.get_preferred_model()
 
         yt_mgr = YouTubeProfileManager()
-        active_yt_channel = yt_mgr.get_active_profile()
+        profiles_yt = yt_mgr.get_profiles()
+        total_yt = len(profiles_yt)
+        yt_live_checker = YouTubeLiveClient()
+        active_cnt = sum(1 for p in profiles_yt if yt_live_checker.has_saved_token(p.get('id', 'default')))
+        
+        # Clean & Compact Status List below menu
+        names_preview = ", ".join([p.get('name') for p in profiles_yt[:2]])
+        if total_yt > 2:
+            names_preview += f" +{total_yt - 2} lainnya"
 
-        if active_site:
-            total_str = f" ({len(sites)} Web)" if len(sites) > 1 else ""
-            type_tag = f"{CYAN}[Astro]{RESET}" if active_site.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
-            wp_status_str = f"{type_tag} {GREEN}{active_site['name']}{total_str}{RESET}"
-        else:
-            wp_status_str = f"{YELLOW}Belum Terdaftar{RESET}"
-        
-        gemini_status_str = f"{GREEN}{gemini_keys_count} Key{RESET}" if gemini_keys_count > 0 else f"{RED}0 Key (Tambahkan Key){RESET}"
-        
         kie_style = kie.get_image_style()
         kie_style_name = IMAGE_STYLE_DESCS.get(kie_style, kie_style).split("(")[0].strip()
-        kie_status_str = f"{GREEN}{kie_keys_count} Key{RESET} | Gaya: {MAGENTA}{kie_style_name}{RESET}" if kie_keys_count > 0 else f"{DIM}0 Key (Mesh Gradient Fallback){RESET}"
 
-        yt_status_str = f"{GREEN}{active_yt_channel.get('name')}{RESET} ({active_yt_channel.get('niche')})"
+        if active_site:
+            total_w = len(sites)
+            w_type = "Astro" if active_site.get("type") == "astro" else "WP"
+            type_badge = f"{CYAN}[{w_type}]{RESET}" if w_type == "Astro" else f"{MAGENTA}[{w_type}]{RESET}"
+            w_more = f" {DIM}(total {total_w} web){RESET}" if total_w > 1 else ""
+            web_status_clean = f"{GREEN}{active_site['name']}{RESET} {type_badge}{w_more}"
+        else:
+            web_status_clean = f"{YELLOW}Belum Terdaftar{RESET}"
 
-        print(f"🤖 Gemini  : {CYAN}{BOLD}{active_model}{RESET} ({gemini_status_str})")
-        print(f"🖼️  Kie.ai   : {CYAN}{BOLD}{kie_model}{RESET} ({kie_status_str})")
-        print(f"🎬 YouTube : {yt_status_str}")
-        print(f"🌐 Web     : {wp_status_str}")
-        print(f"{DIM}{'-' * 60}{RESET}")
-
-        menu_options = [
-            ("1", "Riset & Buat Artikel Silo"),
-            ("2", "Publish Artikel ke Web"),
-            ("3", "Export ke WordPress XML"),
-            ("4", "Kelola Live WordPress"),
-            ("5", "Inventori & Status Artikel"),
-            ("6", "Pengaturan Website"),
-            ("7", "Pengaturan AI & API Key"),
-            ("8", "🎬 YouTube Channel & Metadata Suite"),
-            ("0", "Keluar")
+        footer_list = [
+            f" {YELLOW}{BOLD}📌 STATUS SISTEM & INTEGRASI:{RESET}",
+            f"  • ✍️  {BOLD}Text AI{RESET}   : {CYAN}{active_model}{RESET} {DIM}({gemini_keys_count} keys){RESET}",
+            f"  • 🖼️  {BOLD}Images{RESET}    : {MAGENTA}{kie_model}{RESET} {DIM}• {kie_style_name} ({kie_keys_count} keys){RESET}",
+            f"  • 🎬 {BOLD}YouTube{RESET}   : {GREEN}{total_yt} Channel{RESET} {DIM}({names_preview}){RESET} [{GREEN}{active_cnt}/{total_yt} OAuth Live{RESET}]",
+            f"  • 🌐 {BOLD}Website{RESET}   : {web_status_clean}"
         ]
 
-        pilihan = select_menu(menu_options, title="MENU UTAMA")
+        menu_options = [
+            ("1", "🌐 Website Projects       (Silo, Artikel & Live Publishing per Web)"),
+            ("2", "🎬 YouTube Channels       (Upload, Live Video, CTR & Metadata)"),
+            ("3", "📄 Global Articles Hub    (Arsip, Pencarian & Export Lintas Web)"),
+            ("4", "⚙️ Global Settings        (AI Model, API Keys & Visual Style)"),
+            ("0", "🚪 Keluar")
+        ]
+
+        pilihan = select_menu(menu_options, title="MENU UTAMA", footer=footer_list)
 
         if pilihan == "1":
-            menu_generate_silo()
+            menu_website_projects()
         elif pilihan == "2":
-            menu_push_wordpress()
-        elif pilihan == "3":
-            menu_export_silo_wxr()
-        elif pilihan == "4":
-            menu_manage_live_wp(wp)
-        elif pilihan == "5":
-            menu_view_inventory()
-        elif pilihan == "6":
-            menu_configure_wordpress()
-        elif pilihan == "7":
-            menu_ai_settings()
-        elif pilihan == "8":
             menu_youtube()
+        elif pilihan == "3":
+            menu_global_articles_hub()
+        elif pilihan == "4":
+            menu_ai_settings()
         elif pilihan == "0":
-            print(f"\n{GREEN}Terima kasih telah menggunakan AI Silo Builder! Sampai jumpa.{RESET}\n")
+            print(f"\n{GREEN}Terima kasih telah menggunakan AI Silo Content & YouTube Suite! Sampai jumpa.{RESET}\n")
             sys.exit(0)
 
 if __name__ == "__main__":

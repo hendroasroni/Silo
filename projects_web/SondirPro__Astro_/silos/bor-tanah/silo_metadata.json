@@ -1,0 +1,383 @@
+{
+  "silo_plan": {
+    "seed_keyword": "bor tanah",
+    "silo_theme": "Pengeboran Tanah",
+    "topical_authority_goal": "Membangun otoritas topikal mutlak dalam industri pengeboran tanah, pengujian geoteknik, dan persiapan fondasi konstruksi di Indonesia.",
+    "items": [
+      {
+        "id": 1,
+        "keyword": "bor tanah",
+        "suggested_title": "Panduan Lengkap Pengeboran Tanah: Metode, Alat, dan Estimasi Biaya",
+        "role": "Pillar",
+        "search_intent": "Informational",
+        "competition_level": "High",
+        "target_audience": "Kontraktor, insinyur sipil, developer properti, dan pemilik lahan.",
+        "silo_role_description": "Hub utama yang merangkum seluruh aspek pengeboran tanah dan mendistribusikan link equity ke 15 artikel cluster pendukung.",
+        "recommendation_rank": 1,
+        "recommendation_reason": "Merupakan fondasi utama dari seluruh arsitektur silo yang mengikat semua subtopik.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 2,
+        "keyword": "jasa bor tanah",
+        "suggested_title": "Jasa Bor Tanah Profesional: Layanan, Prosedur, dan Tips Memilih Kontraktor",
+        "role": "Cluster",
+        "search_intent": "Transactional",
+        "competition_level": "Medium",
+        "target_audience": "Developer properti, kontraktor bangunan, dan pemilik rumah.",
+        "silo_role_description": "Mengarahkan traffic komersial langsung ke halaman penawaran jasa dan mengirimkan relevansi transaksional ke Pillar.",
+        "recommendation_rank": 2,
+        "recommendation_reason": "Memiliki search intent transaksional tertinggi yang krusial untuk konversi bisnis langsung.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 3,
+        "keyword": "harga bor tanah per meter",
+        "suggested_title": "Update Biaya dan Harga Bor Tanah per Meter Terbaru",
+        "role": "Cluster",
+        "search_intent": "Transactional",
+        "competition_level": "Medium",
+        "target_audience": "Estimator proyek, kontraktor, dan pemilik lahan yang sedang menyusun anggaran.",
+        "silo_role_description": "Menjawab pertanyaan finansial spesifik pembaca dan menyalurkan link ke artikel Jasa Bor Tanah.",
+        "recommendation_rank": 3,
+        "recommendation_reason": "Keyword dengan intent tinggi yang dicari oleh calon konsumen sebelum melakukan pembelian.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 4,
+        "keyword": "alat bor tanah manual",
+        "suggested_title": "Rekomendasi Alat Bor Tanah Manual Terbaik untuk Proyek Skala Kecil",
+        "role": "Cluster",
+        "search_intent": "Commercial",
+        "competition_level": "Low",
+        "target_audience": "Petani, pekebun, DIYers, dan kontraktor skala kecil.",
+        "silo_role_description": "Menargetkan pencarian alat fisik non-mesin untuk memperluas cakupan kata kunci longtail.",
+        "recommendation_rank": 4,
+        "recommendation_reason": "Kompetisi rendah dengan volume pencarian stabil, sangat baik untuk mendatangkan traffic awal.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 5,
+        "keyword": "metode soil boring",
+        "suggested_title": "Mengenal Metode Soil Boring dalam Penyelidikan Tanah Geoteknik",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Medium",
+        "target_audience": "Insinyur sipil, mahasiswa teknik, dan pengawas proyek.",
+        "silo_role_description": "Membangun otoritas akademis dan teknis mendalam terkait metodologi pengeboran tanah.",
+        "recommendation_rank": 5,
+        "recommendation_reason": "Sangat penting untuk membangun kredibilitas teknis (E-E-A-T) di mata Google.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 6,
+        "keyword": "mesin bor tanah mini",
+        "suggested_title": "Spesifikasi dan Harga Mesin Bor Tanah Mini Portable",
+        "role": "Cluster",
+        "search_intent": "Commercial",
+        "competition_level": "Low",
+        "target_audience": "Kontraktor lansekap, petani modern, dan penyedia jasa sumur bor.",
+        "silo_role_description": "Menargetkan segmen pencarian mesin mekanis portabel dengan intensitas pembelian tinggi.",
+        "recommendation_rank": 6,
+        "recommendation_reason": "Menjembatani pencari informasi alat dengan opsi pembelian atau penyewaan.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 7,
+        "keyword": "bor tanah biopori",
+        "suggested_title": "Cara Menggunakan Bor Tanah Biopori untuk Pembuatan Lubang Resapan",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Pemilik rumah, komunitas lingkungan, dan pengelola sanitasi lingkungan.",
+        "silo_role_description": "Menghubungkan topik pengeboran dengan isu lingkungan hidup dan solusi praktis rumah tangga.",
+        "recommendation_rank": 7,
+        "recommendation_reason": "Volume pencarian tinggi di segmen rumah tangga dengan tingkat persaingan yang sangat rendah.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 8,
+        "keyword": "perbedaan boring dan sondir",
+        "suggested_title": "Perbedaan Boring dan Sondir: Mana yang Tepat untuk Proyek Anda?",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Developer pemula, arsitek, dan pemilik rumah yang ingin membangun gedung bertingkat.",
+        "silo_role_description": "Artikel komparatif yang mengedukasi pembaca di tahap awal riset geoteknik.",
+        "recommendation_rank": 8,
+        "recommendation_reason": "Membantu mengarahkan user dari tahap edukasi ke tahap transaksi (pemesanan jasa).",
+        "is_recommended_default": true
+      },
+      {
+        "id": 9,
+        "keyword": "standard penetration test spt",
+        "suggested_title": "Panduan Pengujian Standard Penetration Test (SPT) pada Bor Tanah",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Medium",
+        "target_audience": "Geotechnical engineer, kontraktor fondasi, dan mahasiswa teknik sipil.",
+        "silo_role_description": "Menjelaskan prosedur pengujian standar yang dilakukan bersamaan dengan pengeboran tanah.",
+        "recommendation_rank": 9,
+        "recommendation_reason": "Menunjukkan kedalaman topik (topical depth) yang sangat disukai oleh algoritma Google Search.",
+        "is_recommended_default": false
+      },
+      {
+        "id": 10,
+        "keyword": "mata bor tanah keras",
+        "suggested_title": "Jenis-Jenis Mata Bor Tanah Keras untuk Batuan dan Formasi Padat",
+        "role": "Cluster",
+        "search_intent": "Commercial",
+        "competition_level": "Low",
+        "target_audience": "Operator mesin bor, mekanik alat berat, dan kontraktor pengeboran.",
+        "silo_role_description": "Menyediakan informasi spesifik mengenai suku cadang dan aksesoris pengeboran.",
+        "recommendation_rank": 10,
+        "recommendation_reason": "Menargetkan audiens profesional spesifik (niche) yang membutuhkan solusi teknis.",
+        "is_recommended_default": false
+      },
+      {
+        "id": 11,
+        "keyword": "cara menggunakan bor tanah manual",
+        "suggested_title": "Panduan Praktis: Cara Menggunakan Bor Tanah Manual dengan Benar",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "DIYers, pekebun mandiri, dan pekerja konstruksi pemula.",
+        "silo_role_description": "Artikel panduan taktis (how-to) yang memperkuat relevansi penggunaan alat.",
+        "recommendation_rank": 11,
+        "recommendation_reason": "Sangat baik untuk mendapatkan cuplikan pilihan (featured snippet) di Google.",
+        "is_recommended_default": false
+      },
+      {
+        "id": 12,
+        "keyword": "kedalaman bor tanah untuk fondasi",
+        "suggested_title": "Berapa Kedalaman Bor Tanah yang Ideal untuk Fondasi Bangunan?",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Medium",
+        "target_audience": "Arsitek, kontraktor sipil, dan pemilik rumah.",
+        "silo_role_description": "Menjawab pertanyaan krusial terkait keamanan struktur bangunan sebelum konstruksi.",
+        "recommendation_rank": 12,
+        "recommendation_reason": "Menarik traffic dari pencari solusi keamanan struktur bangunan.",
+        "is_recommended_default": false
+      },
+      {
+        "id": 13,
+        "keyword": "sewa alat bor tanah",
+        "suggested_title": "Sewa Alat Bor Tanah: Tarif, Jenis Alat, dan Ketentuan Sewa",
+        "role": "Cluster",
+        "search_intent": "Transactional",
+        "competition_level": "Low",
+        "target_audience": "Kontraktor proyek jangka pendek dan mandor bangunan.",
+        "silo_role_description": "Menangkap intent pencarian alternatif bagi mereka yang tidak ingin membeli alat bor.",
+        "recommendation_rank": 13,
+        "recommendation_reason": "Menangkap konversi dari segmen pasar B2B skala menengah ke bawah.",
+        "is_recommended_default": false
+      },
+      {
+        "id": 14,
+        "keyword": "bor tanah untuk sumur bor",
+        "suggested_title": "Teknik Pengeboran Tanah untuk Pembuatan Sumur Bor Air Bersih",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Medium",
+        "target_audience": "Pemilik rumah tangga dan penyedia jasa sumur bor.",
+        "silo_role_description": "Menghubungkan pengeboran tanah dengan kebutuhan utilitas air bersih domestik.",
+        "recommendation_rank": 14,
+        "recommendation_reason": "Memperluas relevansi topik ke sektor utilitas rumah tangga yang sangat populer.",
+        "is_recommended_default": false
+      },
+      {
+        "id": 15,
+        "keyword": "masalah saat pengeboran tanah",
+        "suggested_title": "5 Masalah Utama Saat Pengeboran Tanah dan Cara Mengatasinya",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Operator bor, pengawas lapangan, dan kontraktor.",
+        "silo_role_description": "Menyediakan konten pemecahan masalah (troubleshooting) untuk melengkapi siklus hidup topik.",
+        "recommendation_rank": 15,
+        "recommendation_reason": "Meningkatkan dwell time karena menyajikan solusi atas masalah nyata di lapangan.",
+        "is_recommended_default": false
+      },
+      {
+        "id": 16,
+        "keyword": "bor tanah sondir",
+        "suggested_title": "Mengenal Bor Tanah Sondir untuk Pengujian Daya Dukung Tanah",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Medium",
+        "target_audience": "Developer, arsitek, dan dinas pekerjaan umum.",
+        "silo_role_description": "Menjelaskan integrasi metode sondir dalam proses pengeboran tanah untuk izin mendirikan bangunan (IMB/PBG).",
+        "recommendation_rank": 16,
+        "recommendation_reason": "Melengkapi seluruh ekosistem pengujian tanah sebelum konstruksi dimulai.",
+        "is_recommended_default": false
+      }
+    ],
+    "target_site_id": "astro_sondirpro",
+    "target_site_name": "SondirPro (Astro)"
+  },
+  "articles": [
+    {
+      "item_id": 1,
+      "item": {
+        "id": 1,
+        "keyword": "bor tanah",
+        "suggested_title": "Panduan Lengkap Pengeboran Tanah: Metode, Alat, dan Estimasi Biaya",
+        "role": "Pillar",
+        "search_intent": "Informational",
+        "competition_level": "High",
+        "target_audience": "Kontraktor, insinyur sipil, developer properti, dan pemilik lahan.",
+        "silo_role_description": "Hub utama yang merangkum seluruh aspek pengeboran tanah dan mendistribusikan link equity ke 15 artikel cluster pendukung.",
+        "recommendation_rank": 1,
+        "recommendation_reason": "Merupakan fondasi utama dari seluruh arsitektur silo yang mengikat semua subtopik.",
+        "is_recommended_default": true
+      },
+      "brief": {
+        "item_id": 1,
+        "primary_keyword": "bor tanah",
+        "meta_title": "Panduan Lengkap Pengeboran Tanah: Metode, Alat & Biaya",
+        "meta_description": "Temukan panduan lengkap bor tanah untuk fondasi & sumur. Pelajari metode, jenis alat, estimasi biaya terbaru, hingga tips memilih jasa profesional di sini!",
+        "url_slug": "panduan-lengkap-bor-tanah",
+        "target_word_count": "2000 - 2500 kata",
+        "content_archetype": {
+          "type": "ultimate_pillar_guide",
+          "format_label": "Ultimate Pillar Guide & Navigation Hub",
+          "mandatory_visual_elements": [
+            "Tabel Perbandingan Metode Pengeboran",
+            "Peta Navigasi Silo (Daftar Panduan Terkait)",
+            "Box Estimasi Biaya Ringkas",
+            "Checklist Persiapan Sebelum Pengeboran"
+          ],
+          "content_angle": "Menyajikan panduan komprehensif satu pintu (one-stop resource) yang mengupas tuntas teknik, alat, estimasi biaya, dan pengujian tanah, sekaligus berfungsi sebagai hub navigasi utama ke artikel-artikel klaster spesifik."
+        },
+        "secondary_keywords": [
+          "metode bor tanah",
+          "alat pengeboran tanah",
+          "biaya bor tanah",
+          "mesin bor tanah",
+          "uji bor tanah"
+        ],
+        "semantic_entities_lsi": [
+          "soil boring",
+          "sondir",
+          "Standard Penetration Test (SPT)",
+          "geoteknik",
+          "daya dukung tanah",
+          "fondasi bore pile",
+          "sumur bor",
+          "biopori",
+          "mata bor"
+        ],
+        "internal_link_strategy": {
+          "target_pillar_link": "Artikel ini bertindak sebagai Pillar Post utama. Semua link internal dari artikel klaster (cluster posts) harus mengarah balik ke halaman ini menggunakan anchor text 'bor tanah' atau 'pengeboran tanah'.",
+          "target_cluster_links": [
+            "Hubungkan ke ID 2 (jasa bor tanah) pada bagian tips memilih kontraktor.",
+            "Hubungkan ke ID 3 (harga bor tanah per meter) pada bagian estimasi biaya.",
+            "Hubungkan ke ID 4 (alat bor tanah manual) dan ID 6 (mesin bor tanah mini) pada bagian jenis alat.",
+            "Hubungkan ke ID 5 (metode soil boring) pada bagian metode pengeboran.",
+            "Hubungkan ke ID 8 (perbedaan boring dan sondir) dan ID 9 (standard penetration test spt) pada bagian pengujian tanah.",
+            "Hubungkan ke ID 12 (kedalaman bor tanah untuk fondasi) pada bagian kedalaman ideal.",
+            "Hubungkan ke ID 14 (bor tanah untuk sumur bor) pada bagian aplikasi pengeboran."
+          ],
+          "anchor_variations": {
+            "exact_keyword": "jasa bor tanah",
+            "lsi_synonym": "metode soil boring",
+            "conversational_natural": "biaya bor tanah per meter terbaru"
+          }
+        },
+        "outline": [
+          {
+            "heading_tag": "H2",
+            "heading_title": "Pengantar: Apa itu Pengeboran Tanah (Bor Tanah)?",
+            "key_talking_points": [
+              "Definisi dasar bor tanah dan kepentingannya dalam dunia konstruksi, pertanian, dan geoteknik.",
+              "Mengapa pengeboran tanah sangat krusial sebelum mendirikan bangunan (menghindari risiko penurunan tanah/settlement).",
+              "Gambaran umum aplikasi bor tanah: untuk fondasi, sumur air bersih, lubang biopori, hingga penyelidikan tanah."
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Metode Pengeboran Tanah yang Paling Sering Digunakan",
+            "key_talking_points": [
+              "Pengeboran Manual (Hand Auger): Cocok untuk kedalaman dangkal dan sampel tanah lunak.",
+              "Pengeboran Mekanis (Rotary Drilling): Menggunakan mesin bertenaga tinggi untuk menembus lapisan tanah keras dan batuan.",
+              "Metode Soil Boring Geoteknik: Proses pengambilan sampel tanah untuk uji laboratorium.",
+              "Teknik pengeboran khusus untuk pembuatan sumur bor air bersih."
+            ],
+            "include_element": "Tabel Perbandingan Metode Pengeboran"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Mengenal Jenis Alat dan Mesin Bor Tanah",
+            "key_talking_points": [
+              "Alat bor tanah manual: Bor auger standar dan bor tanah biopori untuk kebutuhan rumah tangga.",
+              "Mesin bor tanah mini portable: Solusi praktis untuk proyek skala kecil hingga menengah di lahan sempit.",
+              "Rig pengeboran besar: Alat berat untuk proyek komersial, gedung bertingkat, dan bore pile.",
+              "Pentingnya memilih jenis mata bor tanah keras yang tepat untuk formasi batuan padat."
+            ],
+            "include_element": "Checklist Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Pentingnya Pengujian Tanah: Boring vs Sondir & SPT",
+            "key_talking_points": [
+              "Mengapa kita tidak boleh langsung membangun tanpa uji tanah (soil test).",
+              "Perbedaan mendasar antara metode boring (pengambilan sampel) dan sondir (uji penetrasi statis).",
+              "Mengenal Standard Penetration Test (SPT) untuk mengukur kepadatan dan daya dukung tanah secara dinamis."
+            ],
+            "include_element": "Pro-Tip Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Kedalaman Ideal Bor Tanah untuk Fondasi Bangunan",
+            "key_talking_points": [
+              "Faktor-faktor yang menentukan kedalaman pengeboran (beban bangunan, kondisi geologis lokal).",
+              "Standar kedalaman bor tanah untuk rumah tinggal 1 lantai, 2 lantai, hingga gedung bertingkat.",
+              "Bagaimana menentukan bahwa ujung pengeboran telah mencapai lapisan tanah keras yang aman."
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Estimasi Biaya dan Harga Bor Tanah per Meter",
+            "key_talking_points": [
+              "Komponen yang mempengaruhi biaya: diameter lubang, kedalaman, tingkat kekerasan tanah, dan lokasi proyek.",
+              "Estimasi tarif jasa bor tanah per meter untuk fondasi bore pile vs sumur bor air.",
+              "Opsi alternatif: Sewa alat bor tanah untuk menghemat anggaran proyek mandiri."
+            ],
+            "include_element": "Box Estimasi Biaya Ringkas"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Tips Memilih Jasa Bor Tanah Profesional dan Terpercaya",
+            "key_talking_points": [
+              "Kriteria kontraktor bor tanah yang kredibel (memiliki sertifikasi, alat lengkap, dan tim ahli).",
+              "Pentingnya transparansi kontrak kerja dan garansi hasil pengeboran.",
+              "Antisipasi masalah utama saat pengeboran tanah (seperti pipa terjepit, longsoran dinding lubang) dan cara mengatasinya."
+            ],
+            "include_element": "Checklist Persiapan Sebelum Pengeboran"
+          }
+        ],
+        "faq_questions": [
+          "Berapa biaya rata-rata bor tanah per meter untuk sumur bor?",
+          "Apa perbedaan utama antara pengujian boring dan sondir tanah?",
+          "Berapa kedalaman bor tanah yang aman untuk fondasi rumah 2 lantai?"
+        ]
+      },
+      "curation_score": 88,
+      "editorial_critique": [
+        "Draf memiliki cakupan topik yang kuat untuk keyword 'bor tanah': definisi, metode, alat, pengujian, kedalaman, biaya, pemilihan kontraktor, persiapan, dan FAQ sudah mencakup kebutuhan pembaca dari tahap riset hingga perencanaan pekerjaan.",
+        "Struktur silo internal link sudah mengikuti Content Brief dan menghubungkan topik jasa, biaya, alat, metode soil boring, pengujian, kedalaman fondasi, serta sumur bor pada konteks yang relevan.",
+        "Draf sebelumnya terlalu sering menggunakan klaim absolut seperti 'wajib', 'aman', atau angka kedalaman tertentu seolah berlaku untuk semua proyek. Versi final mengubahnya menjadi panduan berbasis kondisi lapangan karena kebutuhan investigasi dan desain fondasi harus ditentukan berdasarkan jenis struktur, kondisi tanah, standar yang digunakan, dan hasil investigasi.",
+        "Beberapa konsep teknis diperjelas. Sondir/CPT tidak disamakan dengan pengambilan sampel, soil boring tidak selalu menghasilkan undisturbed sample, dan SPT dijelaskan sebagai pengujian yang umumnya dilakukan di dalam lubang bor menggunakan prosedur standar.",
+        "Klaim bahwa hand auger selalu efektif sampai kedalaman tertentu, wash boring selalu berada pada rentang kedalaman tertentu, serta rotary drilling cocok untuk 'semua jenis tanah' dihapus karena performa aktual sangat bergantung pada formasi, muka air tanah, stabilitas lubang, alat, dan tujuan investigasi.",
+        "Bagian kedalaman fondasi direvisi agar tidak memberikan angka 4–8 meter atau 15–40 meter sebagai rekomendasi universal. Kedalaman fondasi bukan ditentukan semata-mata oleh jumlah lantai, tetapi oleh hasil investigasi tanah dan perhitungan desain.",
+        "Klaim biaya yang terlalu presisi dan berpotensi menyesatkan disederhanakan menjadi kisaran indikatif serta faktor pembentuk harga. Harga pekerjaan aktual dapat berubah menurut diameter, kedalaman, kondisi tanah atau batuan, metode, akses, mobilisasi, casing, fluida pembilas, pengujian, dan lokasi.",
+        "Referensi 'izin tetangga/RT/RW' tidak diposisikan sebagai pengganti persyaratan perizinan resmi. Untuk pekerjaan pemanfaatan air tanah, pembaca diarahkan untuk memeriksa persyaratan pemerintah daerah dan instansi berwenang yang berlaku pada lokasi proyek.",
+        "Bagian 'mata bor tungsten carbide untuk tanah lempung' dan 'diamond core bit untuk granit atau andesit' diperhalus karena pemilihan bit bergantung pada sistem pengeboran, tingkat abrasivitas, kekuatan material, dan tujuan pengambilan sampel.",
+        "Bahasa hiperbolis seperti 'berspekulasi dengan keselamatan jiwa', 'fatal', dan 'krusial' dikurangi agar artikel terdengar seperti panduan industri yang obyektif, bukan materi pemasaran."
+      ]
+    }
+  ]
+}

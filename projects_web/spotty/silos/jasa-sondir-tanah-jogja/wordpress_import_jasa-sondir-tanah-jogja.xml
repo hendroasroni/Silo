@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- generator="WordPress/6.4" created="2026-09-26 16:11" -->
+<rss version="2.0"
+	xmlns:excerpt="http://wordpress.org/export/1.2/excerpt/"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:wp="http://wordpress.org/export/1.2/"
+>
+<channel>
+	<title><![CDATA[jasa-sondir-tanah-jogja]]></title>
+	<link>http://localhost</link>
+	<description><![CDATA[Export Arsitektur SEO Silo]]></description>
+	<pubDate>Sat, 26 Sep 2026 09:11:50 +0000</pubDate>
+	<language>id</language>
+	<wp:wxr_version>1.2</wp:wxr_version>
+	<wp:base_site_url>http://localhost</wp:base_site_url>
+	<wp:base_blog_url>http://localhost</wp:base_blog_url>
+	<wp:category>
+		<wp:term_id>1</wp:term_id>
+		<wp:category_nicename>jasa-sondir-tanah-jogja</wp:category_nicename>
+		<wp:category_parent></wp:category_parent>
+		<wp:cat_name><![CDATA[jasa-sondir-tanah-jogja]]></wp:cat_name>
+	</wp:category>
+
+	<item>
+		<title><![CDATA[Jasa Sondir Tanah Jogja Terbaik & Akurat - Layanan Geoteknik]]></title>
+		<link>http://localhost/jasa-sondir-tanah-jogja/</link>
+		<pubDate>Sat, 26 Sep 2026 09:11:50 +0000</pubDate>
+		<dc:creator><![CDATA[admin]]></dc:creator>
+		<guid isPermaLink="false">http://localhost/?p=1</guid>
+		<description></description>
+		<content:encoded><![CDATA[<p>Pengujian kondisi tanah merupakan langkah krusial yang wajib dilakukan sebelum memulai proyek pembangunan di wilayah Yogyakarta guna menjamin keamanan bangunan dan memenuhi regulasi perizinan. Tanpa data geoteknik yang presisi, risiko struktur mengalami penurunan tidak seragam <em>(differential settlement)</em> atau kegagalan fondasi dapat membengkak secara finansial di kemudian hari.</p>
+<p>Artikel ini menyajikan panduan komprehensif mengenai <strong>jasa sondir tanah Jogja</strong>, mulai dari karakteristik tanah lokal, metodologi uji <em>Dutch Cone Penetrometer</em> (CPT), mekanisme kalkulasi daya dukung, hingga legalitas laporan pengujian untuk kelengkapan administrasi bangunan.</p>
+<hr />
+<h2>Pentingnya Pengujian Sondir Tanah Sebelum Konstruksi di Jogja</h2>
+<p>Langkah awal dalam merancang fondasi yang aman adalah memahami daya dukung tanah tempat bangunan akan berdiri. Penyelidikan tanah geoteknik menggunakan metode sondir atau CPT bertujuan untuk mengukur daya dukung tanah pasif dan aktif secara bertahap langsung di lokasi proyek.</p>
+<p>Secara teknis, alat mekanis ini menekan ujung konus ke dalam lapisan tanah untuk mendapatkan dua parameter utama:<br />
+1. <strong>Perlawanan Penetrasi Konus ($q_c$):</strong> Mengindikasikan kekuatan atau perlawanan tanah terhadap ujung konus, yang merepresentasikan tingkat kekerasan lapisan tanah.<br />
+2. <strong>Hambatan Pelekat ($f_s$):</strong> Mengukur gesekan antara dinding selimut sondir dengan tanah di sekitarnya, yang menunjukkan tingkat lekatan tanah.</p>
+<p>Aktivitas vulkanologis Gunung Merapi dan riwayat tektonik kawasan Daerah Istimewa Yogyakarta (DIY) menghasilkan profil tanah yang sangat bervariasi. Membangun struktur bertingkat tanpa perhitungan $q_c$ dan $f_s$ yang akurat sama saja dengan menanggung risiko kerusakan struktural fatal. Retak rambut pada dinding, pintu yang miring, hingga penurunan fondasi secara mendadak sering kali bersumber dari ketiadaan uji daya dukung tanah di awal perencanaan.</p>
+<blockquote>
+<p>💡 <strong>Pro Tip:</strong> Jangan pernah menentukan kedalaman fondasi hanya berdasarkan kedalaman rumah tetangga. Karakteristik lapisan tanah dapat berubah secara drastis hanya dalam jarak kurun beberapa meter, terutama pada area bekas persawahan atau lereng sungai di wilayah Jogja.</p>
+</blockquote>
+<hr />
+<h2>Karakteristik Lapisan Tanah di Wilayah Yogyakarta &amp; Peran Sondir</h2>
+<p>Kondisi geologi wilayah Yogyakarta dipengaruhi oleh endapan vulkanik muda Merapi di bagian utara serta formasi batuan sedimen dan kapur di bagian selatan. Oleh karena itu, pengujian lokasi spesifik mutlak diperlukan.</p>
+<p>Berikut adalah gambaran umum variasi tanah di beberapa kabupaten/kota di DIY:</p>
+<ul>
+<li><strong>Kabupaten Sleman (Area Utara):</strong> Didominasi oleh tanah aluvial vulkanik Merapi berupa pasir tufaan, kerakal, dan lanau pasiran. Karakteristik tanah ini umumnya memiliki <em>permeabilitas</em> tinggi dengan kekerasan yang relatif dangkal di beberapa titik, namun rawan terhadap erosi internal akibat aliran air tanah.</li>
+<li><strong>Kabupaten Bantul (Area Selatan):</strong> Banyak ditemui endapan aluvial berupa lempung lunak hingga sedang, serta lapisan lanau dengan muka air tanah yang tergolong tinggi. Risiko konsolidasi tanah dan <a href="/karakteristik-dan-risiko-struktur-tanah-yogyakarta">karakteristik tanah di yogyakarta</a> di kawasan ini membutuhkan analisis cermat agar fondasi tidak ambles.</li>
+<li><strong>Kota Yogyakarta:</strong> Memiliki struktur tanah campuran yang sangat padat oleh pemukiman. Di area ini, tantangan utama adalah membedakan lapisan tanah asli dengan lapisan tanah urukan <em>(fill material)</em> yang belum terkonsolidasi sempurna.</li>
+<li><strong>Kabupaten Kulon Progo &amp; Gunungkidul:</strong> Memiliki variasi dari tanah lempung ekspansif yang mudah kembang-susut hingga lapisan batuan kapur <em>(limestone)</em> keras yang membutuhkan pendekatan alat uji khusus.</li>
+</ul>
+<p>Melalui <strong>jasa pengujian tanah jogja</strong>, perencana struktur dapat menentukan apakah bangunan memerlukan fondasi dangkal <em>(footplate/cakar ayam)</em> atau harus menggunakan fondasi dalam <em>(bored pile/pancang)</em> hingga menyentuh kedalaman tanah keras ($q_c \ge 200 \text{ kg/cm}^2$).</p>
+<hr />
+<h2>Layanan Jasa Sondir Tanah Jogja Profesional &amp; Akurat</h2>
+<p>Layanan <strong>uji sondir tanah yogyakarta</strong> menghadirkan solusi pengujian geoteknik <em>in-situ</em> yang mengacu pada standar nasional (SNI 2827:2008). Prosedur ini dirancang untuk menghasilkan parameter teknis yang sah dan dapat dipertanggungjawabkan di mata hukum maupun praktisi teknik sipil.</p>
+<pre><code>[Proses Lapangan: Press Cone CPT] ➔ [Pencatatan Data Tekanan qc &amp; fs] ➔ [Pengolahan Grafik Lab] ➔ [Laporan Geoteknik / Syarat PBG]
+</code></pre>
+<p>Cakupan layanan profesional pengujian CPT mencakup seluruh tahapan penting berikut:</p>
+<ul>
+<li><strong>Pengujian CPT Ringan dan Berat:</strong> Penggunaan <a href="/spesifikasi-alat-sondir-cone-penetrometer">alat sondir tanah</a> kapasitas 2 ton untuk bangunan tempat tinggal hingga 5 ton untuk proyek komersial dan gedung bertingkat.</li>
+<li><strong>Penyusunan Laporan Geoteknik Lengkap:</strong> Menyajikan grafik hubungan antara kedalaman dengan nilai $q_c$, $f_s$, <em>Total Friction</em> ($T_f$), serta rekomendasi kapasitas daya dukung izin fondasi ($q_{all}$).</li>
+<li><strong>Legalitas Pengurusan Perizinan:</strong> Penyediaan berkas laporan yang disahkan oleh <em>Geotechnical Engineer</em> berpengalaman (memiliki SKA/STRA) sebagai lampiran wajib <a href="/sondir-tanah-untuk-pbg-imb-jogja">sondir tanah untuk IMB jogja</a> maupun sistem Pengurusan Persetujuan Bangunan Gedung (PBG) di Dinas Pekerjaan Umum setempat.</li>
+</ul>
+<hr />
+<h2>Sondir (CPT) vs Boring (SPT): Mana Pengujian yang Anda Butuhkan?</h2>
+<p>Dalam dunia penyelidikan tanah geoteknik, sering kali muncul keraguan antara memilih metode <strong>sondir (CPT)</strong> atau <strong>boring teknis (Standard Penetration Test / SPT)</strong>. Keduanya saling melengkapi, namun memiliki mekanisme dan luaran data yang berbeda.</p>
+<p>Tabel di bawah ini menguraikan perbandingan mendasar antara kedua metode pengujian tersebut:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Parameter Perbandingan</th>
+<th style="text-align: left;">Uji Sondir / CPT (<em>Dutch Cone</em>)</th>
+<th style="text-align: left;">Uji Boring Teknik / SPT (<em>Standard Penetration Test</em>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Prinsip Kerja</strong></td>
+<td style="text-align: left;">Penekanan konus secara kontinu menggunakan sistem hidrolis/mekanis.</td>
+<td style="text-align: left;">Pengeboran tanah disertai pemukulan tabung sampel (<em>split spoon sampler</em>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Output Utama</strong></td>
+<td style="text-align: left;">Nilai perlawanan konus ($q_c$) dan hambatan pelekat ($f_s$).</td>
+<td style="text-align: left;">Nilai N-SPT dan sampel tanah fisik (<em>disturbed &amp; undisturbed sample</em>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Pengambilan Sampel</strong></td>
+<td style="text-align: left;">Tidak mengambil sampel fisik tanah (hanya membaca perlawanan).</td>
+<td style="text-align: left;">Mengambil sampel fisik untuk diuji di laboratorium mekanika tanah.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Kedalaman Efektif</strong></td>
+<td style="text-align: left;">Hingga menemukan tanah keras ($q_c \ge 200 \text{ kg/cm}^2$) atau maks. 20-30 meter.</td>
+<td style="text-align: left;">Sangat dalam (bisa melebihi 30–50 meter, bahkan menembus batuan).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Peruntukan Utama</strong></td>
+<td style="text-align: left;">Rumah tinggal (1–4 lantai), ruko, gudang, rukan, dan syarat PBG standar.</td>
+<td style="text-align: left;">Gedung bertingkat tinggi (<em>high-rise</em>), jembatan bentang panjang, dan dam.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Durasi &amp; Waktu Uji</strong></td>
+<td style="text-align: left;">Sangat cepat (1 titik umumnya selesai dalam beberapa jam).</td>
+<td style="text-align: left;">Membutuhkan waktu lebih lama (beberapa hari per titik bor).</td>
+</tr>
+</tbody>
+</table>
+<p>Untuk pemahaman mendalam mengenai elastisitas dan klasifikasi sampel tanah secara rinci, Anda dapat membaca ulasan kami mengenai <a href="/perbedaan-sondir-cpt-dan-boring-spt">perbedaan sondir dan boring</a>.</p>
+<blockquote>
+<p><strong>Rekomendasi:</strong> Untuk bangunan 1 hingga 3 lantai di kawasan Jogja, pengujian <strong>jasa uji CPT jogja</strong> umumnya sudah memenuhi kualifikasi teknis dan administratif PBG. Namun, jika perencanaan melibatkan bangunan di atas 4 lantai atau struktur beban berat di area rawan gempa, kombinasi antara sondir dan <em>boring SPT</em> sangat disarankan.</p>
+</blockquote>
+<hr />
+<h2>Prosedur &amp; Alur Kerja Pengujian Sondir Tanah di Lapangan</h2>
+<p>Proses pelaksanaan pengujian CPT di lokasi proyek mengikuti standar operasional baku demi menjamin presisi data yang dihasilkan. </p>
+<pre><code>+-------------------------------------------------------+
+| 1. Persiapan Lahan &amp; Penentuan Titik Koordinat       |
++-------------------------------------------------------+
+                           |
+                           v
++-------------------------------------------------------+
+| 2. Pemasangan Jangkar (Anchor) &amp; Penyetelan Alat CPT  |
++-------------------------------------------------------+
+                           |
+                           v
++-------------------------------------------------------+
+| 3. Penekanan Stang &amp; Pencatatan Manometer (tiap 20 cm)|
++-------------------------------------------------------+
+                           |
+                           v
++-------------------------------------------------------+
+| 4. Terminasi (qc &gt;= 200 kg/cm² atau Maksimal Kapasitas)|
++-------------------------------------------------------+
+                           |
+                           v
++-------------------------------------------------------+
+| 5. Pengolahan Data Lab &amp; Penyusunan Laporan Geoteknik  |
++-------------------------------------------------------+
+</code></pre>
+<p>Berikut adalah tahapan sistematis uji sondir di lapangan:</p>
+<ol>
+<li><strong>Mobilisasi dan Persiapan Lahan:</strong> Tim teknisi membawa unit alat CPT ke lokasi target, kemudian melakukan pembersihan area dan menentukan titik uji berdasarkan <em>site plan</em> perencanaan bangunan.</li>
+<li><strong>Pemasangan Jangkar (<em>Anchor</em>):</strong> Jangkar spiral diputar masuk ke dalam tanah sebagai penahan gaya reaksi hidrolis/mekanis saat proses penekanan alat sondir berlangsung.</li>
+<li><strong>Penekanan Stang &amp; Pembacaan Manometer:</strong> Stang luar dan stang dalam ditekan secara berurutan masuk ke lapisan tanah. Pembacaan nilai pada <em>manometer</em> dilakukan setiap interval kedalaman 20 cm untuk merekam nilai $q_c$ dan $f_s$.</li>
+<li><strong>Kriteria Penghentian Uji (Terminasi):</strong> Proses penetrasi dihentikan apabila salah satu dari kondisi berikut terpenuhi:<br />
+   * Nilai perlawanan konus ($q_c$) telah mencapai $\ge 200 \text{ kg/cm}^2$ (indikasi lapisan tanah sangat keras).<br />
+   * Kapasitas tekan maksimum alat sondir telah tercapai.<br />
+   * Peralatan terangkat akibat gaya reaktif melampaui bobot jangkar penahan.</li>
+<li><strong>Pengolahan Data &amp; Pembuatan Grafik:</strong> Seluruh data mentah lapangan dikalkulasi menggunakan rumus geoteknik standar untuk menghasilkan <em>Grafik Sondir</em> yang menampilkan kurva perlawanan konus dan total hambatan pelekat. Detail interpretasi grafik ini dapat dibaca pada artikel <a href="/cara-membaca-laporan-hasil-sondir-tanah">cara membaca hasil sondir tanah</a>.</li>
+</ol>
+<hr />
+<h2>Estimasi Biaya Jasa Sondir Tanah di Jogja &amp; Faktor Penentunya</h2>
+<p>Berapa kisaran anggaran yang perlu disiapkan untuk pengujian geoteknik ini? Secara umum, <strong>biaya uji geoteknik jogja</strong> dihitung berdasarkan satuan per titik uji <em>(per point)</em>. Untuk wilayah Kota Yogyakarta, Sleman, dan Bantul, estimasi harga jasa sondir standar berkisar antara <strong>Rp1.500.000 hingga Rp2.500.000 per titik</strong>, tergantung pada spesifikasi kelengkapan berkas yang dibutuhkan.</p>
+<p>Beberapa variabel utama yang mempengaruhi penentuan harga final di lapangan meliputi:</p>
+<ul>
+<li><strong>Jumlah Titik Pengujian:</strong> Semakin banyak titik yang diuji dalam satu lokasi proyek yang sama, maka biaya rata-rata per titik biasanya menjadi lebih efisien.</li>
+<li><strong>Lokasi &amp; Aksesibilitas Medan:</strong> Area yang sulit dijangkau kendaraan operasional atau lokasi ekstrem (seperti lereng curam di Kulon Progo/Gunungkidul) membutuhkan penyesuaian biaya mobilisasi personil dan peralatan.</li>
+<li><strong>Tingkat Kedalaman Tanah Keras:</strong> Lokasi dengan tanah keras yang sangat dalam membutuhkan waktu operasional serta konsumsi material stang yang lebih banyak.</li>
+<li><strong>Kelengkapan Dokumen &amp; Legalitas:</strong> Kebutuhan sertifikasi resmi yang ditandatangani oleh <em>Engineer</em> berlisensi (dengan STRB/SKA aktif) untuk keperluan izin PBG gedung komersial berpengaruh pada nilai penyusunan laporan akhir.</li>
+</ul>
+<p>Pembahasan detail mengenai tarif aktual dapat Anda lihat pada panduan <a href="/biaya-jasa-sondir-tanah-jogja">biaya jasa sondir tanah jogja</a>.</p>
+<blockquote>
+<p>💡 <strong>Pro Tip:</strong> Waspadai penawaran harga pengujian yang jauh di bawah standar pasar. Laporan geoteknik tanpa pengujian lapangan yang sah (<em>fiktif</em>) berisiko tinggi ditolak oleh Dinas PUPR saat verifikasi PBG, serta membahayakan keamanan konstruksi bangunan Anda.</p>
+</blockquote>
+<hr />
+<h2>Mengapa Memilih Layanan Jasa Sondir Tanah Kami di Yogyakarta?</h2>
+<p>Memilih mitra geoteknik yang tepat adalah investasi keselamatan jangka panjang untuk properti Anda. Kami berkomitmen menyajikan hasil pengujian tanah secara objektif, presisi, dan dapat dipertanggungjawabkan secara akademis maupun teknis.</p>
+<p>Keunggulan utama layanan kami mencakup:</p>
+<ul>
+<li><strong>Peralatan Terkalibrasi Berkala:</strong> Seluruh instrumen manometer dan unit alat CPT kami menjalani kalibrasi rutin untuk menjamin keakuratan pembacaan tekanan di lapangan.</li>
+<li><strong>Tim Ahli Bersertifikat:</strong> Pengujian ditangani oleh teknisi berpengalaman dan laporan dianalisis langsung oleh ahli geoteknik sipil yang memiliki legalitas kualifikasi resmi.</li>
+<li><strong>Pengerjaan Cepat &amp; Tepat Waktu:</strong> Pengujian lapangan umumnya diselesaikan dalam 1 hari kerja, dan laporan analisis geoteknik siap dalam waktu 2–3 hari kerja.</li>
+<li><strong>Jaminan Laporan Lolos Verifikasi PBG:</strong> Format laporan kami telah disesuaikan dengan kriteria pemeriksaan teknis Dinas Pekerjaan Umum di seluruh kabupaten/kota se-DIY (Sleman, Bantul, Kota Jogja, Kulon Progo, Gunungkidul).</li>
+<li><strong>Konsultasi Gratis:</strong> Kami siap memberikan konsultasi awal mengenai penentuan jumlah titik uji ideal serta rekomendasi awal jenis fondasi yang cocok berdasarkan kondisi area Anda.</li>
+</ul>
+<hr />
+<h2>Pertanyaan Umum Seputar Jasa Sondir Tanah Jogja (FAQ)</h2>
+<h3>Berapa titik sondir tanah yang dibutuhkan untuk bangunan rumah 2 lantai atau ruko?</h3>
+<p>Untuk rumah tinggal 2 lantai atau ruko dengan luas tapak bangunan standar (di bawah 300 $m^2$), jumlah minimal yang disarankan adalah <strong>2 titik uji</strong>. Namun, jika tapak bangunan memiliki bentuk memanjang, memiliki luasan di atas 500 $m^2$, atau berdiri di atas tanah dengan topografi tidak rata, disarankan menggunakan <strong>3 hingga 4 titik uji</strong> untuk mendapatkan gambaran kontur tanah keras secara menyeluruh.</p>
+<h3>Berapa lama proses pengerjaan uji sondir tanah di lapangan hingga laporan selesai?</h3>
+<p>Proses pengetesan <em>in-situ</em> di lapangan untuk 2–3 titik pengujian umumnya memakan waktu <strong>1 hari kerja</strong>. Setelah pengujian lapangan selesai, data akan diolah oleh tim geoteknik di laboratorium/kantor. Laporan resmi tertulis berupa grafik CPT dan analisis daya dukung tanah selesai dalam waktu <strong>2 hingga 3 hari kerja</strong>.</p>
+<h3>Apakah hasil laporan sondir tanah dari tim Anda dijamin sah untuk kelengkapan berkas PBG / IMB di Jogja?</h3>
+<p><strong>Ya, dijamin sah.</strong> Seluruh laporan hasil pengujian geoteknik yang kami susun telah memenuhi standar teknis SNI dan dilengkapi dengan pengesahan dari <em>Geotechnical Engineer</em> yang memiliki Sertifikat Kompetensi Kerja (SKK) / SKA Ahli Teknik Bangunan Gedung/Geoteknik. Laporan ini siap diunggah ke sistem SIMBG untuk proses pengurusan izin Persetujuan Bangunan Gedung (PBG) di seluruh wilayah Provinsi DIY.</p>
+<hr />
+<h2>Kesimpulan &amp; Langkah Selanjutnya</h2>
+<p>Pengujian tanah melalui <strong>jasa sondir tanah Jogja</strong> bukan sekadar pemenuhan formalitas perizinan PBG/IMB, melainkan fondasi utama bagi keselamatan dan keberlanjutan bangunan Anda. Dengan mengetahui parameter daya dukung tanah secara terukur, Anda dapat menghemat biaya konstruksi melalui perencanaan dimensi fondasi yang efisien tanpa mengorbankan faktor keamanan.</p>
+<p>Jangan pertaruhkan aset dan keselamatan bangunan Anda pada ketidakpastian kondisi tanah. <strong>Hubungi tim ahli geoteknik kami sekarang</strong> untuk mendapatkan konsultasi gratis, penentuan jadwal survei lokasi, serta penawaran harga layanan uji sondir tanah terbaik di wilayah Yogyakarta dan sekitarnya!</p>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Berapa titik sondir tanah yang dibutuhkan untuk bangunan rumah 2 lantai atau ruko?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Untuk rumah tinggal 2 lantai atau ruko dengan luas tapak bangunan standar (di bawah 300 $m^2$), jumlah minimal yang disarankan adalah **2 titik uji**. Namun, jika tapak bangunan memiliki bentuk memanjang, memiliki luasan di atas 500 $m^2$, atau berdiri di atas tanah dengan topografi tidak rata, disarankan menggunakan **3 hingga 4 titik uji** untuk mendapatkan gambaran kontur tanah keras secara menyeluruh."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Berapa lama proses pengerjaan uji sondir tanah di lapangan hingga laporan selesai?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Proses pengetesan *in-situ* di lapangan untuk 2–3 titik pengujian umumnya memakan waktu **1 hari kerja**. Setelah pengujian lapangan selesai, data akan diolah oleh tim geoteknik di laboratorium/kantor. Laporan resmi tertulis berupa grafik CPT dan analisis daya dukung tanah selesai dalam waktu **2 hingga 3 hari kerja**."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Apakah hasil laporan sondir tanah dari tim Anda dijamin sah untuk kelengkapan berkas PBG / IMB di Jogja?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "**Ya, dijamin sah.** Seluruh laporan hasil pengujian geoteknik yang kami susun telah memenuhi standar teknis SNI dan dilengkapi dengan pengesahan dari *Geotechnical Engineer* yang memiliki Sertifikat Kompetensi Kerja (SKK) / SKA Ahli Teknik Bangunan Gedung/Geoteknik. Laporan ini siap diunggah ke sistem SIMBG untuk proses pengurusan izin Persetujuan Bangunan Gedung (PBG) di seluruh wilayah Provinsi DIY. ---"
+      }
+    }
+  ]
+}
+</script>]]></content:encoded>
+		<excerpt:encoded><![CDATA[Layanan jasa sondir tanah Jogja profesional & berpengalaman. Hasil pengujian CPT akurat untuk syarat PBG/IMB. Hubungi kami untuk konsultasi gratis!]]></excerpt:encoded>
+		<wp:post_id>1</wp:post_id>
+		<wp:post_date>2026-09-26 16:11:50</wp:post_date>
+		<wp:post_date_gmt>2026-09-26 16:11:50</wp:post_date_gmt>
+		<wp:comment_status>open</wp:comment_status>
+		<wp:ping_status>open</wp:ping_status>
+		<wp:post_name><![CDATA[jasa-sondir-tanah-jogja]]></wp:post_name>
+		<wp:status><![CDATA[publish]]></wp:status>
+		<wp:post_parent>0</wp:post_parent>
+		<wp:menu_order>0</wp:menu_order>
+		<wp:post_type><![CDATA[post]]></wp:post_type>
+		<wp:post_password></wp:post_password>
+		<wp:is_sticky>0</wp:is_sticky>
+		<category domain="category" nicename="jasa-sondir-tanah-jogja"><![CDATA[jasa-sondir-tanah-jogja]]></category>
+		<wp:postmeta>
+			<wp:meta_key><![CDATA[rank_math_title]]></wp:meta_key>
+			<wp:meta_value><![CDATA[Jasa Sondir Tanah Jogja Terbaik & Akurat - Layanan Geoteknik]]></wp:meta_value>
+		</wp:postmeta>
+		<wp:postmeta>
+			<wp:meta_key><![CDATA[rank_math_description]]></wp:meta_key>
+			<wp:meta_value><![CDATA[Layanan jasa sondir tanah Jogja profesional & berpengalaman. Hasil pengujian CPT akurat untuk syarat PBG/IMB. Hubungi kami untuk konsultasi gratis!]]></wp:meta_value>
+		</wp:postmeta>
+		<wp:postmeta>
+			<wp:meta_key><![CDATA[rank_math_focus_keyword]]></wp:meta_key>
+			<wp:meta_value><![CDATA[jasa sondir tanah jogja]]></wp:meta_value>
+		</wp:postmeta>
+		<wp:postmeta>
+			<wp:meta_key><![CDATA[_yoast_wpseo_title]]></wp:meta_key>
+			<wp:meta_value><![CDATA[Jasa Sondir Tanah Jogja Terbaik & Akurat - Layanan Geoteknik]]></wp:meta_value>
+		</wp:postmeta>
+		<wp:postmeta>
+			<wp:meta_key><![CDATA[_yoast_wpseo_metadesc]]></wp:meta_key>
+			<wp:meta_value><![CDATA[Layanan jasa sondir tanah Jogja profesional & berpengalaman. Hasil pengujian CPT akurat untuk syarat PBG/IMB. Hubungi kami untuk konsultasi gratis!]]></wp:meta_value>
+		</wp:postmeta>
+		<wp:postmeta>
+			<wp:meta_key><![CDATA[_yoast_wpseo_focuskw]]></wp:meta_key>
+			<wp:meta_value><![CDATA[jasa sondir tanah jogja]]></wp:meta_value>
+		</wp:postmeta>
+	</item>
+</channel>
+</rss>

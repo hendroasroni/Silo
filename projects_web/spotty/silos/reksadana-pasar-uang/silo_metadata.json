@@ -1,0 +1,252 @@
+{
+  "silo_plan": {
+    "seed_keyword": "reksadana pasar uang",
+    "silo_theme": "Edukasi Investasi Rendah Risiko untuk Pemula",
+    "topical_authority_goal": "Menetapkan domain sebagai otoritas utama dalam instrumen pasar uang dengan menyediakan panduan komprehensif, perbandingan logis, dan strategi praktis bagi investor baru.",
+    "items": [
+      {
+        "id": 1,
+        "keyword": "reksadana pasar uang",
+        "suggested_title": "Panduan Lengkap Reksadana Pasar Uang: Pengertian, Cara Kerja, dan Keuntungan",
+        "role": "Pillar",
+        "search_intent": "Informational",
+        "competition_level": "High",
+        "target_audience": "Investor pemula yang ingin memahami dasar investasi sebelum memulai.",
+        "silo_role_description": "Berfungsi sebagai hub utama yang merangkum seluruh aspek pasar uang dan mendistribusikan link equity ke artikel cluster yang lebih spesifik.",
+        "recommendation_rank": 1,
+        "recommendation_reason": "Merupakan fondasi utama konten yang diperlukan untuk mendefinisikan topik secara luas di mata search engine.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 2,
+        "keyword": "cara investasi reksadana pasar uang",
+        "suggested_title": "Cara Investasi Reksadana Pasar Uang untuk Pemula: Langkah demi Langkah",
+        "role": "Cluster",
+        "search_intent": "Transactional",
+        "competition_level": "Medium",
+        "target_audience": "Calon investor yang sudah paham teori dan siap melakukan eksekusi pembelian.",
+        "silo_role_description": "Menyediakan panduan praktis 'how-to' yang menghubungkan teori di artikel pilar dengan tindakan nyata.",
+        "recommendation_rank": 2,
+        "recommendation_reason": "Memiliki potensi konversi tinggi karena menargetkan pengguna yang berada di tahap 'consideration' menuju 'action'.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 3,
+        "keyword": "reksadana pasar uang vs tabungan",
+        "suggested_title": "Reksadana Pasar Uang vs Tabungan Bank: Mana yang Lebih Menguntungkan?",
+        "role": "Cluster",
+        "search_intent": "Commercial",
+        "competition_level": "Medium",
+        "target_audience": "Masyarakat umum yang mencari alternatif penyimpanan uang dengan imbal hasil lebih tinggi dari bunga bank.",
+        "silo_role_description": "Membandingkan instrumen populer untuk meyakinkan pembaca tentang value proposition reksadana pasar uang.",
+        "recommendation_rank": 3,
+        "recommendation_reason": "Sangat efektif menarik traffic dari pencarian perbandingan yang sering dilakukan oleh orang awam.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 4,
+        "keyword": "reksadana pasar uang terbaik",
+        "suggested_title": "7 Cara Memilih Reksadana Pasar Uang Terbaik dan Menguntungkan Tahun Ini",
+        "role": "Cluster",
+        "search_intent": "Commercial",
+        "competition_level": "High",
+        "target_audience": "Investor yang sudah yakin ingin membeli namun butuh kurasi atau kriteria pemilihan produk.",
+        "silo_role_description": "Memberikan panduan pemilihan produk spesifik yang memperkuat otoritas keahlian (Expertise) situs.",
+        "recommendation_rank": 4,
+        "recommendation_reason": "Keyword dengan volume tinggi dan niat beli yang sangat kuat.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 5,
+        "keyword": "reksadana pasar uang untuk dana darurat",
+        "suggested_title": "Strategi Mengelola Dana Darurat di Reksadana Pasar Uang agar Tetap Likuid",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Individu yang sedang menyusun perencanaan keuangan dan mencari tempat parkir dana yang aman.",
+        "silo_role_description": "Menghubungkan topik investasi dengan use-case spesifik dalam perencanaan keuangan pribadi.",
+        "recommendation_rank": 5,
+        "recommendation_reason": "Kompetisi lebih rendah (low-hanging fruit) dan sangat relevan dengan kebutuhan finansial dasar.",
+        "is_recommended_default": false
+      },
+      {
+        "id": 6,
+        "keyword": "risiko reksadana pasar uang",
+        "suggested_title": "Apakah Reksadana Pasar Uang Aman? Pahami Risiko dan Cara Meminimalisirnya",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Medium",
+        "target_audience": "Investor konservatif yang sangat memperhatikan aspek keamanan aset.",
+        "silo_role_description": "Membangun kepercayaan (Trust) dengan memberikan edukasi yang jujur mengenai sisi risiko instrumen.",
+        "recommendation_rank": 6,
+        "recommendation_reason": "Penting untuk memenuhi aspek E-E-A-T (Trustworthiness) dalam algoritma Google finansial (YMYL).",
+        "is_recommended_default": false
+      },
+      {
+        "id": 7,
+        "keyword": "perbedaan reksadana pasar uang dan pendapatan tetap",
+        "suggested_title": "Perbedaan Reksadana Pasar Uang dan Pendapatan Tetap: Mana yang Cocok untuk Anda?",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Medium",
+        "target_audience": "Investor yang ingin melakukan diversifikasi atau membandingkan profil risiko antar jenis reksadana.",
+        "silo_role_description": "Memperluas cakupan topik ke kategori reksadana lain untuk memperkuat struktur internal linking antar kategori.",
+        "recommendation_rank": 7,
+        "recommendation_reason": "Membantu pengguna naik ke level pemahaman investasi yang lebih tinggi.",
+        "is_recommended_default": false
+      }
+    ]
+  },
+  "articles": [
+    {
+      "item_id": 1,
+      "item": {
+        "id": 1,
+        "keyword": "reksadana pasar uang",
+        "suggested_title": "Panduan Lengkap Reksadana Pasar Uang: Pengertian, Cara Kerja, dan Keuntungan",
+        "role": "Pillar",
+        "search_intent": "Informational",
+        "competition_level": "High",
+        "target_audience": "Investor pemula yang ingin memahami dasar investasi sebelum memulai.",
+        "silo_role_description": "Berfungsi sebagai hub utama yang merangkum seluruh aspek pasar uang dan mendistribusikan link equity ke artikel cluster yang lebih spesifik.",
+        "recommendation_rank": 1,
+        "recommendation_reason": "Merupakan fondasi utama konten yang diperlukan untuk mendefinisikan topik secara luas di mata search engine.",
+        "is_recommended_default": true
+      },
+      "brief": {
+        "item_id": 1,
+        "primary_keyword": "reksadana pasar uang",
+        "meta_title": "Panduan Lengkap Reksadana Pasar Uang: Pengertian & Keuntungan",
+        "meta_description": "Ingin mulai investasi aman? Pelajari pengertian reksadana pasar uang, cara kerja, hingga keuntungannya bagi pemula di panduan lengkap ini. Cek selengkapnya!",
+        "url_slug": "panduan-reksadana-pasar-uang",
+        "target_word_count": "1500 - 2000 kata",
+        "secondary_keywords": [
+          "apa itu reksadana pasar uang",
+          "keuntungan reksadana pasar uang",
+          "cara kerja reksadana pasar uang",
+          "investasi rendah risiko",
+          "instrumen pasar uang",
+          "reksadana pasar uang adalah"
+        ],
+        "semantic_entities_lsi": [
+          "Manajer Investasi",
+          "Bank Kustodian",
+          "Deposito Berjangka",
+          "Obligasi Jatuh Tempo Kurang dari Setahun",
+          "Likuiditas",
+          "Otoritas Jasa Keuangan (OJK)",
+          "Nilai Aktiva Bersih (NAB)",
+          "Portofolio Efek",
+          "Prospektus",
+          "Fund Fact Sheet"
+        ],
+        "internal_link_strategy": {
+          "target_pillar_link": "N/A (This is the Pillar Page)",
+          "target_cluster_links": [
+            "Link ke artikel ID 2 untuk panduan teknis pendaftaran",
+            "Link ke artikel ID 3 untuk perbandingan mendalam dengan produk perbankan",
+            "Link ke artikel ID 4 untuk tips kurasi produk",
+            "Link ke artikel ID 5 untuk implementasi strategi keuangan",
+            "Link ke artikel ID 6 untuk edukasi manajemen risiko",
+            "Link ke artikel ID 7 untuk perbandingan antar jenis reksadana"
+          ],
+          "suggested_anchor_texts": [
+            "cara investasi reksadana pasar uang",
+            "reksadana pasar uang vs tabungan",
+            "reksadana pasar uang terbaik",
+            "dana darurat di reksadana pasar uang",
+            "risiko reksadana pasar uang",
+            "perbedaan reksadana pasar uang dan pendapatan tetap"
+          ]
+        },
+        "outline": [
+          {
+            "heading_tag": "H2",
+            "heading_title": "Apa Itu Reksadana Pasar Uang?",
+            "key_talking_points": [
+              "Definisi reksadana pasar uang secara umum dan menurut OJK",
+              "Karakteristik utama: risiko rendah, likuiditas tinggi, jangka pendek",
+              "Mengapa instrumen ini populer bagi investor pemula"
+            ],
+            "include_element": "Blockquote definisi dari pakar/regulasi"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Bagaimana Cara Kerja Reksadana Pasar Uang?",
+            "key_talking_points": [
+              "Peran Manajer Investasi dalam mengelola dana kolektif",
+              "Alokasi aset pada instrumen pasar uang (deposito, SBI, obligasi < 1 tahun)",
+              "Proses penghitungan keuntungan melalui kenaikan NAB"
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Keuntungan Investasi Reksadana Pasar Uang",
+            "key_talking_points": [
+              "Modal terjangkau (mulai dari Rp10.000)",
+              "Likuiditas tinggi (mudah dicairkan kapan saja)",
+              "Imbal hasil cenderung lebih tinggi dari deposito bank",
+              "Diversifikasi otomatis oleh profesional"
+            ],
+            "include_element": "Listicle"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Perbandingan: Reksadana Pasar Uang vs Tabungan & Deposito",
+            "key_talking_points": [
+              "Perbedaan dari sisi pajak (reksadana bukan objek pajak)",
+              "Fleksibilitas penarikan dana tanpa penalti",
+              "Potensi return tahunan rata-rata"
+            ],
+            "include_element": "Tabel perbandingan"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Siapa yang Cocok Berinvestasi di Reksadana Pasar Uang?",
+            "key_talking_points": [
+              "Investor dengan profil risiko konservatif",
+              "Pemilik dana yang membutuhkan tempat parkir uang sementara",
+              "Masyarakat yang sedang mengumpulkan dana darurat"
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Memahami Risiko Reksadana Pasar Uang",
+            "key_talking_points": [
+              "Risiko gagal bayar (default) pada obligasi korporasi",
+              "Risiko likuiditas jika terjadi penarikan massal (rush)",
+              "Risiko penurunan suku bunga yang mempengaruhi return"
+            ],
+            "include_element": "Blockquote tips mitigasi"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Cara Memulai Investasi Reksadana Pasar Uang",
+            "key_talking_points": [
+              "Memilih platform APERD (Agen Penjual Efek Reksa Dana) resmi",
+              "Membaca Fund Fact Sheet dan Prospektus",
+              "Konsistensi investasi dengan strategi Dollar Cost Averaging"
+            ],
+            "include_element": "None"
+          }
+        ],
+        "faq_questions": [
+          "Apakah reksadana pasar uang bisa rugi?",
+          "Berapa lama jangka waktu investasi reksadana pasar uang?",
+          "Apakah reksadana pasar uang dikenakan pajak?",
+          "Kapan waktu terbaik untuk membeli reksadana pasar uang?"
+        ]
+      },
+      "curation_score": 96,
+      "editorial_critique": [
+        "Draf awal sudah memiliki struktur yang sangat kuat dan mencakup elemen krusial seperti definisi OJK dan tabel komparasi.",
+        "Penyempurnaan dilakukan pada penghapusan diksi klise AI (seperti 'mengupas tuntas', 'jembatan ideal') untuk memberikan kesan yang lebih otoritatif dan objektif.",
+        "Alur transisi antar sub-topik diperhalus agar pembaca merasa dibimbing dari pemahaman dasar ke langkah praktis.",
+        "Penempatan internal link disesuaikan agar mengalir secara kontekstual di dalam kalimat, bukan sekadar tempelan di akhir paragraf.",
+        "Optimasi pada bagian risiko untuk memberikan nilai edukasi yang lebih dalam bagi investor konservatif."
+      ]
+    }
+  ]
+}

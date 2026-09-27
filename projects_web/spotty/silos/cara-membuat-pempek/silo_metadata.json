@@ -1,0 +1,537 @@
+{
+  "silo_plan": {
+    "seed_keyword": "cara membuat pempek",
+    "silo_theme": "Panduan Lengkap dan Resep Pempek Palembang Otentik",
+    "topical_authority_goal": "Membangun otoritas topik terlengkap seputar pembuatan pempek Palembang, mulai dari teknik dasar, variasi resep, hingga solusi kegagalan bagi pemula dan pelaku usaha.",
+    "items": [
+      {
+        "id": 1,
+        "keyword": "cara membuat pempek",
+        "suggested_title": "Cara Membuat Pempek Palembang Asli yang Lembut dan Kenyal: Panduan Lengkap",
+        "role": "Pillar",
+        "search_intent": "Informational",
+        "competition_level": "High",
+        "target_audience": "Pemula yang ingin belajar membuat pempek Palembang otentik dari nol.",
+        "silo_role_description": "Sebagai pilar utama yang merangkum seluruh jenis pempek, teknik dasar adonan, dan mengarahkan link ke artikel cluster yang membahas teknik spesifik.",
+        "recommendation_rank": 1,
+        "recommendation_reason": "Merupakan fondasi utama dari seluruh topik pempek yang akan menarik traffic terbesar dan menjadi pusat internal linking.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 2,
+        "keyword": "cara membuat cuko pempek",
+        "suggested_title": "Resep Cuko Pempek Palembang yang Kental, Hitam, dan Pedas Mantap",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Medium",
+        "target_audience": "Pecinta kuliner yang ingin membuat kuah pendamping pempek yang otentik.",
+        "silo_role_description": "Mendukung pilar utama karena pempek wajib disajikan dengan cuko. Menyalurkan link equity kembali ke artikel pilar utama.",
+        "recommendation_rank": 2,
+        "recommendation_reason": "Cuko adalah elemen wajib pempek dengan volume pencarian sangat tinggi, krusial untuk melengkapi pilar utama.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 3,
+        "keyword": "cara membuat pempek dos",
+        "suggested_title": "Cara Membuat Pempek Dos Tanpa Ikan yang Tetap Gurih dan Lembut",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Medium",
+        "target_audience": "Ibu rumah tangga atau anak kos yang ingin membuat pempek ekonomis tanpa bahan ikan.",
+        "silo_role_description": "Menargetkan variasi pempek paling populer kedua (tanpa ikan) untuk menangkap audiens dengan budget terbatas.",
+        "recommendation_rank": 3,
+        "recommendation_reason": "Keyword dengan volume pencarian tinggi namun persaingan lebih rendah dibanding pempek ikan asli.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 4,
+        "keyword": "cara membuat pempek kapal selam",
+        "suggested_title": "Tips dan Cara Membuat Pempek Kapal Selam Anti Bocor untuk Pemula",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Medium",
+        "target_audience": "Hobi masak yang ingin menaklukkan tantangan memasukkan telur utuh ke dalam adonan pempek.",
+        "silo_role_description": "Membahas teknik spesifik pembuatan jenis pempek paling ikonik, memperkuat otoritas resep pempek.",
+        "recommendation_rank": 4,
+        "recommendation_reason": "Menjawab kesulitan teknis terbesar (telur bocor saat direbus) yang sering dicari solusinya oleh pengguna.",
+        "is_recommended_default": false
+      },
+      {
+        "id": 5,
+        "keyword": "kenapa pempek keras",
+        "suggested_title": "Penyebab Pempek Keras dan Alot Serta Cara Mengatasinya Agar Kenyal",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Low",
+        "target_audience": "Orang yang gagal membuat pempek dan mencari solusi mengatasi adonan yang keras.",
+        "silo_role_description": "Menjawab search intent berupa troubleshooting, meningkatkan user trust dan dwell time pada silo.",
+        "recommendation_rank": 5,
+        "recommendation_reason": "Keyword bernada problem-solving dengan kompetisi rendah (low-hanging fruit) yang sangat baik untuk membangun reputasi ahli.",
+        "is_recommended_default": true
+      },
+      {
+        "id": 6,
+        "keyword": "cara membuat pempek adaan",
+        "suggested_title": "Cara Membuat Pempek Adaan yang Bulat Sempurna dan Tidak Keriput",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Medium",
+        "target_audience": "Pecinta pempek yang menyukai tekstur pempek adaan yang gurih bersantan.",
+        "silo_role_description": "Fokus pada variasi pempek goreng langsung (tanpa rebus) untuk melengkapi variasi menu pempek.",
+        "recommendation_rank": 6,
+        "recommendation_reason": "Variasi pempek populer yang membutuhkan tips khusus agar bentuknya bulat cantik saat dingin.",
+        "is_recommended_default": false
+      },
+      {
+        "id": 7,
+        "keyword": "cara menyimpan pempek frozen",
+        "suggested_title": "Cara Menyimpan Pempek di Freezer Agar Awet dan Cocok untuk Jualan",
+        "role": "Cluster",
+        "search_intent": "Commercial",
+        "competition_level": "Low",
+        "target_audience": "Pelaku usaha kuliner rumahan atau orang yang ingin menyetok pempek dalam jumlah banyak.",
+        "silo_role_description": "Menghubungkan aspek pembuatan dengan penyimpanan jangka panjang, menyasar audiens berniat bisnis.",
+        "recommendation_rank": 7,
+        "recommendation_reason": "Menargetkan audiens dengan intensi komersial/bisnis yang berpotensi melakukan transaksi atau membaca konten monetisasi.",
+        "is_recommended_default": false
+      }
+    ]
+  },
+  "articles": [
+    {
+      "item_id": 1,
+      "item": {
+        "id": 1,
+        "keyword": "cara membuat pempek",
+        "suggested_title": "Cara Membuat Pempek Palembang Asli yang Lembut dan Kenyal: Panduan Lengkap",
+        "role": "Pillar",
+        "search_intent": "Informational",
+        "competition_level": "High",
+        "target_audience": "Pemula yang ingin belajar membuat pempek Palembang otentik dari nol.",
+        "silo_role_description": "Sebagai pilar utama yang merangkum seluruh jenis pempek, teknik dasar adonan, dan mengarahkan link ke artikel cluster yang membahas teknik spesifik.",
+        "recommendation_rank": 1,
+        "recommendation_reason": "Merupakan fondasi utama dari seluruh topik pempek yang akan menarik traffic terbesar dan menjadi pusat internal linking.",
+        "is_recommended_default": true
+      },
+      "brief": {
+        "item_id": 1,
+        "primary_keyword": "cara membuat pempek",
+        "meta_title": "Cara Membuat Pempek Palembang Asli Lembut & Kenyal",
+        "meta_description": "Resep cara membuat pempek Palembang asli yang lembut, kenyal, dan anti gagal. Temukan takaran pas adonan ikan dan tips rahasia di sini!",
+        "url_slug": "cara-membuat-pempek",
+        "target_word_count": "1500 - 2000 kata",
+        "content_archetype": {
+          "type": "ultimate_pillar_guide",
+          "format_label": "Ultimate Pillar Guide & Recipe Hub",
+          "mandatory_visual_elements": [
+            "Tabel Rasio Bahan dan Jenis Pempek",
+            "Step-by-Step Timeline Pembuatan Adonan",
+            "Box Pro-Tip Anti-Gagal (Kneading Limit)",
+            "Checklist Evaluasi Tekstur Pempek"
+          ],
+          "content_angle": "Panduan komprehensif dari hulu ke hilir yang menggabungkan sains kuliner (rasio ikan-tepung) dengan resep otentik Palembang agar pempek anti-gagal, lembut, dan kenyal tanpa bahan pengawet."
+        },
+        "secondary_keywords": [
+          "resep pempek palembang",
+          "cara membuat pempek ikan",
+          "adonan pempek lembut",
+          "cara merebus pempek"
+        ],
+        "semantic_entities_lsi": [
+          "ikan tenggiri",
+          "tepung sagu tani",
+          "cuko pempek",
+          "pempek kapal selam",
+          "pempek lenjer",
+          "rasio adonan",
+          "air es",
+          "putih telur"
+        ],
+        "internal_link_strategy": {
+          "target_pillar_link": "Artikel ini bertindak sebagai Pillar Page utama untuk seluruh kluster topik pempek.",
+          "target_cluster_links": [
+            "Hubungkan ke artikel ID 2 (cara membuat cuko pempek) pada bagian penyajian pempek.",
+            "Hubungkan ke artikel ID 3 (cara membuat pempek dos) sebagai alternatif resep ekonomis tanpa ikan.",
+            "Hubungkan ke artikel ID 4 (cara membuat pempek kapal selam) saat membahas teknik membentuk pempek isi telur.",
+            "Hubungkan ke artikel ID 5 (kenapa pempek keras) pada bagian troubleshooting tekstur adonan.",
+            "Hubungkan ke artikel ID 6 (cara membuat pempek adaan) saat mengulas variasi bentuk bulat dan penggunaan santan.",
+            "Hubungkan ke artikel ID 7 (cara menyimpan pempek frozen) pada bagian penyimpanan jangka panjang."
+          ],
+          "anchor_variations": {
+            "exact_keyword": "cara membuat pempek",
+            "lsi_synonym": "resep pempek Palembang asli",
+            "conversational_natural": "panduan lengkap mengolah adonan pempek agar kenyal"
+          }
+        },
+        "outline": [
+          {
+            "heading_tag": "H2",
+            "heading_title": "Mengenal Keunikan Pempek Palembang Asli",
+            "key_talking_points": [
+              "Sejarah singkat pempek sebagai kuliner legendaris Palembang.",
+              "Karakteristik pempek yang ideal: perpaduan rasa gurih ikan yang dominan dengan tekstur kenyal namun tetap lembut saat digigit."
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Rahasia Bahan Utama Pempek yang Lembut dan Gurih",
+            "key_talking_points": [
+              "Pemilihan jenis ikan terbaik (ikan tenggiri, gabus, atau belida) dan pengaruh kesegarannya terhadap hasil akhir.",
+              "Pentingnya menggunakan tepung sagu berkualitas tinggi (seperti sagu tani) dibanding tepung tapioka biasa.",
+              "Fungsi air es dan putih telur dalam menjaga suhu adonan serta memberikan kelembutan ekstra."
+            ],
+            "include_element": "Pro-Tip Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Resep & Cara Membuat Pempek Palembang Otentik (Langkah demi Langkah)",
+            "key_talking_points": [
+              "Daftar bahan dan takaran presisi untuk pempek lenjer dasar.",
+              "Proses pencampuran daging ikan dengan air es dan garam hingga membentuk emulsi yang kokoh.",
+              "Teknik memasukkan tepung sagu secara bertahap tanpa diuleni berlebihan (over-kneading) agar tidak alot."
+            ],
+            "include_element": "Step Timeline"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Panduan Membentuk Berbagai Variasi Pempek",
+            "key_talking_points": [
+              "Cara membentuk pempek lenjer kecil dan besar secara rapi.",
+              "Pengenalan variasi pempek lain seperti pempek kapal selam yang legendaris (arahkan ke panduan cara membuat pempek kapal selam anti bocor).",
+              "Variasi bulat gurih seperti pempek adaan (arahkan ke cara membuat pempek adaan bulat sempurna) dan versi ekonomis (arahkan ke cara membuat pempek dos tanpa ikan)."
+            ],
+            "include_element": "Tabel"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Mengapa Pempek Bisa Keras atau Alot? (Troubleshooting)",
+            "key_talking_points": [
+              "Analisis kesalahan umum: terlalu banyak tepung sagu atau menguleni adonan setelah sagu masuk.",
+              "Solusi ilmiah untuk memperbaiki adonan yang terlanjur keras (arahkan ke artikel kenapa pempek keras untuk pembahasan mendalam)."
+            ],
+            "include_element": "Checklist Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Cara Merebus dan Menggoreng Pempek dengan Benar",
+            "key_talking_points": [
+              "Teknik merebus dalam air mendidih yang diberi sedikit minyak agar tidak saling menempel.",
+              "Tanda pempek telah matang sempurna (mengapung dan mengembang).",
+              "Tips menggoreng pempek hingga berkulit garing di luar namun tetap lembut di dalam."
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Cara Menyimpan Pempek Agar Tahan Lama",
+            "key_talking_points": [
+              "Metode mendinginkan pempek rebus sebelum disimpan.",
+              "Cara membekukan pempek untuk stok makanan atau usaha kuliner (arahkan ke cara menyimpan pempek frozen)."
+            ],
+            "include_element": "Pro-Tip Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Penyajian: Cuko Pempek yang Kental dan Pedas Mantap",
+            "key_talking_points": [
+              "Pentingnya cuko sebagai belahan jiwa pempek.",
+              "Kriteria cuko yang enak: menggunakan gula batok hitam asli Lubuklinggau, asam jawa, dan cabai rawit (arahkan ke cara membuat cuko pempek kental)."
+            ],
+            "include_element": "None"
+          }
+        ],
+        "faq_questions": [
+          "Ikan apa saja yang paling bagus digunakan untuk membuat pempek?",
+          "Mengapa adonan pempek saya sangat lengket dan bagaimana cara mengatasinya saat dibentuk?",
+          "Berapa lama pempek rebus dapat bertahan di suhu ruang sebelum basi?"
+        ]
+      },
+      "curation_score": 78,
+      "editorial_critique": [
+        "Draf memiliki cakupan yang kuat untuk search intent 'cara membuat pempek': membahas bahan, formulasi, langkah pembuatan, pembentukan, perebusan, penggorengan, penyimpanan, troubleshooting, cuko, dan FAQ.",
+        "Internal linking sudah mencakup hampir seluruh cluster yang ditetapkan dalam Content Brief, tetapi beberapa tautan memakai anchor yang berulang atau terasa dipaksakan. Versi final mempertahankan semua cluster penting dengan anchor yang lebih natural.",
+        "Draf terlalu banyak menggunakan istilah teknis seperti 'emulsifikasi', 'kneading limit', dan 'aktivasi protein' tanpa penjelasan yang proporsional. Beberapa istilah juga kurang tepat secara teknis untuk menjelaskan mekanisme tekstur pempek.",
+        "Klaim bahwa menguleni setelah sagu masuk 'mengaktifkan jaringan pati secara berlebihan' dan bahwa pati membentuk struktur padat akibat pengulenan perlu diperbaiki. Tekstur pempek terutama dipengaruhi oleh protein ikan yang diekstrak selama pencampuran dengan garam, proporsi pati, kadar air, suhu adonan, serta proses pemasakan.",
+        "Klaim bahwa tepung sagu tani pasti berbeda secara signifikan dari tapioka dalam hasil akhir terlalu absolut. Dalam penggunaan rumahan, istilah tepung sagu dan tapioka juga sering tercampur dalam perdagangan. Versi final menghindari klaim universal dan menekankan penggunaan produk yang memang ditujukan untuk pempek.",
+        "Pernyataan bahwa ikan gabus menghasilkan warna lebih putih dan ikan tertentu merupakan 'standar emas' sebaiknya tidak diposisikan sebagai fakta mutlak. Jenis ikan dapat memengaruhi rasa, warna, aroma, dan tekstur, tetapi hasil akhir juga sangat bergantung pada formulasi dan teknik.",
+        "Klaim mengenai ikan tenggiri betina yang lebih lengket tidak perlu dijadikan aturan karena karakter bahan baku dapat bervariasi. Versi final menghapus generalisasi tersebut.",
+        "Bagian keamanan pangan terlalu spesifik ketika menetapkan pempek pada suhu ruang bertahan 18-24 jam. Untuk artikel konsumen, pendekatan yang lebih aman adalah menganjurkan pendinginan segera dan tidak membiarkan makanan mudah rusak berada pada suhu ruang dalam waktu lama.",
+        "Draf menggunakan frasa promosi seperti 'standar emas', 'paling ideal', 'prima hingga berbulan-bulan', dan 'otentik' secara berlebihan. Versi final menggantinya dengan bahasa objektif, praktis, dan dapat diverifikasi.",
+        "Format timeline berbentuk blok teks kurang nyaman untuk pembaca mobile. Versi final mengubahnya menjadi langkah bernomor dengan instruksi yang lebih mudah dipindai.",
+        "Tabel variasi pempek sebelumnya memberi rasio ikan:sagu yang terlalu preskriptif untuk berbagai jenis pempek karena formulasi setiap resep dapat berbeda. Versi final menggunakan deskripsi karakter dan teknik tanpa menyamakan semua varian dengan satu rasio baku.",
+        "Versi final mempertahankan target keyword 'cara membuat pempek' secara natural pada judul, pembuka, dan bagian utama tanpa melakukan keyword stuffing."
+      ]
+    },
+    {
+      "item_id": 3,
+      "item": {
+        "id": 3,
+        "keyword": "cara membuat pempek dos",
+        "suggested_title": "Cara Membuat Pempek Dos Tanpa Ikan yang Tetap Gurih dan Lembut",
+        "role": "Cluster",
+        "search_intent": "Informational",
+        "competition_level": "Medium",
+        "target_audience": "Ibu rumah tangga atau anak kos yang ingin membuat pempek ekonomis tanpa bahan ikan.",
+        "silo_role_description": "Menargetkan variasi pempek paling populer kedua (tanpa ikan) untuk menangkap audiens dengan budget terbatas.",
+        "recommendation_rank": 3,
+        "recommendation_reason": "Keyword dengan volume pencarian tinggi namun persaingan lebih rendah dibanding pempek ikan asli.",
+        "is_recommended_default": true
+      },
+      "brief": {
+        "item_id": 3,
+        "primary_keyword": "cara membuat pempek dos",
+        "meta_title": "Cara Membuat Pempek Dos Tanpa Ikan: Gurih & Lembut Jitu",
+        "meta_description": "Pelajari cara membuat pempek dos yang kenyal, gurih, dan lembut tanpa bau amis. Resep step-by-step lengkap dengan tips anti gagal.",
+        "url_slug": "cara-membuat-pempek-dos-tanpa-ikan",
+        "target_word_count": "1500 - 2000 kata",
+        "content_archetype": {
+          "type": "step_by_step_workflow",
+          "format_label": "Step-by-Step Procedural Recipe",
+          "mandatory_visual_elements": [
+            "Checklist Bahan Utama & Pengganti",
+            "Timeline Tahuan Pencampuran Ulenian",
+            "Pro-Tip Box: Rahasia Tekstur Kenyal",
+            "Visual Guide Bentuk adonan"
+          ],
+          "content_angle": "Membingkai penggunaan tepung terigu/dos bukan sekadar pengganti murah, melainkan alternatif praktis yang jika diolah dengan teknik 'pengikatan' yang tepat menghasilkan tekstur pekat dan gurih yang menyerupai pempek ikan asli, sekaligus menyasar audiens vegetarian atau alergi ikan."
+        },
+        "secondary_keywords": [
+          "resep pempek dos",
+          "pempek vegetarian",
+          "pengganti ikan pada pempek",
+          "cara bikin pempek praktis"
+        ],
+        "semantic_entities_lsi": [
+          "tepung terigu protein tinggi",
+          "gula pasir",
+          "cuka pempek",
+          "tekstur kenyal",
+          "bahan pengikat elastis",
+          "gorengan khas sumatera selatan",
+          "adonan pempek"
+        ],
+        "internal_link_strategy": {
+          "target_pillar_link": "Sisipkan link ke artikel pilar 'cara membuat pempek' di bagian pengantar sebagai referensi dasar pengetahuan.",
+          "target_cluster_links": [
+            "Link ke artikel cluster 'cara membuat cuko pempek' saat membahas penyajian (sajian wajib cuko).",
+            "Link ke artikel cluster 'kenapa pempek keras' jika membahas troubleshooting tekstur.",
+            "Link ke artikel cluster 'cara membuat pempek adaan' untuk membandingkan bentuk adonan."
+          ],
+          "anchor_variations": {
+            "exact_keyword": "cara membuat pempek dos",
+            "lsi_synonym": "resep pempek berbasis tepung",
+            "conversational_natural": "memahami dasar-dasar pembuatan pempek palembang"
+          }
+        },
+        "outline": [
+          {
+            "heading_tag": "H2",
+            "heading_title": "Mengapa Memilih Pempek Dos Sebagai Alternatif?",
+            "key_talking_points": [
+              "Kepraktisan bahan yang mudah didapat di pasaran",
+              "Kematian risiko alergi ikan bagi sebagian orang",
+              "Potensi vegetarian tanpa pengurangan rasa gurih"
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Persiapan Bahan dan Rasio Pengikatan",
+            "key_talking_points": [
+              "Pilihan tepung terigu (High Protein/Gluten tinggi)",
+              "Peran baking soda dan pengembang ringan",
+              "Penyusun rasa garam, kaldu bubuk, dan bawang putih"
+            ],
+            "include_element": "Checklist Bahan Utama & Pengganti"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Proses Uleni: Kunci Tekstur Kenyal Tanpa Ikan",
+            "key_talking_points": [
+              "Teknik merendam bumbu bawang",
+              "Proses aduk bertahap agar gluten terbentuk sempurna",
+              "Durasi istirahat adonan untuk relaksasi jaringan"
+            ],
+            "include_element": "Timeline Tahuan Pencampuran Ulenian"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Forming dan Teknik Masak: Merebus vs Menggoreng",
+            "key_talking_points": [
+              "Teknik membentuk silinder pipih atau bulat (bentuk classic)",
+              "Pengaturan suhu air rebusi agar tidak pecah",
+              "Metode goreng setelah direbus untuk kulit renyah"
+            ],
+            "include_element": "Pro-Tip Box: Rahasia Tekstur Kenyal"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Menjaga Sajian: Cuko dan Pelengkap",
+            "key_talking_points": [
+              "Importansi cuko untuk menyeimbangkan tekstur pempek kering/kenyal",
+              "Opsi sambal dan kerupuk",
+              "Kombinasi visual dan aroma"
+            ],
+            "include_element": "None"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Troubleshooting: Mengatasi Hasil Pempek Dos yang Kurang Satisfying",
+            "key_talking_points": [
+              "Adonan terlalu lembek: Tambahkan tepung lebih banyak",
+              "Adonan keras: Kurangi tepung atau tambah air hangat",
+              "Warna pucat: Kurangi baking soda atau gunakan pewarna alami"
+            ],
+            "include_element": "None"
+          }
+        ],
+        "faq_questions": [
+          "Apakah pempek dos menggunakan gluten tinggi atau sedang?",
+          "Berapa lama pempek dos tahan jika disimpan di freezer?",
+          "Bisakah pempek dos dipanggang atau kukus?"
+        ]
+      },
+      "curation_score": 92,
+      "editorial_critique": [
+        "Struktur draf sudah sangat baik dengan penggunaan tabel checklist dan troubleshooting yang jelas.",
+        "Menggunakan jargon teknis 'Tepung Terigu Protein Tinggi (Cakra Kembar atau segitu)' yang agak aneh secara lokal (Cakra Kembar adalah merk, bukan jenis protein secara umum, dan 'segitu' adalah typo/kalimat不完整). Telah diperbaiki menjadi rekomendasi merk umum atau spesifikasi protein.",
+        "Frasa 'grasp konsep dasar' dalam pengantar terasa kurang natural untuk konten editorial premium. Diganti dengan bahasa yang lebih baku dan halus.",
+        "Tautan internal sudah sesuai brief, namun penempatannya diposisikan agar lebih mengalir dalam kalimat narasi, bukan sekadar disisipkan.",
+        "Sudah menghilangkan potensi klise dan memastikan nada bicara tetap objektif-edukatif tanpa klaim berlebihan.",
+        "Perbaikan typo 'formiing' menjadi 'forming' dan 'Tahuan' menjadi 'Tahapan'."
+      ]
+    },
+    {
+      "item_id": 7,
+      "item": {
+        "id": 7,
+        "keyword": "cara menyimpan pempek frozen",
+        "suggested_title": "Cara Menyimpan Pempek di Freezer Agar Awet dan Cocok untuk Jualan",
+        "role": "Cluster",
+        "search_intent": "Commercial",
+        "competition_level": "Low",
+        "target_audience": "Pelaku usaha kuliner rumahan atau orang yang ingin menyetok pempek dalam jumlah banyak.",
+        "silo_role_description": "Menghubungkan aspek pembuatan dengan penyimpanan jangka panjang, menyasar audiens berniat bisnis.",
+        "recommendation_rank": 7,
+        "recommendation_reason": "Menargetkan audiens dengan intensi komersial/bisnis yang berpotensi melakukan transaksi atau membaca konten monetisasi.",
+        "is_recommended_default": false
+      },
+      "brief": {
+        "item_id": 7,
+        "primary_keyword": "cara menyimpan pempek frozen",
+        "meta_title": "Cara Menyimpan Pempek Frozen Agar Awet & Layak Jual",
+        "meta_description": "Ingin bisnis pempek frozen laris? Pelajari cara menyimpan pempek frozen di freezer agar awet hingga 3 bulan, bebas bau, dan tetap kenyal saat digoreng!",
+        "url_slug": "cara-menyimpan-pempek-frozen",
+        "target_word_count": "1500 - 2000 kata",
+        "content_archetype": {
+          "type": "step_by_step_workflow",
+          "format_label": "Step-by-Step Commercial Storage Workflow",
+          "mandatory_visual_elements": [
+            "Step-by-Step Timeline Infographic",
+            "Vacuum vs Non-Vacuum Comparison Table",
+            "Pro-Tip Box: Thawing Process"
+          ],
+          "content_angle": "Panduan taktis penyimpanan skala bisnis rumahan (commercial-grade) untuk menjaga kualitas tekstur, rasa, dan higienitas pempek agar siap jual kembali tanpa menurunkan kualitas rasa otentik Palembang."
+        },
+        "secondary_keywords": [
+          "cara membekukan pempek",
+          "pempek frozen tahan berapa lama",
+          "cara mencairkan pempek frozen",
+          "kemasan pempek frozen untuk jualan"
+        ],
+        "semantic_entities_lsi": [
+          "vacuum sealer",
+          "freezer burn",
+          "suhu penyimpanan",
+          "dehidrasi pati",
+          "proses thawing",
+          "plastik nylon food grade",
+          "pempek rebus",
+          "pempek goreng"
+        ],
+        "internal_link_strategy": {
+          "target_pillar_link": "Tautkan ke artikel pilar utama 'cara membuat pempek' (ID 1) sebagai langkah awal sebelum pempek siap dibekukan.",
+          "target_cluster_links": [
+            "Tautkan ke 'kenapa pempek keras' (ID 5) untuk menjelaskan efek pembekuan yang salah terhadap tekstur pempek.",
+            "Tautkan ke 'cara membuat pempek adaan' (ID 6) sebagai jenis pempek yang sering dibekukan."
+          ],
+          "anchor_variations": {
+            "exact_keyword": "cara membuat pempek",
+            "lsi_synonym": "penyebab tekstur pempek menjadi keras",
+            "conversational_natural": "resep pempek adaan yang anti keriput"
+          }
+        },
+        "outline": [
+          {
+            "heading_tag": "H2",
+            "heading_title": "Mengapa Cara Menyimpan Pempek Frozen Sangat Krusial untuk Bisnis?",
+            "key_talking_points": [
+              "Pentingnya menjaga kualitas rasa otentik Palembang meski disimpan lama.",
+              "Menghindari risiko freezer burn yang merusak tekstur kenyal pempek.",
+              "Menjaga kepercayaan pelanggan dengan menyajikan produk yang higienis dan bebas bau freezer."
+            ],
+            "include_element": "Pro-Tip Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Persiapan Sebelum Pembekuan: Tahap Pendinginan dan Pengeringan",
+            "key_talking_points": [
+              "Memastikan pempek benar-benar dingin setelah proses perebusan.",
+              "Mengeringkan permukaan pempek agar tidak lengket satu sama lain saat dibekukan.",
+              "Pemberian sedikit minyak kelapa berkualitas tinggi untuk mencegah pempek menempel."
+            ],
+            "include_element": "Checklist Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Langkah Demi Langkah Cara Menyimpan Pempek Frozen untuk Jualan",
+            "key_talking_points": [
+              "Proses porsi (portioning) berdasarkan paket penjualan.",
+              "Teknik vacuum sealing menggunakan plastik nylon food grade untuk membuang seluruh udara.",
+              "Pengaturan suhu freezer ideal (minimal -18 derajat Celcius) untuk membekukan pempek secara sempurna."
+            ],
+            "include_element": "Step Timeline"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Perbandingan Kemasan: Vacuum Sealing vs Plastik Biasa",
+            "key_talking_points": [
+              "Kelebihan vacuum sealer dalam mencegah dehidrasi pati dan kontaminasi bakteri anaerob.",
+              "Kelemahan plastik klip biasa yang rentan bocor dan memicu kristal es di dalam kemasan.",
+              "Analisis biaya kemasan untuk efisiensi bisnis pempek frozen."
+            ],
+            "include_element": "Tabel"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Cara Mencairkan (Thawing) Pempek Frozen dengan Benar Sebelum Digoreng",
+            "key_talking_points": [
+              "Metode thawing lambat di dalam chiller semalaman untuk menjaga struktur pati.",
+              "Metode thawing cepat menggunakan air dingin mengalir (tetap dalam kemasan rapat).",
+              "Mengapa harus menghindari merebus kembali pempek frozen yang sudah matang (bisa membuat pempek lembek dan berair)."
+            ],
+            "include_element": "Pro-Tip Box"
+          },
+          {
+            "heading_tag": "H2",
+            "heading_title": "Daya Tahan Pempek Frozen: Berapa Lama Bisa Disimpan?",
+            "key_talking_points": [
+              "Estimasi waktu simpan di chiller (suhu 0-4 derajat Celcius) vs freezer (suhu di bawah -18 derajat Celcius).",
+              "Tanda-tanda pempek frozen yang sudah rusak, berlendir, atau mengalami penurunan kualitas rasa.",
+              "Tips pelabelan tanggal produksi (FIFO - First In, First Out) untuk manajemen stok jualan."
+            ],
+            "include_element": "None"
+          }
+        ],
+        "faq_questions": [
+          "Apakah pempek frozen harus direbus dulu sebelum digoreng?",
+          "Mengapa pempek frozen menjadi keriput dan keras setelah digoreng?",
+          "Berapa suhu freezer yang ideal untuk menyimpan pempek frozen skala jualan?"
+        ]
+      },
+      "curation_score": 0,
+      "editorial_critique": []
+    }
+  ]
+}
