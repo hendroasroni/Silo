@@ -3,6 +3,6 @@
   "api_base_url": "https://api.kie.ai",
   "aspect_ratio": "16:9",
   "quality": "standard",
-  "image_mode": "hybrid",
-  "image_style": "illustration"
+  "image_mode": "mesh_gradient",
+  "image_style": "photo"
 }
