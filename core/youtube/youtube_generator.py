@@ -43,7 +43,7 @@ DEFAULT_CHANNEL_PROFILE = {
     "target_audience": "Praktisi, Profesional, dan Pemula yang mencari solusi praktis",
     "tone_of_voice": "Informatif, Praktis, Profesional & Lugas",
     "branding_tagline": "Wawasan Praktis & Solusi Nyata",
-    "default_links_cta": "🌐 Website: https://example.com\n📲 Konsultasi / Kontak: https://wa.me/628123456789\n📌 Jangan lupa Like, Subscribe & Nyalakan Lonceng Notifikasi!",
+    "default_links_cta": " Website: https://example.com\n Konsultasi / Kontak: https://wa.me/628123456789\n Jangan lupa Like, Subscribe & Nyalakan Lonceng Notifikasi!",
     "channel_keywords": "edukasi, bisnis, panduan praktis, tutorial indonesia",
     "is_default": True
 }
@@ -458,23 +458,23 @@ KEMBALIKAN DALAM FORMAT JSON VALID BERIKUT:
         # Format Human-Readable TXT
         lines = []
         lines.append("=" * 70)
-        lines.append(f"🎬 YOUTUBE METADATA PACK - {channel_name.upper()}")
-        lines.append(f"📅 Tanggal Dibuat: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        lines.append(f" YOUTUBE METADATA PACK - {channel_name.upper()}")
+        lines.append(f" Tanggal Dibuat: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         lines.append("=" * 70)
         lines.append("")
 
         # Titles
-        lines.append("📌 PILIHAN JUDUL VIDEO:")
+        lines.append(" PILIHAN JUDUL VIDEO:")
         titles_list = data.get("titles") or data.get("new_titles") or []
         for idx, t in enumerate(titles_list, 1):
             t_type = t.get("type", f"Variasi #{idx}")
             t_text = t.get("title", "")
             lines.append(f"  {idx}. [{t_type}]")
-            lines.append(f"     ➔ {t_text}")
+            lines.append(f"      {t_text}")
         
         rec_title = data.get("recommended_primary_title") or data.get("recommended_new_title")
         if rec_title:
-            lines.append(f"\n  ⭐ REKOMENDASI UTAMA: {rec_title}")
+            lines.append(f"\n   REKOMENDASI UTAMA: {rec_title}")
         lines.append("\n" + "-" * 70)
 
         # Description
@@ -482,7 +482,7 @@ KEMBALIKAN DALAM FORMAT JSON VALID BERIKUT:
         full_desc = desc_obj.get("full_formatted_description", "")
         hook = desc_obj.get("above_the_fold_hook", "")
 
-        lines.append("📝 DESKRIPSI VIDEO (SIAP SALIN KE YOUTUBE STUDIO):")
+        lines.append(" DESKRIPSI VIDEO (SIAP SALIN KE YOUTUBE STUDIO):")
         if hook:
             lines.append(f"[Hook 2 Baris Pertama]:\n{hook}\n")
         lines.append("[Teks Lengkap Deskripsi]:")
@@ -491,33 +491,33 @@ KEMBALIKAN DALAM FORMAT JSON VALID BERIKUT:
 
         # Tags
         tags_str = data.get("tags_comma_separated") or data.get("new_tags_comma_separated") or ""
-        lines.append("🏷️  TAGS VIDEO (< 500 Karakter):")
+        lines.append("  TAGS VIDEO (< 500 Karakter):")
         lines.append(tags_str)
         lines.append("\n" + "-" * 70)
 
         # Hashtags
         hashtags = data.get("hashtags") or data.get("new_hashtags") or []
-        lines.append("🔖 HASHTAGS:")
+        lines.append(" HASHTAGS:")
         lines.append(" ".join(hashtags))
         lines.append("\n" + "-" * 70)
 
         # Thumbnails
         thumbs = data.get("thumbnail_recommendations") or data.get("new_thumbnail_recommendations") or []
-        lines.append("🖼️  REKOMENDASI THUMBNAIL & PROMPT GAMBAR AI:")
+        lines.append("  REKOMENDASI THUMBNAIL & PROMPT GAMBAR AI:")
         for idx, th in enumerate(thumbs, 1):
             lines.append(f"\n  Konsep #{idx}: {th.get('concept_name', '-')}")
-            lines.append(f"  • Tulisan Thumbnail (Overlay Text) : \"{th.get('overlay_text', '-')}\"")
-            lines.append(f"  • Komposisi Visual                 : {th.get('visual_description', '-')}")
-            lines.append(f"  • AI Image Prompt (English)         : {th.get('ai_image_prompt_en', '-')}")
+            lines.append(f"   Tulisan Thumbnail (Overlay Text) : \"{th.get('overlay_text', '-')}\"")
+            lines.append(f"   Komposisi Visual                 : {th.get('visual_description', '-')}")
+            lines.append(f"   AI Image Prompt (English)         : {th.get('ai_image_prompt_en', '-')}")
         lines.append("\n" + "-" * 70)
 
         # Pinned Comment / Action Advice
         if "pinned_comment" in data:
-            lines.append("💬 PINNED COMMENT (KOMENTAR SEMATAN):")
+            lines.append(" PINNED COMMENT (KOMENTAR SEMATAN):")
             lines.append(data["pinned_comment"])
             lines.append("\n" + "-" * 70)
         elif "action_advice" in data:
-            lines.append("💡 SARAN STRATEGI UPDATE:")
+            lines.append(" SARAN STRATEGI UPDATE:")
             lines.append(data["action_advice"])
             lines.append("\n" + "-" * 70)
 

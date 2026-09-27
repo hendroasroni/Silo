@@ -1039,10 +1039,10 @@ class WordPressPublisher:
                     flags=re.DOTALL
                 )
                 if updated_content == raw_content:
-                    updated_content = raw_content + f'\n<div class="silo-cluster-box" style="margin-top:25px;padding:15px;background:#f4f6f8;border-left:4px solid #0073aa;border-radius:4px;"><strong>📚 Topik Terkait:</strong><ul class="silo-cluster-list">{link_item_html}</ul></div>'
+                    updated_content = raw_content + f'\n<div class="silo-cluster-box" style="margin-top:25px;padding:15px;background:#f4f6f8;border-left:4px solid #0073aa;border-radius:4px;"><strong> Topik Terkait:</strong><ul class="silo-cluster-list">{link_item_html}</ul></div>'
             else:
                 # Buat blok baru di akhir artikel pilar
-                new_box = f'\n<div class="silo-cluster-box" style="margin-top:25px;padding:15px;background:#f4f6f8;border-left:4px solid #0073aa;border-radius:4px;"><strong>📚 Topik Terkait dalam Silo:</strong><ul class="silo-cluster-list">{link_item_html}</ul></div>'
+                new_box = f'\n<div class="silo-cluster-box" style="margin-top:25px;padding:15px;background:#f4f6f8;border-left:4px solid #0073aa;border-radius:4px;"><strong> Topik Terkait dalam Silo:</strong><ul class="silo-cluster-list">{link_item_html}</ul></div>'
                 updated_content = raw_content + new_box
 
             # 3. Update postingan pilar via REST API

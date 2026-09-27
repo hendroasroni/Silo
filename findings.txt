@@ -1,0 +1,137 @@
+.\main.py:360 [0xfe0f, 0x2139] ->             print(f"\n{DIM}ℹ️ Profil bisnis untuk web ini belum diisi. Berjalan dalam mode Standar Industri Obyektif.{RESET}")
+.\main.py:381 [0xfe0f, 0x2139] ->             print(f"\n{CYAN}ℹ️ Mode Standar Industri Obyektif aktif (Estimasi pasar & edukatif netral).{RESET}")
+.\main.py:470 [0x1f4ca] ->     print(f"📊 {BOLD}Jumlah Cluster Saat Ini:{RESET} {BOLD}{current_count} cluster{RESET} (Total item: {len(existing_items)})\n")
+.\main.py:535 [0x1f517, 0x1f451] ->         role_str = f"{MAGENTA}👑 Pillar{RESET}" if role.lower() == "pillar" else f"{CYAN}🔗 Cluster{RESET}"
+.\main.py:539 [0x2705] ->             status_str = f"{GREEN}✅ SELESAI{RESET}"
+.\main.py:542 [0x23f3] ->             status_str = f"{YELLOW}⏳ PENDING{RESET}"
+.\main.py:552 [0x21b3] ->             print(f"    {DIM}↳ Judul Usulan: {item['suggested_title']}{RESET}")
+.\main.py:553 [0x21b3] ->             print(f"    {DIM}↳ Alasan: {item.get('recommendation_reason', '-')}{RESET}\n")
+.\main.py:598 [0xfe0f, 0x270d] ->     print(f"  ✍️  [Tahap 2 Draft]  : {MAGENTA}{s2_name}{RESET}")
+.\main.py:599 [0x1f50d] ->     print(f"  🔍 [Tahap 3 Kurasi] : {GREEN}{s3_name}{RESET}")
+.\main.py:625 [0xfe0f, 0x270d] ->         print(f"  ✍️  [2/4] Menulis Draf Sesuai Arketipe Konten...", end="", flush=True)
+.\main.py:642 [0x1f50d] ->         print(f"  🔍 [3/4] Melakukan Kurasi & Polishing Kualitas...", end="", flush=True)
+.\main.py:809 [0x1f517, 0x1f451] ->         role_str = f"{MAGENTA}👑 Pillar{RESET}" if art["silo_role"].lower() == "pillar" else f"{CYAN}🔗 Cluster{RESET}"
+.\main.py:898 [0x21b3] ->             print(f"     ↳ {DIM}ID: {res['post_id']} | Status: {res['status']}{cat_str} | URL: {res['post_url']}{RESET}")
+.\main.py:902 [0x21b3] ->             print(f"     ↳ {RED}Error: {res}{RESET}")
+.\main.py:985 [0x1f4ca] ->         print(f"📊 Total Artikel: {BOLD}{count} artikel{RESET}")
+.\main.py:1009 [0x1f4ca] ->     print(f"📊 {BOLD}Ringkasan Inventori Global:{RESET}")
+.\main.py:1015 [0x1f4cb] ->         print(f"{YELLOW}{BOLD}📋 DAFTAR ARTIKEL PENDING (BELUM PERNAH DIKIRIM KE WEB MANAPUN):{RESET}")
+.\main.py:1019 [0x1f517, 0x1f451] ->             role_str = f"{MAGENTA}👑 Pillar{RESET}" if art["silo_role"].lower() == "pillar" else f"{CYAN}🔗 Cluster{RESET}"
+.\main.py:1026 [0x2705] ->         print(f"\n{GREEN}{BOLD}✅ DAFTAR ARTIKEL YANG SUDAH DIKIRIM KE WEB:{RESET}")
+.\main.py:1056 [0xfe0f, 0x21a9] ->             print(f" [{CYAN}0{RESET}] ↩️  Kembali ke Menu Utama")
+.\main.py:1084 [0xfe0f, 0x21a9] ->         options.append(("0", "↩️  Kembali ke Menu Utama"))
+.\main.py:1132 [0x1f4ca] ->         print(f"📊 {BOLD}Koleksi Silo  :{RESET} {BOLD}{total_silos} Silo{RESET} ({GREEN}{completed_articles} Artikel Selesai{RESET}, {YELLOW}{pending_articles} Pending{RESET})\n")
+.\main.py:1141 [0xfe0f, 0x21a9] ->             ("0", "↩️  Kembali ke Daftar Website")
+.\main.py:1208 [0xfe0f, 0x21a9] ->         options.append(("0", "↩️  Kembali"))
+.\main.py:1243 [0x1f9ea] ->             ("1", "🧪 Uji Koneksi Website Ini"),
+.\main.py:1244 [0xfe0f, 0x270f] ->             ("2", "✏️ Edit Kredensial / Konfigurasi Web Ini"),
+.\main.py:1246 [0xfe0f, 0x1f5d1] ->             ("4", "🗑️ Hapus Website Ini"),
+.\main.py:1247 [0xfe0f, 0x21a9] ->             ("0", "↩️  Kembali")
+.\main.py:1342 [0x1f4ca] ->         print(f"📊 {BOLD}Statistik Konten Lintas Website:{RESET}")
+.\main.py:1348 [0x1f50d] ->             ("1", f"🔍 Inventori & Pencarian Seluruh Artikel ({total} Artikel)"),
+.\main.py:1351 [0xfe0f, 0x21a9] ->             ("0", "↩️  Kembali ke Menu Utama")
+.\main.py:1535 [0xfe0f, 0x21a9] ->     options.append(("0", "↩️  Kembali"))
+.\main.py:1557 [0xfe0f, 0x21a9] ->     options.append(("0", "↩️  Kembali"))
+.\main.py:1591 [0xfe0f, 0x21a9] ->     options.append(("0", "↩️  Kembali"))
+.\main.py:1649 [0xfe0f, 0x21a9] ->     options.append(("0", "↩️  Kembali"))
+.\main.py:1688 [0xfe0f, 0x21a9] ->         options.append(("0", "↩️  Kembali"))
+.\main.py:1736 [0xfe0f, 0x270f] ->             ("2", "✏️  Edit Field Tertentu"),
+.\main.py:1737 [0xfe0f, 0x1f5d1] ->             ("3", "🗑️  Kosongkan / Reset Profil"),
+.\main.py:1738 [0xfe0f, 0x21a9] ->             ("0", "↩️  Kembali")
+.\main.py:1778 [0xfe0f, 0x21a9] ->             field_opts.append(("0", "↩️  Batal"))
+.\main.py:1990 [0x1f517] ->         print(f"🔗 {BOLD}URL Link     :{RESET} {link}")
+.\main.py:1992 [0x1f4ca] ->         print(f"📊 {BOLD}Status Live  :{RESET} {GREEN if status == 'publish' else YELLOW}{BOLD}{status.upper()}{RESET}")
+.\main.py:1993 [0x1f4c5] ->         print(f"📅 {BOLD}Tanggal      :{RESET} {date_str} (Update: {modified_str})")
+.\main.py:2087 [0x1f3a8] ->                 print(f"🎨 {BOLD}[1/2] Sedang men-generate gambar...{RESET}", end="", flush=True)
+.\main.py:2109 [0x1f517] ->                             print(f"🔗 Media ID  : {BOLD}{media_id}{RESET}")
+.\main.py:2321 [0xfe0f, 0x270d] ->         print(f"✍️  {BOLD}Tahap 2: Penulisan Draf Artikel{RESET}  -> {MAGENTA}{BOLD}{s2_name}{RESET}")
+.\main.py:2322 [0x1f50d] ->         print(f"🔍 {BOLD}Tahap 3: Kurasi Kualitas & Redaksi{RESET} -> {GREEN}{BOLD}{s3_name}{RESET}")
+.\main.py:2329 [0x26a1] ->             ("P", "⚡ Pilih Preset Cepat (Gemini / Agnes AI / Hybrid / Full GPT-6)"),
+.\main.py:2473 [0x1f4ca] ->             print(f"📊 {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid{RESET} | {RED}{len(invalid_keys)} Gagal/Invalid{RESET}")
+.\main.py:2491 [0x1f9f9] ->                 ("A", "🧹 Bersihkan Otomatis Semua Key Invalid (Scan Cepat)"),
+.\main.py:2544 [0x1f3a8] ->         print(f"🎨 {BOLD}Gaya Visual Gambar:{RESET} {MAGENTA}{BOLD}{style_desc}{RESET}")
+.\main.py:2609 [0x1f4ca] ->             print(f"📊 {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid / Ada Kredit{RESET} | {RED}{len(zero_or_invalid_keys)} Habis / Minus / Invalid{RESET}")
+.\main.py:2627 [0x1f9f9] ->                 ("A", "🧹 Bersihkan Otomatis Semua Key Habis / 0 / Invalid (Scan Cepat)"),
+.\main.py:2823 [0x1f4ca] ->             print(f"📊 {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid{RESET} | {RED}{len(invalid_keys)} Gagal/Invalid{RESET}")
+.\main.py:2841 [0x1f9f9] ->                 ("A", "🧹 Bersihkan Otomatis Semua Key Invalid (Scan Cepat)"),
+.\main.py:3044 [0x1f4ca] ->     print(f"📊 {BOLD}Status Thumbnail Global di Seluruh Silo:{RESET}")
+.\main.py:3151 [0x26a1] ->         options.append((str(idx_counter), f"⚡ {code:<22} - {desc}{active_badge}"))
+.\main.py:3159 [0x1f9e0] ->         options.append((str(idx_counter), f"🧠 {code:<22} - {desc}{active_badge}"))
+.\main.py:3237 [0x1f7e1, 0x1f7e2] ->             tok_badge = f"{GREEN}🟢 OAuth Live{RESET}" if has_tok else f"{YELLOW}🟡 Belum Login{RESET}"
+.\main.py:3247 [0x1f4e2] ->             ("4", "📢 Optimasi & Update Deskripsi Channel (Halaman About & Channel Keywords)"),
+.\main.py:3248 [0x1f465] ->             ("5", "👥 Manajemen Multi-Channel (Tambah Channel Baru, Edit, Ganti Fokus)"),
+.\main.py:3249 [0x1f510] ->             ("6", "🔐 Pengaturan OAuth & Koneksi Akun Google Channel"),
+.\main.py:3250 [0x1f4c2] ->             ("7", "📂 Buka Folder Fisik Channel (Workspace: videos/, thumbnails/, metadata/)"),
+.\main.py:3416 [0x1f4c2] ->         vid_menu.append(("O", "📂 Buka Folder 'videos/' di File Explorer"))
+.\main.py:3457 [0xfe0f, 0x270d] ->         ("2", "✍️ Input Manual (Ketik Sendiri Judul, Deskripsi & Tags)"),
+.\main.py:3552 [0x1f30d] ->         ("1", "🌍 Public (Langsung Terbit untuk Semua Penonton)"),
+.\main.py:3553 [0x1f517] ->         ("2", "🔗 Unlisted (Tidak Publik - Hanya yang Memiliki Tautan)"),
+.\main.py:3554 [0x1f512] ->         ("3", "🔒 Private (Pribadi - Hanya Anda yang Bisa Melihat)"),
+.\main.py:3595 [0x1f512] ->     print(f"🔒 {BOLD}Status Privasi :{RESET} {GREEN}{privacy_status.upper()}{RESET}")
+.\main.py:3612 [0x2588, 0x2591] ->         bar = "█" * filled + "░" * (bar_len - filled)
+.\main.py:3685 [0x1f50d] ->     print(f"\n🔍 {BOLD}ANALISIS KELEMAHAN JUDUL LAMA:{RESET}")
+.\main.py:3763 [0x1f4d6] ->     print(f"\n📖 {BOLD}DESKRIPSI HALAMAN ABOUT (LENGKAP):{RESET}")
+.\main.py:3776 [0x1f4c2] ->     print(f"📂 {BOLD}SARAN STRUKTUR PLAYLIST:{RESET}")
+.\main.py:3844 [0x1f4cb] ->             ("2", "📋 Login Manual (Paste URL / Auth Code di CLI)"),
+.\main.py:3845 [0x1f504] ->             ("3", "🔄 Sinkronkan Nama & Deskripsi Channel dari YouTube ke Profil Silo"),
+.\main.py:3846 [0x1f513] ->             ("4", "🔓 Putuskan Koneksi OAuth (Logout)"),
+.\main.py:3969 [0x1f4ca] ->         print(f"📊 {BOLD}Statistik      :{RESET} {video.get('view_count', 0):,} Views | {video.get('like_count', 0):,} Likes | {video.get('comment_count', 0):,} Komentar")
+.\main.py:3970 [0x1f512] ->         print(f"🔒 {BOLD}Status Publik  :{RESET} {video.get('privacy_status', 'public').upper()}")
+.\main.py:3975 [0xfe0f, 0x270f] ->             ("2", "✏️ Edit Langsung Judul Video Live"),
+.\main.py:3979 [0xfe0f, 0x1f5d1] ->             ("6", "🗑️ Hapus Video Ini Secara Permanen dari YouTube"),
+.\main.py:4009 [0x1f50d] ->             print(f"\n🔍 {BOLD}ANALISIS KELEMAHAN JUDUL LAMA:{RESET}")
+.\main.py:4221 [0x1f7e1, 0x1f7e2] ->             tok_status = f"{GREEN}🟢 OAuth Live{RESET}" if has_tok else f"{YELLOW}🟡 Belum Login{RESET}"
+.\main.py:4254 [0x1f4cb] ->                 ("2", "📋 Login Google Manual (Paste URL / Kode di CLI - Auto Tarik Identitas)"),
+.\main.py:4255 [0xfe0f, 0x270d] ->                 ("3", "✍️ Input Manual Saja (Buat Profil Draft Tanpa Login)"),
+.\main.py:4378 [0x1f4c2] ->             ("1", f"📂 Buka Folder Channel Ini di File Explorer (Windows Explorer)"),
+.\main.py:4425 [0x1f4c2] ->             m_opts.append(("O", "📂 Buka Folder metadata_packs/ di File Explorer"))
+.\core\ai\ai_pipeline.py:26 [0x2b50] ->     ("agnes:agnes-3.0-flash", "Agnes AI 3.0 Flash (Sangat Cepat, Cerdas & Responsif) ⭐"),
+.\core\ai\kie_image_api.py:28 [0x201d, 0x2018, 0x2013, 0x2014, 0x2019, 0x201c] ->     cleaned = cleaned.replace('–', '-').replace('—', '-').replace('’', "'").replace('‘', "'").replace('“', '"').replace('”', '"')
+.\core\ai\kie_image_api.py:142 [0x2022] ->         return f"{read_mins} Menit Baca • {role_label}"
+.\core\ai\kie_image_api.py:144 [0x2022] ->         return f"Panduan Lengkap • {clean_cat}"
+.\core\ai\kie_image_api.py:146 [0x2022] ->         return f"Wawasan & Analisis • {clean_cat}"
+.\core\ai\kie_image_api.py:148 [0x2022] ->         return f"{read_mins} Menit Baca • {clean_cat}"
+.\core\ai\kie_image_api.py:150 [0x2022] ->         return f"Edukasi Praktis • {role_label}"
+.\core\ai\kie_image_api.py:862 [0x2794] ->         1. 'hybrid': Coba Kie.ai AI Photo -> Jika gagal/tanpa key ➔ Otomatis buat Mesh Gradient Banner (100% Reliable).
+.\core\silo\silo_generator.py:276 [0x1f3af] ->                 "🎯 PANDUAN FORMAT KHUSUS (HEAD-TO-HEAD COMPARISON):\n"
+.\core\silo\silo_generator.py:284 [0x1f3af] ->                 "🎯 PANDUAN FORMAT KHUSUS (STEP-BY-STEP WORKFLOW):\n"
+.\core\silo\silo_generator.py:285 [0x2794] ->                 "- Sajikan alur kerja dengan format tahapan bernomor terstruktur (Tahap 1 ➔ Tahap 2 ➔ Tahap 3).\n"
+.\core\silo\silo_generator.py:287 [0xfe0f, 0x26a0] ->                 "- Wajib sertakan Callout Box Peringatan: `> ⚠️ **Peringatan / Kesalahan Fatal yang Sering Terjadi:** ...`.\n"
+.\core\silo\silo_generator.py:291 [0x1f3af] ->                 "🎯 PANDUAN FORMAT KHUSUS (BUYER'S GUIDE & ESTIMASI BIAYA):\n"
+.\core\silo\silo_generator.py:298 [0x1f3af] ->                 "🎯 PANDUAN FORMAT KHUSUS (PROBLEM-SOLUTION / DIAGNOSTIK):\n"
+.\core\silo\silo_generator.py:305 [0x1f3af] ->                 "🎯 PANDUAN FORMAT KHUSUS (ULTIMATE PILLAR ENCYCLOPEDIA):\n"
+.\core\silo\silo_generator.py:312 [0x1f3af] ->                 "🎯 PANDUAN FORMAT KHUSUS (DEEP TECHNICAL EXPLAINER):\n"
+.\core\silo\silo_generator.py:318 [0x1f3af] ->                 "🎯 PANDUAN FORMAT KHUSUS (LEGAL & REGULATION COMPLIANCE):\n"
+.\core\silo\silo_generator.py:324 [0x1f3af] ->                 "🎯 PANDUAN FORMAT KHUSUS (ACTIONABLE INSIGHTS):\n"
+.\core\silo\silo_generator.py:351 [0x1f4a1, 0x26a0, 0xfe0f] ->    - Gunakan blockquote (`> 💡 **Pro Tip:** ...` atau `> ⚠️ **Catatan Penting:** ...`) untuk informasi krusial.
+.\core\silo\silo_generator.py:570 [0xfe0f, 0x1f3db] ->         md.append(f"# 🏛️ Arsitektur Silo: {silo_plan.get('silo_theme', silo_plan.get('seed_keyword'))}\n")
+.\core\silo\silo_generator.py:586 [0x1f4cc] ->         md.append("## 📌 Struktur & Peta Internal Linking\n")
+.\core\silo\silo_generator.py:596 [0x2705] ->                 status = "✅ Selesai Dibuat"
+.\core\silo\silo_generator.py:600 [0x23f3] ->                 status = "⏳ Belum Dibuat"
+.\core\silo\silo_generator.py:602 [0x1f517, 0x1f451] ->             role_badge = "👑 **Pillar**" if item["role"].lower() == "pillar" else "🔗 *Cluster*"
+.\core\silo\silo_generator.py:606 [0x1f9ed] ->         md.append("## 🧭 Panduan Distribusi Link Equity (Silo Linking Rule)\n")
+.\core\silo\silo_generator.py:611 [0x1f4dd] ->         md.append("## 📝 Ringkasan Kurasi Artikel yang Telah Selesai\n")
+.\core\silo\wp_publisher.py:1042 [0x1f4da] ->                     updated_content = raw_content + f'\n<div class="silo-cluster-box" style="margin-top:25px;padding:15px;background:#f4f6f8;border-left:4px solid #0073aa;border-radius:4px;"><strong>📚 Topik Terkait:</strong><ul class="silo-cluster-list">{link_item_html}</ul></div>'
+.\core\silo\wp_publisher.py:1045 [0x1f4da] ->                 new_box = f'\n<div class="silo-cluster-box" style="margin-top:25px;padding:15px;background:#f4f6f8;border-left:4px solid #0073aa;border-radius:4px;"><strong>📚 Topik Terkait dalam Silo:</strong><ul class="silo-cluster-list">{link_item_html}</ul></div>'
+.\core\youtube\youtube_generator.py:46 [0x1f310, 0x1f4f2, 0x1f4cc] ->     "default_links_cta": "🌐 Website: https://example.com\n📲 Konsultasi / Kontak: https://wa.me/628123456789\n📌 Jangan lupa Like, Subscribe & Nyalakan Lonceng Notifikasi!",
+.\core\youtube\youtube_generator.py:461 [0x1f3ac] ->         lines.append(f"🎬 YOUTUBE METADATA PACK - {channel_name.upper()}")
+.\core\youtube\youtube_generator.py:462 [0x1f4c5] ->         lines.append(f"📅 Tanggal Dibuat: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+.\core\youtube\youtube_generator.py:467 [0x1f4cc] ->         lines.append("📌 PILIHAN JUDUL VIDEO:")
+.\core\youtube\youtube_generator.py:473 [0x2794] ->             lines.append(f"     ➔ {t_text}")
+.\core\youtube\youtube_generator.py:477 [0x2b50] ->             lines.append(f"\n  ⭐ REKOMENDASI UTAMA: {rec_title}")
+.\core\youtube\youtube_generator.py:485 [0x1f4dd] ->         lines.append("📝 DESKRIPSI VIDEO (SIAP SALIN KE YOUTUBE STUDIO):")
+.\core\youtube\youtube_generator.py:494 [0xfe0f, 0x1f3f7] ->         lines.append("🏷️  TAGS VIDEO (< 500 Karakter):")
+.\core\youtube\youtube_generator.py:500 [0x1f516] ->         lines.append("🔖 HASHTAGS:")
+.\core\youtube\youtube_generator.py:506 [0x1f5bc, 0xfe0f] ->         lines.append("🖼️  REKOMENDASI THUMBNAIL & PROMPT GAMBAR AI:")
+.\core\youtube\youtube_generator.py:509 [0x2022] ->             lines.append(f"  • Tulisan Thumbnail (Overlay Text) : \"{th.get('overlay_text', '-')}\"")
+.\core\youtube\youtube_generator.py:510 [0x2022] ->             lines.append(f"  • Komposisi Visual                 : {th.get('visual_description', '-')}")
+.\core\youtube\youtube_generator.py:511 [0x2022] ->             lines.append(f"  • AI Image Prompt (English)         : {th.get('ai_image_prompt_en', '-')}")
+.\core\youtube\youtube_generator.py:516 [0x1f4ac] ->             lines.append("💬 PINNED COMMENT (KOMENTAR SEMATAN):")
+.\core\youtube\youtube_generator.py:520 [0x1f4a1] ->             lines.append("💡 SARAN STRATEGI UPDATE:")
+.\core\youtube\youtube_live_api.py:277 [0x1f310] ->         print("🌐 OTENTIKASI OTOMATIS (1-CLICK LOGIN - TANPA COPY PASTE)")
+.\core\youtube\youtube_live_api.py:330 [0x1f310] ->         print("🌐 HUBUNGKAN CHANNEL YOUTUBE BARU (1-CLICK BROWSER LOGIN)")
+.\core\youtube\youtube_live_api.py:390 [0x1f4cb] ->         print("📋 HUBUNGKAN CHANNEL BARU (MANUAL PASTE)")
+.\core\youtube\youtube_live_api.py:393 [0x1f449] ->         print(f"   👉 \033[96m\033[1m{auth_url}\033[0m\n")
+.\core\youtube\youtube_live_api.py:501 [0x1f4cb] ->         print("📋 OTENTIKASI MANUAL (PASTE DI TERMINAL)")
+.\core\youtube\youtube_live_api.py:504 [0x1f449] ->         print(f"   👉 \033[96m\033[1m{auth_url}\033[0m\n")
+.\core\youtube\youtube_live_api.py:539 [0xfe0f, 0x26a0] ->             print(f"\n\033[93m⚠️ Otentikasi otomatis via browser lokal mengalami kendala ({e}).\nBeralih ke mode manual...\033[0m")

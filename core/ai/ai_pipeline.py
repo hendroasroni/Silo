@@ -23,7 +23,7 @@ AVAILABLE_ENGINES = [
     ("gemini:default", "Gemini (Sesuai Model Utama Aktif di Pengaturan Gemini)"),
     ("gemini:gemini-3.8-flash", "Gemini 3.8 Flash (Cepat & Hemat Token)"),
     ("gemini:gemini-3.7-pro", "Gemini 3.7 Pro (Penalaran Tinggi & Akurat)"),
-    ("agnes:agnes-3.0-flash", "Agnes AI 3.0 Flash (Sangat Cepat, Cerdas & Responsif) ⭐"),
+    ("agnes:agnes-3.0-flash", "Agnes AI 3.0 Flash (Sangat Cepat, Cerdas & Responsif) "),
     ("agnes:agnes-2.5-flash", "Agnes AI 2.5 Flash (Stabil & Terstruktur)"),
     ("agnes:agnes-2.5-pro", "Agnes AI 2.5 Pro (Penalaran Mendalam & Analisis Kompleks)"),
     ("kie:gpt-6-luna", "Kie.ai GPT-6 Luna (Sangat Cerdas, Penalaran Tinggi & Akurat)"),

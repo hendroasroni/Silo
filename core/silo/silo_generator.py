@@ -273,7 +273,7 @@ Format output JSON harus sebagai berikut:
         archetype_instructions = ""
         if arch_type == "comparison_head_to_head":
             archetype_instructions = (
-                "🎯 PANDUAN FORMAT KHUSUS (HEAD-TO-HEAD COMPARISON):\n"
+                " PANDUAN FORMAT KHUSUS (HEAD-TO-HEAD COMPARISON):\n"
                 "- Wajib sertakan minimal 1 TABEL KOMPARASI LENGKAP (6-8 baris parameter perbandingan teknis, biaya, akurasi, waktu, dan skenario kecocokan).\n"
                 "- Wajib buat sub-bab 'Kelebihan & Kekurangan' untuk masing-masing opsi dalam format list/callout yang jelas.\n"
                 "- Sertakan panduan 'Kapan Harus Memilih Opsi A vs Opsi B' berdasarkan skenario nyata di lapangan.\n"
@@ -281,47 +281,47 @@ Format output JSON harus sebagai berikut:
             )
         elif arch_type == "step_by_step_workflow":
             archetype_instructions = (
-                "🎯 PANDUAN FORMAT KHUSUS (STEP-BY-STEP WORKFLOW):\n"
-                "- Sajikan alur kerja dengan format tahapan bernomor terstruktur (Tahap 1 ➔ Tahap 2 ➔ Tahap 3).\n"
+                " PANDUAN FORMAT KHUSUS (STEP-BY-STEP WORKFLOW):\n"
+                "- Sajikan alur kerja dengan format tahapan bernomor terstruktur (Tahap 1  Tahap 2  Tahap 3).\n"
                 "- Sertakan checklist dokumen / persiapan yang harus dilakukan sebelum memulai.\n"
-                "- Wajib sertakan Callout Box Peringatan: `> ⚠️ **Peringatan / Kesalahan Fatal yang Sering Terjadi:** ...`.\n"
+                "- Wajib sertakan Callout Box Peringatan: `>  **Peringatan / Kesalahan Fatal yang Sering Terjadi:** ...`.\n"
             )
         elif arch_type == "buyers_guide_pricing":
             archetype_instructions = (
-                "🎯 PANDUAN FORMAT KHUSUS (BUYER'S GUIDE & ESTIMASI BIAYA):\n"
+                " PANDUAN FORMAT KHUSUS (BUYER'S GUIDE & ESTIMASI BIAYA):\n"
                 "- Wajib sertakan TABEL ESTIMASI BIAYA / RENTANG TARIF dan faktor-faktor penentu biaya di lapangan.\n"
                 "- Berikan tips praktis cara memilih penyedia jasa terpercaya dan cara menghindari biaya tak terduga (hidden cost).\n"
                 "- Berikan simulasi perhitungan anggaran proyek secara logis dan realistis.\n"
             )
         elif arch_type == "problem_solution_diagnostic":
             archetype_instructions = (
-                "🎯 PANDUAN FORMAT KHUSUS (PROBLEM-SOLUTION / DIAGNOSTIK):\n"
+                " PANDUAN FORMAT KHUSUS (PROBLEM-SOLUTION / DIAGNOSTIK):\n"
                 "- Wajib bahas 'Tanda & Gejala Lapangan' saat masalah terjadi.\n"
                 "- Lakukan analisis akar penyebab (Root Cause Analysis) secara teknis namun mudah dipahami.\n"
                 "- Berikan 'Langkah Tindakan Mitigasi Darurat & Solusi Pencegahan Permanen'.\n"
             )
         elif arch_type == "ultimate_pillar_guide":
             archetype_instructions = (
-                "🎯 PANDUAN FORMAT KHUSUS (ULTIMATE PILLAR ENCYCLOPEDIA):\n"
+                " PANDUAN FORMAT KHUSUS (ULTIMATE PILLAR ENCYCLOPEDIA):\n"
                 "- Buat 'Executive Summary / Ringkasan Inti' di awal artikel.\n"
                 "- Bahas seluruh pilar fundamental secara komprehensif (Definisi, Regulasi SNI/ISO, Metode Utama, dan Evaluasi Hasil).\n"
                 "- Hubungkan seluruh topik pendukung dengan internal link yang kuat, alami, dan kaya konteks.\n"
             )
         elif arch_type == "deep_technical_explainer":
             archetype_instructions = (
-                "🎯 PANDUAN FORMAT KHUSUS (DEEP TECHNICAL EXPLAINER):\n"
+                " PANDUAN FORMAT KHUSUS (DEEP TECHNICAL EXPLAINER):\n"
                 "- Terjemahkan rumus, parameter teknis, atau konsep rumit ke dalam analogi sederhana yang mudah dipahami orang awam.\n"
                 "- Sertakan box 'Fakta Kunci & Parameter Teknis' berformat ringkas.\n"
             )
         elif arch_type == "legal_compliance_guide":
             archetype_instructions = (
-                "🎯 PANDUAN FORMAT KHUSUS (LEGAL & REGULATION COMPLIANCE):\n"
+                " PANDUAN FORMAT KHUSUS (LEGAL & REGULATION COMPLIANCE):\n"
                 "- Sebutkan acuan regulasi resmi (SNI, Permen PUPR, atau Perda terkait).\n"
                 "- Buat TABEL / CHECKLIST DOKUMEN WAJIB untuk kepatuhan hukum / izin PBG/IMB.\n"
             )
         else:
             archetype_instructions = (
-                "🎯 PANDUAN FORMAT KHUSUS (ACTIONABLE INSIGHTS):\n"
+                " PANDUAN FORMAT KHUSUS (ACTIONABLE INSIGHTS):\n"
                 "- Bagi materi ke dalam poin-poin bernilai tinggi dengan ulasan mendalam.\n"
                 "- Gunakan callout box tips dan key takeaways di akhir setiap bagian.\n"
             )
@@ -348,7 +348,7 @@ PANDUAN PENULISAN UMUM:
 4. Elemen Visual & Skimmable:
    - Buat minimal 1 TABEL dalam format Markdown sesuai arketipe di atas.
    - Gunakan bullet points atau numbered lists pada langkah-langkah / tips.
-   - Gunakan blockquote (`> 💡 **Pro Tip:** ...` atau `> ⚠️ **Catatan Penting:** ...`) untuk informasi krusial.
+   - Gunakan blockquote (`>  **Pro Tip:** ...` atau `>  **Catatan Penting:** ...`) untuk informasi krusial.
 5. Arsitektur Silo & Variasi Anchor Text (Anti-Overoptimization):
    - Sisipkan internal link ke artikel pilar atau cluster pendukung secara kontekstual di dalam paragraf.
    - WAJIB gunakan variasi anchor text (campuran exact keyword, sinonim LSI, dan frasa mengalir natural). Jangan gunakan kata kunci kaku berulang-ulang. Format: `[Variasi Anchor Text](slug-artikel)`.
@@ -567,7 +567,7 @@ Kembalikan hasil dalam format JSON:
         completed_ids = {a["item_id"]: a for a in completed_articles}
         
         md = []
-        md.append(f"# 🏛️ Arsitektur Silo: {silo_plan.get('silo_theme', silo_plan.get('seed_keyword'))}\n")
+        md.append(f"#  Arsitektur Silo: {silo_plan.get('silo_theme', silo_plan.get('seed_keyword'))}\n")
         md.append(f"**Seed Keyword:** `{silo_plan.get('seed_keyword')}`  ")
         md.append(f"**Topical Authority Goal:** {silo_plan.get('topical_authority_goal', '')}  ")
 
@@ -583,7 +583,7 @@ Kembalikan hasil dalam format JSON:
 
         md.append(f"**Update Terakhir:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         md.append("---\n")
-        md.append("## 📌 Struktur & Peta Internal Linking\n")
+        md.append("##  Struktur & Peta Internal Linking\n")
         md.append("| No | Role | Target Keyword | Judul Artikel | Status | Skor Kurasi | URL Slug |")
         md.append("|---|---|---|---|---|---|---|")
 
@@ -593,22 +593,22 @@ Kembalikan hasil dalam format JSON:
                 art = completed_ids[i_id]
                 score = art.get("curation_score", "-")
                 slug = art.get("brief", {}).get("url_slug", "-")
-                status = "✅ Selesai Dibuat"
+                status = " Selesai Dibuat"
             else:
                 score = "-"
                 slug = slugify(item["keyword"])
-                status = "⏳ Belum Dibuat"
+                status = " Belum Dibuat"
 
-            role_badge = "👑 **Pillar**" if item["role"].lower() == "pillar" else "🔗 *Cluster*"
+            role_badge = " **Pillar**" if item["role"].lower() == "pillar" else " *Cluster*"
             md.append(f"| {i_id} | {role_badge} | `{item['keyword']}` | {item['suggested_title']} | {status} | {score}/100 | `{slug}` |")
 
         md.append("\n---\n")
-        md.append("## 🧭 Panduan Distribusi Link Equity (Silo Linking Rule)\n")
+        md.append("##  Panduan Distribusi Link Equity (Silo Linking Rule)\n")
         md.append("1. **Cluster -> Pillar:** Semua artikel *Cluster* wajib memberikan minimal 1-2 link ke artikel *Pillar Utama* menggunakan variasi anchor text yang relevan.")
         md.append("2. **Pillar -> Cluster:** Artikel *Pillar* memuat daftar/sub-topik yang menautkan ke seluruh artikel *Cluster* pendukung.")
         md.append("3. **Cluster <-> Cluster (Sibling):** Artikel cluster yang berada dalam rumpun topik yang sama saling menautkan satu sama lain untuk memperkuat relevansi semantik.")
         md.append("\n---\n")
-        md.append("## 📝 Ringkasan Kurasi Artikel yang Telah Selesai\n")
+        md.append("##  Ringkasan Kurasi Artikel yang Telah Selesai\n")
 
         for a in completed_articles:
             brief = a.get("brief", {})

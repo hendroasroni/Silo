@@ -274,7 +274,7 @@ class YouTubeLiveClient:
         last_err = None
 
         print("\n" + "=" * 70)
-        print("🌐 OTENTIKASI OTOMATIS (1-CLICK LOGIN - TANPA COPY PASTE)")
+        print(" OTENTIKASI OTOMATIS (1-CLICK LOGIN - TANPA COPY PASTE)")
         print("=" * 70)
         print("Sedang membuka browser default Anda untuk login Google...")
         print("Cukup pilih akun Google channel Anda dan klik 'Allow / Izinkan'.\n")
@@ -327,7 +327,7 @@ class YouTubeLiveClient:
         last_err = None
 
         print("\n" + "=" * 70)
-        print("🌐 HUBUNGKAN CHANNEL YOUTUBE BARU (1-CLICK BROWSER LOGIN)")
+        print(" HUBUNGKAN CHANNEL YOUTUBE BARU (1-CLICK BROWSER LOGIN)")
         print("=" * 70)
         print("Sedang membuka browser default Anda...")
         print("Pilih akun Google & Channel YouTube yang ingin ditambahkan, lalu klik 'Izinkan / Allow'.\n")
@@ -387,10 +387,10 @@ class YouTubeLiveClient:
         auth_url = self.get_authorization_url()
 
         print("\n" + "=" * 70)
-        print("📋 HUBUNGKAN CHANNEL BARU (MANUAL PASTE)")
+        print(" HUBUNGKAN CHANNEL BARU (MANUAL PASTE)")
         print("=" * 70)
         print(f"1. Buka tautan berikut di browser:")
-        print(f"   👉 \033[96m\033[1m{auth_url}\033[0m\n")
+        print(f"    \033[96m\033[1m{auth_url}\033[0m\n")
         print("2. Pilih akun Google & channel YouTube yang ingin ditambahkan dan klik 'Allow / Izinkan'.\n")
         print("3. SALIN URL redirect dari browser, lalu PASTE DI BAWAH:")
         print("=" * 70)
@@ -498,10 +498,10 @@ class YouTubeLiveClient:
         auth_url = self.get_authorization_url()
 
         print("\n" + "=" * 70)
-        print("📋 OTENTIKASI MANUAL (PASTE DI TERMINAL)")
+        print(" OTENTIKASI MANUAL (PASTE DI TERMINAL)")
         print("=" * 70)
         print(f"1. Buka tautan berikut di browser:")
-        print(f"   👉 \033[96m\033[1m{auth_url}\033[0m\n")
+        print(f"    \033[96m\033[1m{auth_url}\033[0m\n")
         print("2. Pilih akun Google channel YouTube Anda dan klik 'Allow / Izinkan'.\n")
         print("3. SALIN URL redirect dari browser, lalu PASTE DI BAWAH:")
         print("=" * 70)
@@ -536,7 +536,7 @@ class YouTubeLiveClient:
         try:
             return self.authenticate_auto(channel_id=channel_id)
         except Exception as e:
-            print(f"\n\033[93m⚠️ Otentikasi otomatis via browser lokal mengalami kendala ({e}).\nBeralih ke mode manual...\033[0m")
+            print(f"\n\033[93m Otentikasi otomatis via browser lokal mengalami kendala ({e}).\nBeralih ke mode manual...\033[0m")
             return self.authenticate_manual(channel_id=channel_id)
 
     def get_service(self, channel_id="default"):

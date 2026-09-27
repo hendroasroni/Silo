@@ -357,7 +357,7 @@ def create_new_silo_flow(silo_engine, client, target_site=None, silos_base_dir=N
             b_name = business_profile.get("brand_name", target_site.get("name"))
             print(f"\n{GREEN}[OK] Menggunakan Profil Bisnis Terhubung: '{BOLD}{b_name}{RESET}{GREEN}' (Zero Hallucination Grounding){RESET}")
         else:
-            print(f"\n{DIM}ℹ️ Profil bisnis untuk web ini belum diisi. Berjalan dalam mode Standar Industri Obyektif.{RESET}")
+            print(f"\n{DIM} Profil bisnis untuk web ini belum diisi. Berjalan dalam mode Standar Industri Obyektif.{RESET}")
     else:
         print_section("LANGKAH 1.5: Pilih Profil Bisnis & Grounding Knowledge")
         sites = wp.get_sites()
@@ -378,7 +378,7 @@ def create_new_silo_flow(silo_engine, client, target_site=None, silos_base_dir=N
         p_choice = select_menu(profile_options, title="PILIH PROFIL GROUNDING WEBSITE")
 
         if p_choice == "0":
-            print(f"\n{CYAN}ℹ️ Mode Standar Industri Obyektif aktif (Estimasi pasar & edukatif netral).{RESET}")
+            print(f"\n{CYAN} Mode Standar Industri Obyektif aktif (Estimasi pasar & edukatif netral).{RESET}")
             business_profile = {}
         elif p_choice.upper() == "K":
             print_section("INPUT CATATAN RINGKAS (QUICK CONTEXT)")
@@ -467,7 +467,7 @@ def expand_silo_flow(silo_engine, silo_plan, completed_ids, client, silos_base_d
     current_count = len(existing_clusters)
 
     print(f"[*] {BOLD}Topik Silo:{RESET} {silo_plan.get('seed_keyword')}")
-    print(f"📊 {BOLD}Jumlah Cluster Saat Ini:{RESET} {BOLD}{current_count} cluster{RESET} (Total item: {len(existing_items)})\n")
+    print(f" {BOLD}Jumlah Cluster Saat Ini:{RESET} {BOLD}{current_count} cluster{RESET} (Total item: {len(existing_items)})\n")
 
     new_count_str = input(f"{BOLD}Masukkan target total cluster baru (misal: 8, 10, 15 - atau 0 untuk batal):{RESET} ").strip()
     if new_count_str == "0" or not new_count_str:
@@ -532,14 +532,14 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
         rank = item.get("recommendation_rank", i_id)
         is_done = i_id in completed_existing_ids
 
-        role_str = f"{MAGENTA}👑 Pillar{RESET}" if role.lower() == "pillar" else f"{CYAN}🔗 Cluster{RESET}"
+        role_str = f"{MAGENTA} Pillar{RESET}" if role.lower() == "pillar" else f"{CYAN} Cluster{RESET}"
         kw_display = (kw[:27] + '...') if len(kw) > 27 else kw
 
         if is_done:
-            status_str = f"{GREEN}✅ SELESAI{RESET}"
+            status_str = f"{GREEN} SELESAI{RESET}"
             rec_tag = f"{DIM}Sudah Dibuat{RESET}"
         else:
-            status_str = f"{YELLOW}⏳ PENDING{RESET}"
+            status_str = f"{YELLOW} PENDING{RESET}"
             pending_items.append(item)
             if is_rec:
                 default_rec_ids.append(i_id)
@@ -549,8 +549,8 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
 
         print(f"{BOLD}#{i_id:<3}{RESET} {role_str:<18} {kw_display:<30} {status_str:<23} {rec_tag}")
         if not is_done:
-            print(f"    {DIM}↳ Judul Usulan: {item['suggested_title']}{RESET}")
-            print(f"    {DIM}↳ Alasan: {item.get('recommendation_reason', '-')}{RESET}\n")
+            print(f"    {DIM} Judul Usulan: {item['suggested_title']}{RESET}")
+            print(f"    {DIM} Alasan: {item.get('recommendation_reason', '-')}{RESET}\n")
 
     if not pending_items:
         print(f"\n{GREEN}{BOLD}[!] Semua artikel dalam Silo ini sudah selesai dibuat!{RESET}")
@@ -595,8 +595,8 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
     # Generate Brief, Write, Curate
     print_section("PEMBUATAN KONTEN & KURASI KUALITAS MULTI-STAGE")
     print(f"  [Doc] [Tahap 1 Brief]  : {CYAN}{s1_name}{RESET}")
-    print(f"  ✍️  [Tahap 2 Draft]  : {MAGENTA}{s2_name}{RESET}")
-    print(f"  🔍 [Tahap 3 Kurasi] : {GREEN}{s3_name}{RESET}")
+    print(f"    [Tahap 2 Draft]  : {MAGENTA}{s2_name}{RESET}")
+    print(f"   [Tahap 3 Kurasi] : {GREEN}{s3_name}{RESET}")
     new_completed = []
 
     for idx, item in enumerate(selected_items, 1):
@@ -622,7 +622,7 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
             continue
 
         # B. Write Draft
-        print(f"  ✍️  [2/4] Menulis Draf Sesuai Arketipe Konten...", end="", flush=True)
+        print(f"    [2/4] Menulis Draf Sesuai Arketipe Konten...", end="", flush=True)
         try:
             draft = silo_engine.write_article_draft(
                 brief,
@@ -639,7 +639,7 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
             continue
 
         # C. Curate & Polish
-        print(f"  🔍 [3/4] Melakukan Kurasi & Polishing Kualitas...", end="", flush=True)
+        print(f"   [3/4] Melakukan Kurasi & Polishing Kualitas...", end="", flush=True)
         try:
             curation = silo_engine.curate_and_polish_article(
                 draft,
@@ -806,7 +806,7 @@ def menu_push_wordpress(target_site=None):
     print("-" * 78)
 
     for i, art in enumerate(pending_articles, 1):
-        role_str = f"{MAGENTA}👑 Pillar{RESET}" if art["silo_role"].lower() == "pillar" else f"{CYAN}🔗 Cluster{RESET}"
+        role_str = f"{MAGENTA} Pillar{RESET}" if art["silo_role"].lower() == "pillar" else f"{CYAN} Cluster{RESET}"
         title_disp = (art["title"][:35] + '...') if len(art["title"]) > 35 else art["title"]
         silo_disp = (art["silo_theme"][:18] + '...') if len(art["silo_theme"]) > 18 else art["silo_theme"]
         score_disp = f"{art['curation_score']}/100" if art['curation_score'] != '-' else '-'
@@ -895,11 +895,11 @@ def menu_push_wordpress(target_site=None):
             success_count += 1
             print(f" {GREEN}SUKSES!{RESET}")
             cat_str = f" | Cat ID: {res.get('category_id')}" if res.get('category_id') else ""
-            print(f"     ↳ {DIM}ID: {res['post_id']} | Status: {res['status']}{cat_str} | URL: {res['post_url']}{RESET}")
+            print(f"      {DIM}ID: {res['post_id']} | Status: {res['status']}{cat_str} | URL: {res['post_url']}{RESET}")
         else:
             fail_count += 1
             print(f" {RED}GAGAL!{RESET}")
-            print(f"     ↳ {RED}Error: {res}{RESET}")
+            print(f"      {RED}Error: {res}{RESET}")
         time.sleep(0.5)
 
     print(f"\n{GREEN}{BOLD}[!] PENGIRIMAN SELESAI!{RESET}")
@@ -982,7 +982,7 @@ def menu_export_silo_wxr():
         fsize_kb = os.path.getsize(xml_path) / 1024
         print(f"\n{GREEN}{BOLD}[!] EXPORT WORDPRESS XML BERHASIL!{RESET}")
         print(f"[Folder] Lokasi File  : {CYAN}{BOLD}{xml_path}{RESET}")
-        print(f"📊 Total Artikel: {BOLD}{count} artikel{RESET}")
+        print(f" Total Artikel: {BOLD}{count} artikel{RESET}")
         print(f"[Pkg] Ukuran File  : {BOLD}{fsize_kb:.1f} KB{RESET}")
         print(f"\n{YELLOW}[INFO] Cara Import ke WordPress:{RESET}")
         print(f" 1. Buka WP Admin -> {BOLD}Tools -> Import{RESET}")
@@ -1006,24 +1006,24 @@ def menu_view_inventory():
     pending, sent = wp.scan_articles_global("output")
 
     total = len(pending) + len(sent)
-    print(f"📊 {BOLD}Ringkasan Inventori Global:{RESET}")
+    print(f" {BOLD}Ringkasan Inventori Global:{RESET}")
     print(f" - Total Artikel Dibuat          : {BOLD}{total}{RESET}")
     print(f" - Belum Dikirim (Pending Global): {BOLD}{YELLOW}{len(pending)}{RESET}")
     print(f" - Sudah Terkirim ke Web (Sent)  : {BOLD}{GREEN}{len(sent)}{RESET}\n")
 
     if pending:
-        print(f"{YELLOW}{BOLD}📋 DAFTAR ARTIKEL PENDING (BELUM PERNAH DIKIRIM KE WEB MANAPUN):{RESET}")
+        print(f"{YELLOW}{BOLD} DAFTAR ARTIKEL PENDING (BELUM PERNAH DIKIRIM KE WEB MANAPUN):{RESET}")
         print(f"{BOLD}{'No':<4} {'Tema Silo':<20} {'Role':<10} {'Judul Artikel':<38} {'Skor'}{RESET}")
         print("-" * 78)
         for i, art in enumerate(pending, 1):
-            role_str = f"{MAGENTA}👑 Pillar{RESET}" if art["silo_role"].lower() == "pillar" else f"{CYAN}🔗 Cluster{RESET}"
+            role_str = f"{MAGENTA} Pillar{RESET}" if art["silo_role"].lower() == "pillar" else f"{CYAN} Cluster{RESET}"
             title_disp = (art["title"][:35] + '...') if len(art["title"]) > 35 else art["title"]
             silo_disp = (art["silo_theme"][:18] + '...') if len(art["silo_theme"]) > 18 else art["silo_theme"]
             score_disp = f"{art['curation_score']}/100" if art['curation_score'] != '-' else '-'
             print(f"#{i:<3} {silo_disp:<20} {role_str:<18} {title_disp:<38} {score_disp}")
 
     if sent:
-        print(f"\n{GREEN}{BOLD}✅ DAFTAR ARTIKEL YANG SUDAH DIKIRIM KE WEB:{RESET}")
+        print(f"\n{GREEN}{BOLD} DAFTAR ARTIKEL YANG SUDAH DIKIRIM KE WEB:{RESET}")
         print(f"{BOLD}{'No':<4} {'Judul Artikel':<33} {'Target Web':<18} {'WP ID':<8} {'Waktu Kirim'}{RESET}")
         print("-" * 78)
         for i, art in enumerate(sent, 1):
@@ -1053,7 +1053,7 @@ def menu_website_projects():
         if not sites:
             print(f"{YELLOW}Belum ada website yang terdaftar.{RESET}\n")
             print(f" [{CYAN}1{RESET}] [+] Tambah Website Baru (WordPress / Astro)")
-            print(f" [{CYAN}0{RESET}] ↩️  Kembali ke Menu Utama")
+            print(f" [{CYAN}0{RESET}]   Kembali ke Menu Utama")
             c = get_single_key(f"\nPilih [1/0]: ", valid_keys=['1', '0'])
             if c == "1":
                 menu_add_website_flow(wp)
@@ -1081,7 +1081,7 @@ def menu_website_projects():
             type_tag = f"[Astro]" if s.get("type") == "astro" else f"[WP]"
             options.append((str(i), f"Buka Project: {type_tag} {BOLD}{s['name']}{RESET}"))
         options.append(("A", "[+] Tambah Website Baru (WordPress / Astro)"))
-        options.append(("0", "↩️  Kembali ke Menu Utama"))
+        options.append(("0", "  Kembali ke Menu Utama"))
 
         c = select_menu(options, title="PILIH PROJECT WEBSITE")
         if c == "0":
@@ -1129,7 +1129,7 @@ def menu_website_dashboard(site):
         print(f"[Web] {BOLD}URL / Target  :{RESET} {site.get('wp_url', site.get('content_dir', ''))}")
         print(f"[Business] {BOLD}Profil Bisnis :{RESET} {GREEN if brand_name != '-' else YELLOW}{brand_name}{RESET}")
         print(f"[Folder] {BOLD}Workspace     :{RESET} {DIM}{ws_dir}{RESET}")
-        print(f"📊 {BOLD}Koleksi Silo  :{RESET} {BOLD}{total_silos} Silo{RESET} ({GREEN}{completed_articles} Artikel Selesai{RESET}, {YELLOW}{pending_articles} Pending{RESET})\n")
+        print(f" {BOLD}Koleksi Silo  :{RESET} {BOLD}{total_silos} Silo{RESET} ({GREEN}{completed_articles} Artikel Selesai{RESET}, {YELLOW}{pending_articles} Pending{RESET})\n")
 
         options = [
             ("1", "[Target] Riset & Buat Arsitektur Silo Baru (Khusus web ini)"),
@@ -1138,7 +1138,7 @@ def menu_website_dashboard(site):
             ("4", "[Live] Kelola Post Live di Web Ini (WordPress)"),
             ("5", "[Business] Profil Bisnis & Knowledge Grounding Web Ini"),
             ("6", "[Key] Pengaturan Kredensial & Uji Koneksi Web Ini"),
-            ("0", "↩️  Kembali ke Daftar Website")
+            ("0", "  Kembali ke Daftar Website")
         ]
 
         choice = select_menu(options, title=f"DASHBOARD PROJECT: {site['name']}")
@@ -1205,7 +1205,7 @@ def menu_manage_site_silos(site, silo_engine, client):
             status = f"({YELLOW}{s['pending_count']} Pending{RESET})" if s['pending_count'] > 0 else f"({GREEN}Lengkap{RESET})"
             options.append((str(i), f"{s['silo_theme']} {status}"))
         options.append(("N", "[+] Buat Silo Baru di Web Ini"))
-        options.append(("0", "↩️  Kembali"))
+        options.append(("0", "  Kembali"))
 
         c = select_menu(options, title="PILIH SILO UNTUK DIKELOLA")
         if c == "0":
@@ -1240,11 +1240,11 @@ def menu_single_site_settings(wp, site):
         print(f"[Web] {BOLD}URL / Target:{RESET} {site.get('wp_url', site.get('content_dir', ''))}\n")
 
         options = [
-            ("1", "🧪 Uji Koneksi Website Ini"),
-            ("2", "✏️ Edit Kredensial / Konfigurasi Web Ini"),
+            ("1", " Uji Koneksi Website Ini"),
+            ("2", " Edit Kredensial / Konfigurasi Web Ini"),
             ("3", "* Jadikan Website Default"),
-            ("4", "🗑️ Hapus Website Ini"),
-            ("0", "↩️  Kembali")
+            ("4", " Hapus Website Ini"),
+            ("0", "  Kembali")
         ]
 
         c = select_menu(options, title=f"KREDENSIAL: {site['name']}")
@@ -1339,16 +1339,16 @@ def menu_global_articles_hub():
         pending, sent = wp.scan_articles_global()
         total = len(pending) + len(sent)
 
-        print(f"📊 {BOLD}Statistik Konten Lintas Website:{RESET}")
+        print(f" {BOLD}Statistik Konten Lintas Website:{RESET}")
         print(f" - Total Artikel Tersimpan : {BOLD}{total} Artikel{RESET}")
         print(f" - Pending (Belum Terbit)  : {YELLOW}{BOLD}{len(pending)} Artikel{RESET}")
         print(f" - Published (Sudah Terbit): {GREEN}{BOLD}{len(sent)} Artikel{RESET}\n")
 
         options = [
-            ("1", f"🔍 Inventori & Pencarian Seluruh Artikel ({total} Artikel)"),
+            ("1", f" Inventori & Pencarian Seluruh Artikel ({total} Artikel)"),
             ("2", "[Pkg] Export Universal WordPress WXR (.XML)"),
             ("3", "[Publish] Kirim Artikel Pending Lintas Website"),
-            ("0", "↩️  Kembali ke Menu Utama")
+            ("0", "  Kembali ke Menu Utama")
         ]
 
         c = select_menu(options, title="GLOBAL ARTICLES HUB")
@@ -1532,7 +1532,7 @@ def menu_set_active_site(wp):
         options.append((str(i), f"{type_tag} {s['name']} ({s.get('wp_url', '')}){is_def}"))
         if s["id"] == active_id:
             default_idx = i - 1
-    options.append(("0", "↩️  Kembali"))
+    options.append(("0", "  Kembali"))
     
     choice = select_menu(options, title="GANTI WEBSITE DEFAULT / AKTIF", default_index=default_idx)
     if choice == "0":
@@ -1554,7 +1554,7 @@ def menu_test_site_connection(wp):
     for i, s in enumerate(sites, 1):
         type_tag = f"{CYAN}[Astro]{RESET}" if s.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
         options.append((str(i), f"{type_tag} {s['name']} ({s.get('wp_url', '')})"))
-    options.append(("0", "↩️  Kembali"))
+    options.append(("0", "  Kembali"))
 
     c = select_menu(options, title="UJI KONEKSI WEBSITE (WORDPRESS & ASTRO)")
     if c == "0":
@@ -1588,7 +1588,7 @@ def menu_edit_website_flow(wp):
         return
 
     options = [(str(i), f"{s['name']} ({s.get('wp_url', '')})") for i, s in enumerate(sites, 1)]
-    options.append(("0", "↩️  Kembali"))
+    options.append(("0", "  Kembali"))
 
     c = select_menu(options, title="EDIT DATA WEBSITE")
     if c == "0":
@@ -1646,7 +1646,7 @@ def menu_delete_website_flow(wp):
         return
 
     options = [(str(i), f"{s['name']} ({s.get('wp_url', '')})") for i, s in enumerate(sites, 1)]
-    options.append(("0", "↩️  Kembali"))
+    options.append(("0", "  Kembali"))
 
     c = select_menu(options, title="HAPUS WEBSITE")
     if c == "0":
@@ -1685,7 +1685,7 @@ def menu_manage_site_profiles(wp):
             else:
                 status_tag = f"{YELLOW}[!] Belum Diisi{RESET}"
             options.append((str(i), f"{type_tag} {s['name']} - {status_tag}"))
-        options.append(("0", "↩️  Kembali"))
+        options.append(("0", "  Kembali"))
 
         c = select_menu(options, title="KELOLA PROFIL BISNIS WEBSITE (GROUNDING KNOWLEDGE)")
         if c == "0":
@@ -1733,9 +1733,9 @@ def manage_single_site_profile_flow(wp, site):
 
         options = [
             ("1", "[Doc] Isi / Perbarui Seluruh Profil (Wizard Berurutan)"),
-            ("2", "✏️  Edit Field Tertentu"),
-            ("3", "🗑️  Kosongkan / Reset Profil"),
-            ("0", "↩️  Kembali")
+            ("2", "  Edit Field Tertentu"),
+            ("3", "  Kosongkan / Reset Profil"),
+            ("0", "  Kembali")
         ]
 
         action = select_menu(options, title="PILIH AKSI PROFIL")
@@ -1775,7 +1775,7 @@ def manage_single_site_profile_flow(wp, site):
                 cur_val = prof.get(key, "") if prof else ""
                 short_val = (cur_val[:30] + '..') if len(cur_val) > 30 else (cur_val if cur_val else '-')
                 field_opts.append((str(i), f"{label} ({DIM}{short_val}{RESET})"))
-            field_opts.append(("0", "↩️  Batal"))
+            field_opts.append(("0", "  Batal"))
 
             f_choice = select_menu(field_opts, title="PILIH FIELD YANG INGIN DIEDIT")
             if f_choice == "0":
@@ -1987,10 +1987,10 @@ def menu_single_post_detail(wp, target_site, post_summary):
         rm_kw = meta.get("rank_math_focus_keyword") or meta.get("_yoast_wpseo_focuskw") or "-"
 
         print(f"[*] {BOLD}Judul Post   :{RESET} {CYAN}{BOLD}{title}{RESET}")
-        print(f"🔗 {BOLD}URL Link     :{RESET} {link}")
+        print(f" {BOLD}URL Link     :{RESET} {link}")
         print(f"[Tag]  {BOLD}Kategori     :{RESET} {cat_str}")
-        print(f"📊 {BOLD}Status Live  :{RESET} {GREEN if status == 'publish' else YELLOW}{BOLD}{status.upper()}{RESET}")
-        print(f"📅 {BOLD}Tanggal      :{RESET} {date_str} (Update: {modified_str})")
+        print(f" {BOLD}Status Live  :{RESET} {GREEN if status == 'publish' else YELLOW}{BOLD}{status.upper()}{RESET}")
+        print(f" {BOLD}Tanggal      :{RESET} {date_str} (Update: {modified_str})")
         if rm_kw != "-":
             print(f"[Target] {BOLD}Focus Keyword:{RESET} {GREEN}{rm_kw}{RESET}")
         print("-" * 75)
@@ -2084,7 +2084,7 @@ def menu_single_post_detail(wp, target_site, post_summary):
                 os.makedirs(temp_dir, exist_ok=True)
                 temp_img_path = os.path.join(temp_dir, f"wp_{post_id}_{clean_slug}.webp")
                 
-                print(f"🎨 {BOLD}[1/2] Sedang men-generate gambar...{RESET}", end="", flush=True)
+                print(f" {BOLD}[1/2] Sedang men-generate gambar...{RESET}", end="", flush=True)
                 try:
                     gemini_c = GeminiClient(key_file="apikey.txt")
                     saved_path, method_used = kie.generate_featured_image_auto(
@@ -2106,7 +2106,7 @@ def menu_single_post_detail(wp, target_site, post_summary):
                             print(f" {GREEN}SUKSES!{RESET}")
                             print(f"\n{GREEN}{BOLD}[!] Featured image berhasil dibuat & dipasang di Post #{post_id}!{RESET}")
                             print(f"[Image]  File Lokal: {CYAN}{saved_path}{RESET}")
-                            print(f"🔗 Media ID  : {BOLD}{media_id}{RESET}")
+                            print(f" Media ID  : {BOLD}{media_id}{RESET}")
                         else:
                             print(f" {RED}GAGAL ({res_u}){RESET}")
                     else:
@@ -2318,15 +2318,15 @@ def menu_pipeline_settings():
         s3_name = pipeline_mgr.get_stage_display_name(3)
 
         print(f"[Doc] {BOLD}Tahap 1: Riset & Content Brief{RESET}   -> {CYAN}{BOLD}{s1_name}{RESET}")
-        print(f"✍️  {BOLD}Tahap 2: Penulisan Draf Artikel{RESET}  -> {MAGENTA}{BOLD}{s2_name}{RESET}")
-        print(f"🔍 {BOLD}Tahap 3: Kurasi Kualitas & Redaksi{RESET} -> {GREEN}{BOLD}{s3_name}{RESET}")
+        print(f"  {BOLD}Tahap 2: Penulisan Draf Artikel{RESET}  -> {MAGENTA}{BOLD}{s2_name}{RESET}")
+        print(f" {BOLD}Tahap 3: Kurasi Kualitas & Redaksi{RESET} -> {GREEN}{BOLD}{s3_name}{RESET}")
         print(f"[Image]  {BOLD}Tahap 4: Featured Image Banner{RESET}    -> {YELLOW}{BOLD}Kie.ai Z-Image / Agnes Image / Mesh Gradient{RESET}\n")
 
         options = [
             ("1", "Ubah Model Tahap 1 (Riset & Content Brief)"),
             ("2", "Ubah Model Tahap 2 (Penulisan Draf Artikel)"),
             ("3", "Ubah Model Tahap 3 (Kurasi Kualitas & Redaksi)"),
-            ("P", "⚡ Pilih Preset Cepat (Gemini / Agnes AI / Hybrid / Full GPT-6)"),
+            ("P", " Pilih Preset Cepat (Gemini / Agnes AI / Hybrid / Full GPT-6)"),
             ("0", "Kembali")
         ]
 
@@ -2470,7 +2470,7 @@ def menu_gemini_keys():
                 print(f"- Key #{r['index']} ({r['masked']}): {st_icon} -> {r['message']}")
             
             print("-" * 60)
-            print(f"📊 {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid{RESET} | {RED}{len(invalid_keys)} Gagal/Invalid{RESET}")
+            print(f" {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid{RESET} | {RED}{len(invalid_keys)} Gagal/Invalid{RESET}")
 
             if invalid_keys:
                 print(f"\n{YELLOW}[!]  Ditemukan {len(invalid_keys)} key yang tidak valid / gagal.{RESET}")
@@ -2488,7 +2488,7 @@ def menu_gemini_keys():
                 continue
             
             del_options = [
-                ("A", "🧹 Bersihkan Otomatis Semua Key Invalid (Scan Cepat)"),
+                ("A", " Bersihkan Otomatis Semua Key Invalid (Scan Cepat)"),
             ]
             for i, k in enumerate(keys, 1):
                 masked = f"{k[:8]}...{k[-4:]}" if len(k) >= 12 else k
@@ -2541,7 +2541,7 @@ def menu_kie_keys(gemini_client=None):
         mode_str = mode_labels.get(current_mode, current_mode)
 
         print(f"[Image]  {BOLD}Mode Gambar Aktif :{RESET} {GREEN}{BOLD}{mode_str}{RESET}")
-        print(f"🎨 {BOLD}Gaya Visual Gambar:{RESET} {MAGENTA}{BOLD}{style_desc}{RESET}")
+        print(f" {BOLD}Gaya Visual Gambar:{RESET} {MAGENTA}{BOLD}{style_desc}{RESET}")
         print(f"[AI] {BOLD}Model Kie.ai Aktif:{RESET} {CYAN}{BOLD}{current_model}{RESET}\n")
 
         print(f"{BOLD}Daftar API Key Kie.ai ({len(keys)} Key Terdaftar):{RESET}")
@@ -2606,7 +2606,7 @@ def menu_kie_keys(gemini_client=None):
                 print(f"- Key #{r['index']} ({r['masked']}): {st_icon} -> {r['message']}")
             
             print("-" * 60)
-            print(f"📊 {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid / Ada Kredit{RESET} | {RED}{len(zero_or_invalid_keys)} Habis / Minus / Invalid{RESET}")
+            print(f" {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid / Ada Kredit{RESET} | {RED}{len(zero_or_invalid_keys)} Habis / Minus / Invalid{RESET}")
 
             if zero_or_invalid_keys:
                 print(f"\n{YELLOW}[!]  Ditemukan {len(zero_or_invalid_keys)} key yang kreditnya 0, minus, atau tidak valid.{RESET}")
@@ -2624,7 +2624,7 @@ def menu_kie_keys(gemini_client=None):
                 continue
             
             del_options = [
-                ("A", "🧹 Bersihkan Otomatis Semua Key Habis / 0 / Invalid (Scan Cepat)"),
+                ("A", " Bersihkan Otomatis Semua Key Habis / 0 / Invalid (Scan Cepat)"),
             ]
             for i, k in enumerate(keys, 1):
                 masked = f"{k[:8]}...{k[-4:]}" if len(k) >= 12 else k
@@ -2820,7 +2820,7 @@ def menu_agnes_keys():
                 print(f"- Key #{r['index']} ({r['masked']}): {st_icon} -> {r['message']}")
             
             print("-" * 60)
-            print(f"📊 {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid{RESET} | {RED}{len(invalid_keys)} Gagal/Invalid{RESET}")
+            print(f" {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid{RESET} | {RED}{len(invalid_keys)} Gagal/Invalid{RESET}")
 
             if invalid_keys:
                 print(f"\n{YELLOW}[!]  Ditemukan {len(invalid_keys)} key yang tidak valid / gagal.{RESET}")
@@ -2838,7 +2838,7 @@ def menu_agnes_keys():
                 continue
             
             del_options = [
-                ("A", "🧹 Bersihkan Otomatis Semua Key Invalid (Scan Cepat)"),
+                ("A", " Bersihkan Otomatis Semua Key Invalid (Scan Cepat)"),
             ]
             for i, k in enumerate(keys, 1):
                 masked = f"{k[:8]}...{k[-4:]}" if len(k) >= 12 else k
@@ -3041,7 +3041,7 @@ def menu_batch_generate_missing_thumbnails(gemini_client=None):
     total_missing = sum(len(s["missing_articles"]) for s in silos)
     total_existing = total_articles - total_missing
 
-    print(f"📊 {BOLD}Status Thumbnail Global di Seluruh Silo:{RESET}")
+    print(f" {BOLD}Status Thumbnail Global di Seluruh Silo:{RESET}")
     print(f" - Total Artikel Dibuat        : {BOLD}{total_articles}{RESET}")
     print(f" - Sudah Memiliki Thumbnail     : {BOLD}{GREEN}{total_existing}{RESET}")
     print(f" - Belum Memiliki Thumbnail    : {BOLD}{YELLOW}{total_missing}{RESET}\n")
@@ -3148,7 +3148,7 @@ def menu_change_model_flow(client):
 
     for code, desc in DEFAULT_FLASH_MODELS:
         active_badge = f" {GREEN}[Aktif]{RESET}" if code == current else ""
-        options.append((str(idx_counter), f"⚡ {code:<22} - {desc}{active_badge}"))
+        options.append((str(idx_counter), f" {code:<22} - {desc}{active_badge}"))
         model_choices[str(idx_counter)] = code
         if code == current:
             default_idx = idx_counter - 1
@@ -3156,7 +3156,7 @@ def menu_change_model_flow(client):
 
     for code, desc in DEFAULT_PRO_MODELS:
         active_badge = f" {GREEN}[Aktif]{RESET}" if code == current else ""
-        options.append((str(idx_counter), f"🧠 {code:<22} - {desc}{active_badge}"))
+        options.append((str(idx_counter), f" {code:<22} - {desc}{active_badge}"))
         model_choices[str(idx_counter)] = code
         if code == current:
             default_idx = idx_counter - 1
@@ -3234,7 +3234,7 @@ def menu_youtube():
         for idx, p in enumerate(profiles, 1):
             p_id = p.get("id", "default")
             has_tok = yt_live.has_saved_token(p_id)
-            tok_badge = f"{GREEN}🟢 OAuth Live{RESET}" if has_tok else f"{YELLOW}🟡 Belum Login{RESET}"
+            tok_badge = f"{GREEN} OAuth Live{RESET}" if has_tok else f"{YELLOW} Belum Login{RESET}"
             fokus_tag = f" {CYAN}{BOLD}[Fokus]{RESET}" if p.get("id") == active_profile.get("id") else ""
             print(f"  #{idx} {BOLD}{p.get('name')}{RESET}{fokus_tag} -> {DIM}{p.get('niche')}{RESET} | {tok_badge}")
 
@@ -3244,10 +3244,10 @@ def menu_youtube():
             ("1", "[YouTube] Generate Metadata Video Baru (Pilih Channel -> Judul, Deskripsi, Tags, Thumb)"),
             ("2", "[Publish] Upload Video Lokal ke YouTube (Pilih Channel -> Resumable Upload + Thumbnail)"),
             ("3", "[Live] Kelola Live Video Channel (Pilih Channel -> Update/Regenerate Metadata & Hapus)"),
-            ("4", "📢 Optimasi & Update Deskripsi Channel (Halaman About & Channel Keywords)"),
-            ("5", "👥 Manajemen Multi-Channel (Tambah Channel Baru, Edit, Ganti Fokus)"),
-            ("6", "🔐 Pengaturan OAuth & Koneksi Akun Google Channel"),
-            ("7", "📂 Buka Folder Fisik Channel (Workspace: videos/, thumbnails/, metadata/)"),
+            ("4", " Optimasi & Update Deskripsi Channel (Halaman About & Channel Keywords)"),
+            ("5", " Manajemen Multi-Channel (Tambah Channel Baru, Edit, Ganti Fokus)"),
+            ("6", " Pengaturan OAuth & Koneksi Akun Google Channel"),
+            ("7", " Buka Folder Fisik Channel (Workspace: videos/, thumbnails/, metadata/)"),
             ("0", "Kembali ke Menu Utama")
         ]
 
@@ -3413,7 +3413,7 @@ def menu_yt_upload_video(ai_client, yt_live, active_profile, yt_profile_mgr):
             fn_disp = (fn[:40] + '..') if len(fn) > 40 else fn
             vid_menu.append((str(idx), f"{fn_disp:<42} ({sz:.2f} MB)"))
         vid_menu.append(("M", "Drag & Drop / Ketik Path File Video Lain secara Manual"))
-        vid_menu.append(("O", "📂 Buka Folder 'videos/' di File Explorer"))
+        vid_menu.append(("O", " Buka Folder 'videos/' di File Explorer"))
         vid_menu.append(("0", "Batal"))
 
         v_sel = select_menu(vid_menu, title="PILIH FILE VIDEO UNTUK DI-UPLOAD")
@@ -3454,7 +3454,7 @@ def menu_yt_upload_video(ai_client, yt_live, active_profile, yt_profile_mgr):
     # Pilihan sumber metadata
     meta_opts = [
         ("1", "[AI] Buat Metadata Otomatis dengan AI (Judul, Deskripsi, Tags dari Topik Video) *"),
-        ("2", "✍️ Input Manual (Ketik Sendiri Judul, Deskripsi & Tags)"),
+        ("2", " Input Manual (Ketik Sendiri Judul, Deskripsi & Tags)"),
         ("3", "[Articles] Muat dari File Metadata TXT yang Sudah Ada"),
         ("0", "Batal")
     ]
@@ -3549,9 +3549,9 @@ def menu_yt_upload_video(ai_client, yt_live, active_profile, yt_profile_mgr):
 
     # Pilih Privacy Status
     privacy_opts = [
-        ("1", "🌍 Public (Langsung Terbit untuk Semua Penonton)"),
-        ("2", "🔗 Unlisted (Tidak Publik - Hanya yang Memiliki Tautan)"),
-        ("3", "🔒 Private (Pribadi - Hanya Anda yang Bisa Melihat)"),
+        ("1", " Public (Langsung Terbit untuk Semua Penonton)"),
+        ("2", " Unlisted (Tidak Publik - Hanya yang Memiliki Tautan)"),
+        ("3", " Private (Pribadi - Hanya Anda yang Bisa Melihat)"),
         ("0", "Batal")
     ]
     p_sel = select_menu(privacy_opts, title="PILIH STATUS PRIVASI VIDEO")
@@ -3592,7 +3592,7 @@ def menu_yt_upload_video(ai_client, yt_live, active_profile, yt_profile_mgr):
     print(f"[YouTube] {BOLD}Channel Tujuan :{RESET} {GREEN}{active_profile.get('name')}{RESET} (ID: {ch_id})")
     print(f"[Folder] {BOLD}File Video     :{RESET} {os.path.basename(vid_path)} ({file_size_mb:.2f} MB)")
     print(f"[*] {BOLD}Judul          :{RESET} {CYAN}{BOLD}{final_title}{RESET}")
-    print(f"🔒 {BOLD}Status Privasi :{RESET} {GREEN}{privacy_status.upper()}{RESET}")
+    print(f" {BOLD}Status Privasi :{RESET} {GREEN}{privacy_status.upper()}{RESET}")
     if thumb_path:
         print(f"[Image]  {BOLD}Thumbnail      :{RESET} {thumb_path}")
     print(f"[Tag]  {BOLD}Tags           :{RESET} {DIM}{final_tags[:70]}...{RESET}")
@@ -3609,7 +3609,7 @@ def menu_yt_upload_video(ai_client, yt_live, active_profile, yt_profile_mgr):
     def upload_progress(pct):
         bar_len = 30
         filled = int(bar_len * pct / 100)
-        bar = "█" * filled + "░" * (bar_len - filled)
+        bar = "" * filled + "" * (bar_len - filled)
         sys.stdout.write(f"\r  {CYAN}Upload Progress: [{bar}] {pct}%{RESET}")
         sys.stdout.flush()
 
@@ -3682,7 +3682,7 @@ def menu_yt_optimize_existing_video(ai_client, active_profile):
     print_section(f"HASIL OPTIMASI VIDEO: {old_title}")
 
     analysis = data.get("analysis", {})
-    print(f"\n🔍 {BOLD}ANALISIS KELEMAHAN JUDUL LAMA:{RESET}")
+    print(f"\n {BOLD}ANALISIS KELEMAHAN JUDUL LAMA:{RESET}")
     print(f"  {YELLOW}{analysis.get('old_title_weakness')}{RESET}")
     print(f"  {CYAN}Strategi:{RESET} {analysis.get('improvement_strategy')}")
 
@@ -3760,7 +3760,7 @@ def menu_yt_optimize_channel(ai_client, yt_profile_mgr, active_profile, yt_live=
     print_banner()
     print_section(f"HASIL OPTIMASI CHANNEL: {ch_name}")
 
-    print(f"\n📖 {BOLD}DESKRIPSI HALAMAN ABOUT (LENGKAP):{RESET}")
+    print(f"\n {BOLD}DESKRIPSI HALAMAN ABOUT (LENGKAP):{RESET}")
     print(f"{res.get('about_bio_long')}\n")
 
     print(f"[*] {BOLD}DESKRIPSI RINGKAS (SHORT BIO):{RESET}")
@@ -3773,7 +3773,7 @@ def menu_yt_optimize_channel(ai_client, yt_profile_mgr, active_profile, yt_live=
     print(f"\n[Tag]  {BOLD}CHANNEL KEYWORDS (STUDIO SETTINGS - SIAP SALIN):{RESET}")
     print(f"{GREEN}{res.get('channel_keywords_comma_separated')}{RESET}\n")
 
-    print(f"📂 {BOLD}SARAN STRUKTUR PLAYLIST:{RESET}")
+    print(f" {BOLD}SARAN STRUKTUR PLAYLIST:{RESET}")
     for pl in res.get("suggested_playlists", []):
         print(f"  - {BOLD}{pl.get('playlist_name')}{RESET}: {DIM}{pl.get('description')}{RESET}")
 
@@ -3841,9 +3841,9 @@ def menu_yt_oauth_settings(yt_live, active_profile, yt_profile_mgr):
 
         options = [
             ("1", "[Publish] Login Otomatis (1-Click Browser - Tanpa Copy Paste) * [Rekomendasi]"),
-            ("2", "📋 Login Manual (Paste URL / Auth Code di CLI)"),
-            ("3", "🔄 Sinkronkan Nama & Deskripsi Channel dari YouTube ke Profil Silo"),
-            ("4", "🔓 Putuskan Koneksi OAuth (Logout)"),
+            ("2", " Login Manual (Paste URL / Auth Code di CLI)"),
+            ("3", " Sinkronkan Nama & Deskripsi Channel dari YouTube ke Profil Silo"),
+            ("4", " Putuskan Koneksi OAuth (Logout)"),
             ("0", "Kembali")
         ]
 
@@ -3966,17 +3966,17 @@ def process_single_live_video_flow(ai_client, yt_live, video, active_profile):
 
         print(f"[YouTube] {BOLD}Judul Saat Ini :{RESET} {GREEN}{BOLD}{video.get('title')}{RESET}")
         print(f"[Web] {BOLD}URL Video      :{RESET} {CYAN}{video.get('video_url')}{RESET}")
-        print(f"📊 {BOLD}Statistik      :{RESET} {video.get('view_count', 0):,} Views | {video.get('like_count', 0):,} Likes | {video.get('comment_count', 0):,} Komentar")
-        print(f"🔒 {BOLD}Status Publik  :{RESET} {video.get('privacy_status', 'public').upper()}")
+        print(f" {BOLD}Statistik      :{RESET} {video.get('view_count', 0):,} Views | {video.get('like_count', 0):,} Likes | {video.get('comment_count', 0):,} Komentar")
+        print(f" {BOLD}Status Publik  :{RESET} {video.get('privacy_status', 'public').upper()}")
         print(f"[Tag]  {BOLD}Tags Saat Ini  :{RESET} {', '.join(video.get('tags', [])) if video.get('tags') else '(Tidak ada tag)'}\n")
 
         options = [
             ("1", "[AI] AI Optimasi & Regenerasi Judul, Deskripsi & Tags (Analisis CTR & Live Push)"),
-            ("2", "✏️ Edit Langsung Judul Video Live"),
+            ("2", " Edit Langsung Judul Video Live"),
             ("3", "[Doc] Edit Langsung Deskripsi Video Live"),
             ("4", "[Tag] Edit Langsung Tags Video Live"),
             ("5", "[Image] Upload Custom Thumbnail Baru ke Video Live (Pilih File Gambar)"),
-            ("6", "🗑️ Hapus Video Ini Secara Permanen dari YouTube"),
+            ("6", " Hapus Video Ini Secara Permanen dari YouTube"),
             ("7", "[Web] Buka Video di Browser (YouTube.com)"),
             ("0", "Kembali")
         ]
@@ -4006,7 +4006,7 @@ def process_single_live_video_flow(ai_client, yt_live, video, active_profile):
             print_section("HASIL REGENERASI AI (SIAP UPDATE KE LIVE YOUTUBE)")
 
             analysis = data.get("analysis", {})
-            print(f"\n🔍 {BOLD}ANALISIS KELEMAHAN JUDUL LAMA:{RESET}")
+            print(f"\n {BOLD}ANALISIS KELEMAHAN JUDUL LAMA:{RESET}")
             print(f"  {YELLOW}{analysis.get('old_title_weakness')}{RESET}")
             print(f"  {CYAN}Strategi:{RESET} {analysis.get('improvement_strategy')}\n")
 
@@ -4218,7 +4218,7 @@ def menu_yt_manage_profiles(yt_profile_mgr, yt_live=None):
         for i, p in enumerate(profiles, 1):
             p_id = p.get("id", "default")
             has_tok = yt_live.has_saved_token(p_id)
-            tok_status = f"{GREEN}🟢 OAuth Live{RESET}" if has_tok else f"{YELLOW}🟡 Belum Login{RESET}"
+            tok_status = f"{GREEN} OAuth Live{RESET}" if has_tok else f"{YELLOW} Belum Login{RESET}"
             is_def = f"{CYAN}[Fokus]{RESET}" if p.get("is_default") else f"{DIM}[Aktif]{RESET}"
             p_name = (p.get("name", "")[:22] + '..') if len(p.get("name", "")) > 22 else p.get("name", "")
             p_niche = (p.get("niche", "")[:22] + '..') if len(p.get("niche", "")) > 22 else p.get("niche", "")
@@ -4251,8 +4251,8 @@ def menu_yt_manage_profiles(yt_profile_mgr, yt_live=None):
             print_section("TAMBAH CHANNEL YOUTUBE BARU")
             add_opts = [
                 ("1", "[Publish] Login Google Otomatis (1-Click Browser - Auto Tarik Profil & Identitas) * [Rekomendasi]"),
-                ("2", "📋 Login Google Manual (Paste URL / Kode di CLI - Auto Tarik Identitas)"),
-                ("3", "✍️ Input Manual Saja (Buat Profil Draft Tanpa Login)"),
+                ("2", " Login Google Manual (Paste URL / Kode di CLI - Auto Tarik Identitas)"),
+                ("3", " Input Manual Saja (Buat Profil Draft Tanpa Login)"),
                 ("0", "Batal")
             ]
             add_c = select_menu(add_opts, title="PILIH CARA PENAMBAHAN CHANNEL")
@@ -4375,7 +4375,7 @@ def menu_yt_view_history(active_profile=None):
         print(f" - [Articles] {BOLD}Paket Metadata (metadata_packs/) :{RESET} {GREEN}{m_count} file{RESET} (File judul/deskripsi tersimpan)\n")
 
         options = [
-            ("1", f"📂 Buka Folder Channel Ini di File Explorer (Windows Explorer)"),
+            ("1", f" Buka Folder Channel Ini di File Explorer (Windows Explorer)"),
             ("2", f"[YouTube] Buka Subfolder Video ({os.path.basename(videos_dir)}/)"),
             ("3", f"[Image] Buka Subfolder Thumbnail ({os.path.basename(thumbs_dir)}/)"),
             ("4", f"[Articles] Buka & Lihat File Metadata ({os.path.basename(meta_dir)}/)"),
@@ -4422,7 +4422,7 @@ def menu_yt_view_history(active_profile=None):
 
             print_section(f"DAFTAR FILE METADATA CHANNEL: {ch_name}")
             m_opts = [(str(i), fn) for i, (fn, fp) in enumerate(meta_files[:15], 1)]
-            m_opts.append(("O", "📂 Buka Folder metadata_packs/ di File Explorer"))
+            m_opts.append(("O", " Buka Folder metadata_packs/ di File Explorer"))
             m_opts.append(("0", "Kembali"))
 
             m_choice = select_menu(m_opts, title="PILIH FILE METADATA UNTUK DIBUKA")

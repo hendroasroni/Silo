@@ -25,7 +25,7 @@ def clean_text_for_rendering(text):
     cleaned = re.sub(r'&#0*8221;?', '"', cleaned)
     cleaned = re.sub(r'&amp;?', '&', cleaned)
     # 3. Normalisasi unicode dash & smart quotes ke ASCII aman font
-    cleaned = cleaned.replace('–', '-').replace('—', '-').replace('’', "'").replace('‘', "'").replace('“', '"').replace('”', '"')
+    cleaned = cleaned.replace('', '-').replace('', '-').replace('', "'").replace('', "'").replace('', '"').replace('', '"')
     # 4. Hapus tag HTML jika ada
     cleaned = re.sub(r'<[^>]+>', '', cleaned)
     # 5. Hapus Emojis & Variation Selectors yang menyebabkan kotak/tofu pada font TrueType Pillow
@@ -139,15 +139,15 @@ def build_dynamic_footer_text(title, keyword, category, silo_role=None):
     role_label = "Panduan Pilar Utama" if is_pillar else "Seri Silo Terstruktur"
 
     if variant == 0:
-        return f"{read_mins} Menit Baca • {role_label}"
+        return f"{read_mins} Menit Baca  {role_label}"
     elif variant == 1:
-        return f"Panduan Lengkap • {clean_cat}"
+        return f"Panduan Lengkap  {clean_cat}"
     elif variant == 2:
-        return f"Wawasan & Analisis • {clean_cat}"
+        return f"Wawasan & Analisis  {clean_cat}"
     elif variant == 3:
-        return f"{read_mins} Menit Baca • {clean_cat}"
+        return f"{read_mins} Menit Baca  {clean_cat}"
     else:
-        return f"Edukasi Praktis • {role_label}"
+        return f"Edukasi Praktis  {role_label}"
 
 class KieImageClient:
     def __init__(self, key_file=KIE_KEY_FILE, config_file=KIE_CONFIG_FILE):
@@ -859,7 +859,7 @@ Do NOT include any explanations, quotes, or text elements.
     def generate_featured_image_auto(self, title, keyword, category, save_path, gemini_client=None, model=None):
         """
         Generator Featured Image terpadu dengan 3 mode:
-        1. 'hybrid': Coba Kie.ai AI Photo -> Jika gagal/tanpa key ➔ Otomatis buat Mesh Gradient Banner (100% Reliable).
+        1. 'hybrid': Coba Kie.ai AI Photo -> Jika gagal/tanpa key  Otomatis buat Mesh Gradient Banner (100% Reliable).
         2. 'mesh_gradient': Langsung buat Mesh Gradient Banner lokal (0 Biaya, instan).
         3. 'kie_only': Hanya buat lewat Kie.ai.
         
