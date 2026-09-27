@@ -18,6 +18,7 @@ from gemini_api import GeminiClient, DEFAULT_FLASH_MODELS, DEFAULT_PRO_MODELS
 from kie_image_api import KieImageClient, DEFAULT_KIE_MODELS, DEFAULT_IMAGE_STYLES, IMAGE_STYLE_DESCS, clean_text_for_rendering
 from kie_chat_api import KieChatClient
 from agnes_api import AgnesClient, DEFAULT_AGNES_TEXT_MODELS, DEFAULT_AGNES_IMAGE_MODELS
+from youtube_generator import YouTubeProfileManager, YouTubeGenerator, YOUTUBE_OUTPUT_DIR
 from ai_pipeline import AIPipelineManager, AVAILABLE_ENGINES, STAGE_NAMES
 from silo_generator import SiloGenerator
 from wp_publisher import WordPressPublisher
@@ -2812,6 +2813,437 @@ def menu_change_model_flow(client):
     press_any_key()
 
 # ==========================================
+# MENU: YOUTUBE CREATOR & METADATA SUITE
+# ==========================================
+def menu_youtube():
+    yt_profile_mgr = YouTubeProfileManager()
+    pipeline_mgr = AIPipelineManager()
+
+    while True:
+        clear_screen()
+        print_banner()
+        print_section("YOUTUBE CREATOR & METADATA SUITE")
+
+        active_profile = yt_profile_mgr.get_active_profile()
+        ai_client = pipeline_mgr.get_client_for_stage(1)
+        engine_name = pipeline_mgr.get_stage_display_name(1)
+
+        print(f"🎬 {BOLD}Channel Aktif:{RESET} {GREEN}{BOLD}{active_profile.get('name')}{RESET} (Niche: {active_profile.get('niche')})")
+        print(f"🎯 {BOLD}Tagline      :{RESET} {DIM}{active_profile.get('branding_tagline')}{RESET}")
+        print(f"🤖 {BOLD}AI Engine    :{RESET} {CYAN}{engine_name}{RESET}\n")
+
+        options = [
+            ("1", "🎬 Generate Metadata Video Baru (Judul, Deskripsi, Tags, Thumbnail Concept)"),
+            ("2", "🔄 Optimasi / Regenerasi Video Lama (Dongkrak CTR & Traffic Video Publish)"),
+            ("3", "📢 Optimasi Profil Channel (Halaman About Bio & Channel Keywords Studio)"),
+            ("4", "⚙️ Kelola Profil Identitas Channel (Ganti / Tambah / Edit Channel)"),
+            ("5", "📂 Lihat Riwayat File Metadata Video YouTube Tersimpan"),
+            ("0", "Kembali ke Menu Utama")
+        ]
+
+        choice = select_menu(options, title="PILIH AKSI YOUTUBE")
+        if choice == "0":
+            break
+        elif choice == "1":
+            menu_yt_generate_new_video(ai_client, active_profile)
+        elif choice == "2":
+            menu_yt_optimize_existing_video(ai_client, active_profile)
+        elif choice == "3":
+            menu_yt_optimize_channel(ai_client, yt_profile_mgr, active_profile)
+        elif choice == "4":
+            menu_yt_manage_profiles(yt_profile_mgr)
+        elif choice == "5":
+            menu_yt_view_history()
+
+def menu_yt_generate_new_video(ai_client, active_profile):
+    print_section(f"GENERATE METADATA VIDEO BARU - [{active_profile.get('name')}]")
+    print(f"{DIM}Ketik '0' untuk membatalkan.{RESET}\n")
+
+    topic = input(f"{BOLD}Topik / Konsep Video:{RESET} ").strip()
+    if topic == "0" or not topic:
+        return
+
+    key_points = input(f"{BOLD}Poin Pembahasan Kunci [Opsional, tekan Enter untuk lewati]:{RESET} ").strip()
+    if key_points == "0":
+        return
+
+    focus_kw = input(f"{BOLD}Target Keyword Fokus [Opsional, tekan Enter untuk lewati]:{RESET} ").strip()
+    if focus_kw == "0":
+        return
+
+    print(f"\n{CYAN}Sedang merancang paket metadata YouTube terbaik (Judul, Deskripsi, Tags, Thumbnail)...{RESET}")
+    
+    try:
+        yt_gen = YouTubeGenerator(ai_client=ai_client)
+        data = yt_gen.generate_new_video_metadata(
+            video_topic=topic,
+            key_points=key_points,
+            focus_keyword=focus_kw,
+            channel_profile=active_profile
+        )
+    except Exception as e:
+        print(f"{RED}✖ Gagal membuat metadata: {e}{RESET}")
+        press_any_key()
+        return
+
+    # Tampilkan Hasil
+    clear_screen()
+    print_banner()
+    print_section(f"HASIL METADATA VIDEO: {topic}")
+
+    print(f"\n📌 {BOLD}5 REKOMENDASI JUDUL VIDEO (HIGH CTR & SEO):{RESET}")
+    titles = data.get("titles", [])
+    for idx, t in enumerate(titles, 1):
+        print(f"  {BOLD}#{idx} [{t.get('type')}]{RESET} : {GREEN}{t.get('title')}{RESET}")
+    
+    rec_title = data.get("recommended_primary_title", "")
+    if rec_title:
+        print(f"  ⭐ {BOLD}Rekomendasi Paling Kuat:{RESET} {CYAN}{BOLD}{rec_title}{RESET}")
+
+    desc = data.get("description", {})
+    print(f"\n📝 {BOLD}HOOK 2 BARIS PERTAMA (ABOVE THE FOLD):{RESET}")
+    print(f"  {YELLOW}{desc.get('above_the_fold_hook')}{RESET}")
+
+    print(f"\n🏷️  {BOLD}TAGS VIDEO ({len(data.get('tags_comma_separated', ''))} karakter):{RESET}")
+    print(f"  {DIM}{data.get('tags_comma_separated')}{RESET}")
+
+    print(f"\n🔖 {BOLD}HASHTAGS:{RESET}")
+    print(f"  {CYAN}{' '.join(data.get('hashtags', []))}{RESET}")
+
+    print(f"\n🖼️  {BOLD}REKOMENDASI THUMBNAIL & TEXT OVERLAY:{RESET}")
+    thumbs = data.get("thumbnail_recommendations", [])
+    for idx, th in enumerate(thumbs, 1):
+        print(f"  {BOLD}Konsep #{idx}: {th.get('concept_name')}{RESET}")
+        print(f"  • Tulisan Thumbnail (Max 3-4 Kata) : {MAGENTA}{BOLD}\"{th.get('overlay_text')}\"{RESET}")
+        print(f"  • Komposisi Visual                 : {th.get('visual_description')}")
+        print(f"  • AI Image Prompt                  : {DIM}{th.get('ai_image_prompt_en')}{RESET}\n")
+
+    if data.get("pinned_comment"):
+        print(f"💬 {BOLD}PINNED COMMENT PANCINGAN DISKUSI:{RESET}")
+        print(f"  {data.get('pinned_comment')}")
+
+    # Simpan File
+    txt_path, json_path = yt_gen.save_video_pack(data, active_profile.get("name"), topic)
+    print(f"\n{GREEN}✔ Paket metadata berhasil disimpan di:{RESET}\n  📁 {CYAN}{txt_path}{RESET}")
+
+    open_choice = get_single_key(f"\n{BOLD}Buka file teks sekarang di Notepad/Editor? [Y/N]:{RESET} ", valid_keys=['y', 'n', '0', '\r', '\n'])
+    if open_choice.lower() == 'y':
+        try:
+            if os.name == 'nt':
+                os.startfile(txt_path)
+            else:
+                webbrowser.open(f"file:///{os.path.abspath(txt_path).replace('\\', '/')}")
+        except Exception:
+            pass
+
+    press_any_key()
+
+def menu_yt_optimize_existing_video(ai_client, active_profile):
+    print_section(f"OPTIMASI / REGENERASI VIDEO PUBLISH - [{active_profile.get('name')}]")
+    print(f"{DIM}Ketik '0' untuk membatalkan.{RESET}\n")
+
+    old_title = input(f"{BOLD}Judul Video Lama Saat Ini:{RESET} ").strip()
+    if old_title == "0" or not old_title:
+        return
+
+    old_desc = input(f"{BOLD}Deskripsi Lama [Opsional, tekan Enter untuk lewati]:{RESET} ").strip()
+    if old_desc == "0":
+        return
+
+    issue = input(f"{BOLD}Masalah / Keluhan [misal: 'CTR rendah', 'View mandek']: {RESET}").strip()
+    if issue == "0":
+        return
+
+    print(f"\n{CYAN}Sedang membedah dan meregenerasi variasi judul, deskripsi & thumbnail baru...{RESET}")
+    
+    try:
+        yt_gen = YouTubeGenerator(ai_client=ai_client)
+        data = yt_gen.optimize_existing_video(
+            old_title=old_title,
+            old_description=old_desc,
+            current_issue=issue,
+            channel_profile=active_profile
+        )
+    except Exception as e:
+        print(f"{RED}✖ Gagal optimasi video: {e}{RESET}")
+        press_any_key()
+        return
+
+    # Tampilkan Hasil
+    clear_screen()
+    print_banner()
+    print_section(f"HASIL OPTIMASI VIDEO: {old_title}")
+
+    analysis = data.get("analysis", {})
+    print(f"\n🔍 {BOLD}ANALISIS KELEMAHAN JUDUL LAMA:{RESET}")
+    print(f"  {YELLOW}{analysis.get('old_title_weakness')}{RESET}")
+    print(f"  {CYAN}Strategi:{RESET} {analysis.get('improvement_strategy')}")
+
+    print(f"\n📌 {BOLD}5 REKOMENDASI JUDUL BARU (REFRESH CTR):{RESET}")
+    titles = data.get("new_titles", [])
+    for idx, t in enumerate(titles, 1):
+        print(f"  {BOLD}#{idx} [{t.get('type')}]{RESET} : {GREEN}{t.get('title')}{RESET}")
+    
+    rec_title = data.get("recommended_new_title", "")
+    if rec_title:
+        print(f"  ⭐ {BOLD}Judul Rekomendasi Utama:{RESET} {CYAN}{BOLD}{rec_title}{RESET}")
+
+    print(f"\n🖼️  {BOLD}REKOMENDASI RE-DESIGN THUMBNAIL:{RESET}")
+    thumbs = data.get("new_thumbnail_recommendations", [])
+    for idx, th in enumerate(thumbs, 1):
+        print(f"  {BOLD}Konsep #{idx}: {th.get('concept_name')}{RESET}")
+        print(f"  • Tulisan Thumbnail Baru : {MAGENTA}{BOLD}\"{th.get('overlay_text')}\"{RESET}")
+        print(f"  • Komposisi Visual       : {th.get('visual_description')}")
+        print(f"  • AI Image Prompt        : {DIM}{th.get('ai_image_prompt_en')}{RESET}\n")
+
+    if data.get("action_advice"):
+        print(f"💡 {BOLD}SARAN STRATEGI PENGGANTIAN METADATA:{RESET}")
+        print(f"  {data.get('action_advice')}")
+
+    # Simpan File
+    txt_path, json_path = yt_gen.save_video_pack(data, active_profile.get("name"), f"REFRESH_{old_title}")
+    print(f"\n{GREEN}✔ Paket optimasi berhasil disimpan di:{RESET}\n  📁 {CYAN}{txt_path}{RESET}")
+
+    open_choice = get_single_key(f"\n{BOLD}Buka file teks sekarang di Notepad/Editor? [Y/N]:{RESET} ", valid_keys=['y', 'n', '0', '\r', '\n'])
+    if open_choice.lower() == 'y':
+        try:
+            if os.name == 'nt':
+                os.startfile(txt_path)
+            else:
+                webbrowser.open(f"file:///{os.path.abspath(txt_path).replace('\\', '/')}")
+        except Exception:
+            pass
+
+    press_any_key()
+
+def menu_yt_optimize_channel(ai_client, yt_profile_mgr, active_profile):
+    print_section("OPTIMASI PROFIL CHANNEL (ABOUT & KEYWORDS)")
+    print(f"{DIM}Membuat copywriting halaman About dan Channel Keywords untuk YouTube Studio.{RESET}\n")
+
+    ch_name = input(f"{BOLD}Nama Channel [{active_profile.get('name')}]:{RESET} ").strip()
+    if ch_name == "0": return
+    ch_name = ch_name if ch_name else active_profile.get("name")
+
+    niche = input(f"{BOLD}Niche / Industri [{active_profile.get('niche')}]:{RESET} ").strip()
+    if niche == "0": return
+    niche = niche if niche else active_profile.get("niche")
+
+    audience = input(f"{BOLD}Target Penonton [{active_profile.get('target_audience')}]:{RESET} ").strip()
+    if audience == "0": return
+    audience = audience if audience else active_profile.get("target_audience")
+
+    core_topics = input(f"{BOLD}Topik Utama yang Dibahas [Tekan Enter untuk lewati]:{RESET} ").strip()
+    if core_topics == "0": return
+
+    print(f"\n{CYAN}Sedang merancang bio channel & kata kunci YouTube Studio...{RESET}")
+    try:
+        yt_gen = YouTubeGenerator(ai_client=ai_client)
+        res = yt_gen.optimize_channel_profile(
+            channel_name=ch_name,
+            niche=niche,
+            target_audience=audience,
+            core_topics=core_topics
+        )
+    except Exception as e:
+        print(f"{RED}✖ Gagal optimasi channel: {e}{RESET}")
+        press_any_key()
+        return
+
+    clear_screen()
+    print_banner()
+    print_section(f"HASIL OPTIMASI CHANNEL: {ch_name}")
+
+    print(f"\n📖 {BOLD}DESKRIPSI HALAMAN ABOUT (LENGKAP):{RESET}")
+    print(f"{res.get('about_bio_long')}\n")
+
+    print(f"📌 {BOLD}DESKRIPSI RINGKAS (SHORT BIO):{RESET}")
+    print(f"{res.get('about_bio_short')}\n")
+
+    print(f"🎯 {BOLD}PILIHAN TAGLINE BRANDING:{RESET}")
+    for idx, tag in enumerate(res.get("tagline_options", []), 1):
+        print(f"  {idx}. {CYAN}{tag}{RESET}")
+
+    print(f"\n🏷️  {BOLD}CHANNEL KEYWORDS (STUDIO SETTINGS - SIAP SALIN):{RESET}")
+    print(f"{GREEN}{res.get('channel_keywords_comma_separated')}{RESET}\n")
+
+    print(f"📂 {BOLD}SARAN STRUKTUR PLAYLIST:{RESET}")
+    for pl in res.get("suggested_playlists", []):
+        print(f"  • {BOLD}{pl.get('playlist_name')}{RESET}: {DIM}{pl.get('description')}{RESET}")
+
+    apply_choice = get_single_key(f"\n{BOLD}Simpan Channel Keywords & Tagline ini ke Profil Channel aktif? [Y/N]:{RESET} ", valid_keys=['y', 'n', '0'])
+    if apply_choice.lower() == 'y':
+        update_data = {
+            "channel_keywords": res.get("channel_keywords_comma_separated", ""),
+        }
+        taglines = res.get("tagline_options", [])
+        if taglines:
+            update_data["branding_tagline"] = taglines[0]
+        yt_profile_mgr.update_profile(active_profile.get("id"), update_data)
+        print(f"\n{GREEN}✔ Profil Channel berhasil diperbarui dengan keywords baru!{RESET}")
+
+    press_any_key()
+
+def menu_yt_manage_profiles(yt_profile_mgr):
+    while True:
+        clear_screen()
+        print_banner()
+        print_section("KELOLA PROFIL IDENTITAS CHANNEL YOUTUBE")
+
+        profiles = yt_profile_mgr.get_profiles()
+        print(f"{BOLD}Daftar Channel Terdaftar ({len(profiles)} Channel):{RESET}")
+        print(f"{BOLD}{'No':<4} {'Nama Channel':<26} {'Niche':<24} {'Status'}{RESET}")
+        print("-" * 65)
+        for i, p in enumerate(profiles, 1):
+            is_def = f"{GREEN}[Aktif]{RESET}" if p.get("is_default") else f"{DIM}(Tersimpan){RESET}"
+            p_name = (p.get("name", "")[:24] + '..') if len(p.get("name", "")) > 24 else p.get("name", "")
+            p_niche = (p.get("niche", "")[:22] + '..') if len(p.get("niche", "")) > 22 else p.get("niche", "")
+            print(f"#{i:<3} {BOLD}{p_name:<26}{RESET} {p_niche:<24} {is_def}")
+        print("-" * 65)
+
+        options = [
+            ("1", "Pilih Channel Aktif"),
+            ("2", "Tambah Profil Channel Baru"),
+            ("3", "Edit Profil Channel"),
+            ("4", "Hapus Profil Channel"),
+            ("0", "Kembali")
+        ]
+
+        choice = select_menu(options, title="AKSI PROFIL CHANNEL")
+        if choice == "0":
+            break
+        elif choice == "1":
+            p_opts = [(str(i), f"{p.get('name')} ({p.get('niche')})") for i, p in enumerate(profiles, 1)]
+            p_opts.append(("0", "Batal"))
+            sel = select_menu(p_opts, title="PILIH CHANNEL AKTIF")
+            if sel != "0":
+                target_p = profiles[int(sel) - 1]
+                yt_profile_mgr.set_active_profile(target_p["id"])
+                print(f"\n{GREEN}✔ Channel aktif diubah ke '{target_p.get('name')}'!{RESET}")
+                press_any_key()
+        elif choice == "2":
+            print_section("TAMBAH PROFIL CHANNEL YOUTUBE BARU")
+            print(f"{DIM}Ketik '0' untuk batal.{RESET}\n")
+            name = input(f"{BOLD}Nama Channel:{RESET} ").strip()
+            if name == "0" or not name: continue
+            niche = input(f"{BOLD}Niche / Topik Industri:{RESET} ").strip()
+            if niche == "0" or not niche: continue
+            audience = input(f"{BOLD}Target Penonton:{RESET} ").strip()
+            if audience == "0": continue
+            tone = input(f"{BOLD}Gaya Bicara / Tone [Default: Informatif, Praktis & Profesional]:{RESET} ").strip()
+            if tone == "0": continue
+            tagline = input(f"{BOLD}Tagline Branding / Slogan:{RESET} ").strip()
+            if tagline == "0": continue
+            cta = input(f"{BOLD}Link Standar & CTA Footer [Website / WA / Sosmed]:{RESET} ").strip()
+            if cta == "0": continue
+
+            new_prof = {
+                "name": name,
+                "niche": niche,
+                "target_audience": audience if audience else "Umum",
+                "tone_of_voice": tone if tone else "Informatif, Praktis & Profesional",
+                "branding_tagline": tagline if tagline else "",
+                "default_links_cta": cta if cta else "",
+                "channel_keywords": "",
+                "is_default": False
+            }
+            yt_profile_mgr.add_profile(new_prof)
+            print(f"\n{GREEN}✔ Channel '{name}' berhasil ditambahkan!{RESET}")
+            press_any_key()
+        elif choice == "3":
+            p_opts = [(str(i), f"{p.get('name')} ({p.get('niche')})") for i, p in enumerate(profiles, 1)]
+            p_opts.append(("0", "Batal"))
+            sel = select_menu(p_opts, title="PILIH CHANNEL UNTUK DI-EDIT")
+            if sel != "0":
+                target_p = profiles[int(sel) - 1]
+                print_section(f"EDIT CHANNEL: {target_p.get('name')}")
+                print(f"{DIM}Tekan Enter untuk mempertahankan nilai lama, ketik '0' untuk batal.{RESET}\n")
+
+                n = input(f"Nama Channel [{target_p.get('name')}]: ").strip()
+                if n == "0": continue
+                nic = input(f"Niche [{target_p.get('niche')}]: ").strip()
+                if nic == "0": continue
+                aud = input(f"Target Penonton [{target_p.get('target_audience')}]: ").strip()
+                if aud == "0": continue
+                ton = input(f"Tone [{target_p.get('tone_of_voice')}]: ").strip()
+                if ton == "0": continue
+                tag = input(f"Tagline [{target_p.get('branding_tagline')}]: ").strip()
+                if tag == "0": continue
+                links = input(f"Default Links / CTA [{target_p.get('default_links_cta')}]: ").strip()
+                if links == "0": continue
+
+                up_data = {}
+                if n: up_data["name"] = n
+                if nic: up_data["niche"] = nic
+                if aud: up_data["target_audience"] = aud
+                if ton: up_data["tone_of_voice"] = ton
+                if tag: up_data["branding_tagline"] = tag
+                if links: up_data["default_links_cta"] = links
+
+                yt_profile_mgr.update_profile(target_p["id"], up_data)
+                print(f"\n{GREEN}✔ Profil Channel berhasil diperbarui!{RESET}")
+                press_any_key()
+        elif choice == "4":
+            p_opts = [(str(i), f"{p.get('name')} ({p.get('niche')})") for i, p in enumerate(profiles, 1)]
+            p_opts.append(("0", "Batal"))
+            sel = select_menu(p_opts, title="PILIH CHANNEL UNTUK DIHAPUS")
+            if sel != "0":
+                target_p = profiles[int(sel) - 1]
+                confirm = get_single_key(f"\n{RED}Yakin ingin menghapus channel '{target_p.get('name')}'? [Y/N]: {RESET}", valid_keys=['y', 'n', '0'])
+                if confirm.lower() == 'y':
+                    ok, msg = yt_profile_mgr.delete_profile(target_p["id"])
+                    if ok:
+                        print(f"\n{GREEN}✔ {msg}{RESET}")
+                    else:
+                        print(f"\n{RED}✖ {msg}{RESET}")
+                    press_any_key()
+
+def menu_yt_view_history():
+    print_section("RIWAYAT FILE METADATA YOUTUBE TERSIMPAN")
+    if not os.path.exists(YOUTUBE_OUTPUT_DIR):
+        print(f"{YELLOW}Belum ada metadata video yang pernah digenerate.{RESET}")
+        press_any_key()
+        return
+
+    files_list = []
+    for root, dirs, files in os.walk(YOUTUBE_OUTPUT_DIR):
+        for f in files:
+            if f.endswith(".txt"):
+                f_path = os.path.join(root, f)
+                ch_name = os.path.basename(root)
+                files_list.append((f, f_path, ch_name))
+
+    if not files_list:
+        print(f"{YELLOW}Belum ada file metadata video di folder '{YOUTUBE_OUTPUT_DIR}/'.{RESET}")
+        press_any_key()
+        return
+
+    # Sort descending by filename timestamp
+    files_list.sort(key=lambda x: x[0], reverse=True)
+
+    print(f"{BOLD}{'No':<4} {'Channel':<18} {'Nama File Metadata':<45}{RESET}")
+    print("-" * 70)
+    for idx, (fname, fpath, ch) in enumerate(files_list[:20], 1):
+        fn_disp = (fname[:42] + '..') if len(fname) > 42 else fname
+        print(f"#{idx:<3} {CYAN}{ch:<18}{RESET} {fn_disp:<45}")
+    print("-" * 70)
+
+    options = [(str(i), f"Buka #{i}: {fname}") for i, (fname, _, _) in enumerate(files_list[:15], 1)]
+    options.append(("0", "Kembali"))
+
+    c = select_menu(options, title="PILIH FILE METADATA UNTUK DIBUKA")
+    if c != "0":
+        target_fpath = files_list[int(c) - 1][1]
+        try:
+            if os.name == 'nt':
+                os.startfile(target_fpath)
+            else:
+                webbrowser.open(f"file:///{os.path.abspath(target_fpath).replace('\\', '/')}")
+            print(f"\n{GREEN}✔ Membuka {target_fpath}...{RESET}")
+        except Exception as e:
+            print(f"{RED}✖ Gagal membuka file: {e}{RESET}")
+        press_any_key()
+
+# ==========================================
 # MAIN ENTRYPOINT
 # ==========================================
 def main():
@@ -2835,6 +3267,9 @@ def main():
         kie_keys_count = len(kie.api_keys)
         kie_model = kie.get_preferred_model()
 
+        yt_mgr = YouTubeProfileManager()
+        active_yt_channel = yt_mgr.get_active_profile()
+
         if active_site:
             total_str = f" ({len(sites)} Web)" if len(sites) > 1 else ""
             type_tag = f"{CYAN}[Astro]{RESET}" if active_site.get("type") == "astro" else f"{MAGENTA}[WP]{RESET}"
@@ -2848,8 +3283,11 @@ def main():
         kie_style_name = IMAGE_STYLE_DESCS.get(kie_style, kie_style).split("(")[0].strip()
         kie_status_str = f"{GREEN}{kie_keys_count} Key{RESET} | Gaya: {MAGENTA}{kie_style_name}{RESET}" if kie_keys_count > 0 else f"{DIM}0 Key (Mesh Gradient Fallback){RESET}"
 
-        print(f"🤖 Gemini : {CYAN}{BOLD}{active_model}{RESET} ({gemini_status_str})")
-        print(f"🖼️  Kie.ai  : {CYAN}{BOLD}{kie_model}{RESET} ({kie_status_str})")
+        yt_status_str = f"{GREEN}{active_yt_channel.get('name')}{RESET} ({active_yt_channel.get('niche')})"
+
+        print(f"🤖 Gemini  : {CYAN}{BOLD}{active_model}{RESET} ({gemini_status_str})")
+        print(f"🖼️  Kie.ai   : {CYAN}{BOLD}{kie_model}{RESET} ({kie_status_str})")
+        print(f"🎬 YouTube : {yt_status_str}")
         print(f"🌐 Web     : {wp_status_str}")
         print(f"{DIM}{'-' * 60}{RESET}")
 
@@ -2861,6 +3299,7 @@ def main():
             ("5", "Inventori & Status Artikel"),
             ("6", "Pengaturan Website"),
             ("7", "Pengaturan AI & API Key"),
+            ("8", "🎬 YouTube Channel & Metadata Suite"),
             ("0", "Keluar")
         ]
 
@@ -2880,6 +3319,8 @@ def main():
             menu_configure_wordpress()
         elif pilihan == "7":
             menu_ai_settings()
+        elif pilihan == "8":
+            menu_youtube()
         elif pilihan == "0":
             print(f"\n{GREEN}Terima kasih telah menggunakan AI Silo Builder! Sampai jumpa.{RESET}\n")
             sys.exit(0)

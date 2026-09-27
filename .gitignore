@@ -12,6 +12,7 @@ agnes_apikey.txt
 
 # Output directory for generated Silo markdown & images
 output/
+output_youtube/
 
 # Environment / IDE
 .env
