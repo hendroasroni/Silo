@@ -3109,11 +3109,12 @@ def menu_yt_oauth_settings(yt_live, active_profile, yt_profile_mgr):
 
         if not has_secret:
             print(f"{YELLOW}⚠️  File 'client_secret.json' belum ditemukan di root folder.{RESET}")
-            print(f"{DIM}Cara mendapatkan client_secret.json:{RESET}")
+            print(f"{DIM}Cara mendapatkan client_secret.json (TV and Limited Input Devices):{RESET}")
             print(f" 1. Buka Google Cloud Console: {CYAN}https://console.cloud.google.com/{RESET}")
             print(f" 2. Buat project baru dan aktifkan {BOLD}YouTube Data API v3{RESET}.")
-            print(f" 3. Di menu 'Credentials' ➔ Buat 'OAuth client ID' (Application type: Desktop App).")
-            print(f" 4. Unduh JSON kredensial dan simpan di folder Silo dengan nama {BOLD}'client_secret.json'{RESET}.\n")
+            print(f" 3. Di menu 'Credentials' ➔ Klik '+ Create Credentials' ➔ 'OAuth client ID'.")
+            print(f" 4. Pada Application type, pilih: {BOLD}'TVs and Limited Input devices'{RESET}.")
+            print(f" 5. Unduh JSON kredensial dan simpan di folder Silo dengan nama {BOLD}'client_secret.json'{RESET}.\n")
         else:
             print(f"{GREEN}✔ File 'client_secret.json' terdeteksi.{RESET}")
 
@@ -3130,10 +3131,10 @@ def menu_yt_oauth_settings(yt_live, active_profile, yt_profile_mgr):
             except Exception as e:
                 print(f"{YELLOW}⚠️ Catatan: {e}{RESET}\n")
         else:
-            print(f"{YELLOW}Status Koneksi: BELUM TERHUBUNG (Pilih menu 1 untuk login via OAuth){RESET}\n")
+            print(f"{YELLOW}Status Koneksi: BELUM TERHUBUNG (Pilih menu 1 untuk login Headless){RESET}\n")
 
         options = [
-            ("1", "🔑 Login & Hubungkan Akun Google / YouTube (OAuth 2.0)"),
+            ("1", "🔑 Login & Hubungkan Akun Google / YouTube (Headless / TV & Limited Device)"),
             ("2", "🔄 Sinkronkan Nama & Deskripsi Channel dari YouTube ke Profil Silo"),
             ("3", "🔓 Putuskan Koneksi OAuth (Logout)"),
             ("0", "Kembali")
@@ -3143,8 +3144,7 @@ def menu_yt_oauth_settings(yt_live, active_profile, yt_profile_mgr):
         if c == "0":
             break
         elif c == "1":
-            print_section("LOGIN OAUTH GOOGLE YOUTUBE")
-            print(f"{CYAN}Membuka browser untuk otentikasi Google OAuth...{RESET}")
+            print_section("LOGIN OAUTH GOOGLE YOUTUBE (HEADLESS / TV & LIMITED DEVICE)")
             try:
                 ok, msg = yt_live.authenticate(channel_id=ch_id, force_new=True)
                 print(f"\n{GREEN}✔ {msg}{RESET}")

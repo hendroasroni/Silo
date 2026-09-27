@@ -70,7 +70,30 @@ class YouTubeLiveClient:
         except Exception:
             return False
 
-    def authenticate(self, channel_id="default", force_new=False, port=8080):
+    def _extract_client_credentials(self):
+        if not os.path.exists(self.client_secrets_file):
+            return None, None
+
+        try:
+            with open(self.client_secrets_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            
+            # Bisa di bawah 'installed', 'web', 'device', atau root
+            obj = data.get("installed") or data.get("web") or data.get("device") or data
+            client_id = obj.get("client_id", "").strip()
+            client_secret = obj.get("client_secret", "").strip()
+            if client_id and client_secret:
+                return client_id, client_secret
+        except Exception:
+            pass
+        return None, None
+
+    def authenticate(self, channel_id="default", force_new=False, on_code_display=None):
+        """
+        Otentikasi OAuth 2.0 menggunakan TV & Limited Input Device Flow (Headless / Device Code Flow).
+        Bekerja 100% di terminal CLI / VPS tanpa butuh local redirect server.
+        Pengguna cukup membuka https://www.google.com/device dan memasukkan kode di layar.
+        """
         if not GOOGLE_API_AVAILABLE:
             raise RuntimeError("Library Google API belum terpasang. Jalankan: pip install google-api-python-client google-auth-oauthlib")
 
@@ -81,42 +104,115 @@ class YouTubeLiveClient:
                 self.service = build("youtube", "v3", credentials=self.creds)
                 return True, "Otentikasi berhasil menggunakan token tersimpan."
 
-        if not self.is_secret_file_present():
+        client_id, client_secret = self._extract_client_credentials()
+        if not client_id or not client_secret:
             raise FileNotFoundError(
-                f"File kredensial OAuth '{self.client_secrets_file}' tidak ditemukan di root folder proyek.\n"
-                "Silakan unduh Client Secret JSON dari Google Cloud Console dan simpan sebagai 'client_secret.json'."
+                f"File kredensial '{self.client_secrets_file}' tidak valid atau belum ada.\n"
+                "Pastikan file tersebut berisi 'client_id' dan 'client_secret' dari Google Cloud Console."
             )
 
-        # Start OAuth flow
-        flow = InstalledAppFlow.from_client_secrets_file(
-            self.client_secrets_file,
-            scopes=YOUTUBE_SCOPES
-        )
+        # 1. Request Device Code dari Google OAuth
+        import requests
+        device_code_url = "https://oauth2.googleapis.com/device/code"
+        device_payload = {
+            "client_id": client_id,
+            "scope": " ".join(YOUTUBE_SCOPES)
+        }
 
-        ports_to_try = [port, 8090, 8888, 0]
-        creds = None
-        last_err = None
+        try:
+            resp = requests.post(device_code_url, data=device_payload, timeout=20)
+            if resp.status_code != 200:
+                raise RuntimeError(f"Gagal meminta Device Code dari Google: (HTTP {resp.status_code}) {resp.text}")
+            device_data = resp.json()
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(f"Koneksi ke endpoint OAuth Google gagal: {e}")
 
-        for p in ports_to_try:
+        device_code = device_data.get("device_code")
+        user_code = device_data.get("user_code")
+        verification_url = device_data.get("verification_url", "https://www.google.com/device")
+        expires_in = int(device_data.get("expires_in", 1800))
+        interval = int(device_data.get("interval", 5))
+
+        if on_code_display:
+            on_code_display(verification_url, user_code, expires_in)
+        else:
+            print("\n" + "=" * 65)
+            print("📺 OTENTIKASI OAUTH YOUTUBE (TV & LIMITED DEVICE / HEADLESS)")
+            print("=" * 65)
+            print(f"1. Buka tautan berikut di browser Anda (HP / Laptop / PC):")
+            print(f"   👉 \033[96m\033[1m{verification_url}\033[0m")
+            print(f"\n2. Masukkan kode berikut:")
+            print(f"   🔑 \033[92m\033[1m[ {user_code} ]\033[0m")
+            print(f"\n3. Login dengan akun Google channel Anda dan klik 'Allow / Izinkan'.")
+            print("=" * 65)
+            print(f"\n⏳ Menunggu otorisasi dari perangkat Anda (Polling setiap {interval}s)...", end="", flush=True)
+
+        # 2. Polling Token Endpoint
+        import time
+        token_url = "https://oauth2.googleapis.com/token"
+        token_payload = {
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "device_code": device_code,
+            "grant_type": "urn:ietf:params:oauth:grant-type:device_code"
+        }
+
+        start_time = time.time()
+        creds_obj = None
+
+        while (time.time() - start_time) < expires_in:
+            time.sleep(interval)
+            print(".", end="", flush=True)
+
             try:
-                creds = flow.run_local_server(
-                    port=p,
-                    prompt="consent",
-                    authorization_prompt_message="Silakan login dan beri izin akses YouTube di browser Anda...",
-                    success_message="Otentikasi YouTube Berhasil! Anda dapat menutup jendela browser ini sekarang."
-                )
-                break
-            except Exception as e:
-                last_err = e
+                t_resp = requests.post(token_url, data=token_payload, timeout=20)
+                if t_resp.status_code == 200:
+                    t_data = t_resp.json()
+                    access_token = t_data.get("access_token")
+                    refresh_token = t_data.get("refresh_token")
+                    token_expiry = t_data.get("expires_in")
+                    
+                    # Buat Credentials objek
+                    creds_obj = Credentials(
+                        token=access_token,
+                        refresh_token=refresh_token,
+                        token_uri=token_url,
+                        client_id=client_id,
+                        client_secret=client_secret,
+                        scopes=YOUTUBE_SCOPES
+                    )
+                    break
+                else:
+                    err_json = {}
+                    try:
+                        err_json = t_resp.json()
+                    except Exception:
+                        pass
+                    
+                    err_type = err_json.get("error")
+                    if err_type == "authorization_pending":
+                        continue
+                    elif err_type == "slow_down":
+                        interval += 5
+                        continue
+                    elif err_type == "expired_token":
+                        raise RuntimeError("\nWaktu otentikasi telah habis (expired). Silakan coba lagi.")
+                    elif err_type == "access_denied":
+                        raise RuntimeError("\nOtentikasi ditolak oleh pengguna di browser (access_denied).")
+                    else:
+                        err_desc = err_json.get("error_description", t_resp.text)
+                        raise RuntimeError(f"\nError OAuth: {err_type} - {err_desc}")
+            except requests.exceptions.RequestException as e:
                 continue
 
-        if not creds:
-            raise RuntimeError(f"Gagal melakukan otentikasi OAuth: {last_err}")
+        if not creds_obj:
+            raise RuntimeError("\nWaktu otentikasi habis sebelum selesai.")
 
-        self.creds = creds
-        self.save_credentials(creds, channel_id)
+        print("\n\033[92m✔ Otentikasi Berhasil Diterima!\033[0m")
+        self.creds = creds_obj
+        self.save_credentials(creds_obj, channel_id)
         self.service = build("youtube", "v3", credentials=self.creds)
-        return True, "Otentikasi OAuth YouTube berhasil diselesaikan!"
+        return True, "Otentikasi Headless (Device Flow) YouTube berhasil diselesaikan!"
 
     def get_service(self, channel_id="default"):
         if not self.service:
