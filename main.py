@@ -25,7 +25,7 @@ from core.youtube import (
     YouTubeProfileManager, YouTubeGenerator, YOUTUBE_OUTPUT_DIR, CHANNELS_BASE_DIR,
     get_channel_dir, clean_channel_slug, YouTubeLiveClient
 )
-from core.silo import SiloGenerator, WordPressPublisher, slugify
+from core.silo import SiloGenerator, WordPressPublisher, BulkSiloManager, slugify
 from core.config_utils import get_config_path, get_project_root, get_config_dir, CONFIG_DIR
 
 # ANSI color styling
@@ -304,6 +304,191 @@ def menu_generate_silo(target_site=None):
 
     create_new_silo_flow(silo_engine, client, target_site=target_site, silos_base_dir=silos_base_dir)
 
+def bulk_silo_autopilot_flow(silo_engine, client, target_site=None):
+    clear_screen()
+    print_banner()
+    wp = WordPressPublisher()
+    bulk_mgr = BulkSiloManager()
+    cfg = bulk_mgr.get_config()
+
+    silos_base_dir = wp.get_site_silos_dir(target_site) if target_site else "output"
+    clusters_per_silo = cfg.get("clusters_per_silo", 9)
+    language = cfg.get("default_language", "Bahasa Indonesia")
+    tone = cfg.get("default_tone", "Informatif, Mengalir Natural & Profesional, Solutif, Bebas Klise AI")
+    pacing_s = cfg.get("pacing_seconds", 3)
+    site_name = target_site.get("name", "Website") if target_site else "Default Project"
+
+    print_section(f"BULK AUTOPILOT SILO GENERATOR - {site_name.upper()}")
+    print(f" {DIM}Mode batch otomatis: Cukup masukkan keyword, sistem menghitung total silo & artikel lalu generate non-stop.{RESET}\n")
+    print(f" {BOLD}Format Input:{RESET} Ketik/paste keyword dipisahkan dengan koma (,) atau baris baru.")
+    print(f" {DIM}Contoh: geoteknik pondasi, uji tanah sondir, soil stabilization, retaining wall, bored pile{RESET}")
+    print(f" {DIM}Ketik '0' untuk membatalkan dan kembali.{RESET}\n")
+
+    raw_input = input(f"{BOLD}Masukkan Seed Keywords:{RESET}\n> ").strip()
+    if raw_input == "0" or not raw_input:
+        return
+
+    keywords = BulkSiloManager.parse_bulk_keywords(raw_input)
+    if not keywords:
+        print(f"\n{RED}[X] Tidak ada keyword valid yang terdeteksi.{RESET}")
+        press_any_key()
+        return
+
+    total_silos = len(keywords)
+    total_articles = total_silos * (1 + clusters_per_silo)
+
+    print_section("RINGKASAN TARGET PRODUKSI BATCH")
+    print(f"[*] {BOLD}Terdeteksi Seed Keywords ({total_silos} Silo):{RESET}")
+    for idx, kw in enumerate(keywords, 1):
+        print(f"    #{idx:<2} {BOLD}{kw}{RESET}")
+
+    print(f"\n[*] {BOLD}Estimasi Produksi :{RESET} {GREEN}{BOLD}{total_silos} Silo x (1 Pillar + {clusters_per_silo} Cluster) = {total_articles} Artikel Total{RESET}")
+    print(f"[*] {BOLD}Target Website    :{RESET} {CYAN}{site_name}{RESET}")
+    print(f"[*] {BOLD}Bahasa & Tone     :{RESET} {language} | {tone[:40]}...")
+    print(f"[*] {BOLD}Jeda Pacing       :{RESET} {pacing_s} detik antar-silo\n")
+
+    confirm = get_single_key(f"{GREEN}{BOLD}Tekan [ENTER] untuk langsung menjalankan proses autopilot (atau '0' untuk batal): {RESET}", valid_keys=['\r', '\n', 'y', '1', '0'])
+    if confirm == '0':
+        print(f"\n{YELLOW}Dibatalkan oleh pengguna.{RESET}")
+        press_any_key()
+        return
+
+    business_profile = wp.get_business_profile(target_site.get("id")) if target_site else {}
+    pipeline_mgr = AIPipelineManager()
+    stage1_client = pipeline_mgr.get_client_for_stage(1, default_gemini_client=client)
+
+    print_section(f"MEMULAI AUTOPILOT: {total_silos} SILO ({total_articles} ARTIKEL)")
+    start_time = time.time()
+    silos_success = 0
+
+    for s_idx, seed_kw in enumerate(keywords, 1):
+        print(f"\n{YELLOW}{'=' * 75}{RESET}")
+        print(f"  {BOLD}{MAGENTA}[SILO {s_idx}/{total_silos}]{RESET} {BOLD}MEMPROSES SEED TOPIC: '{seed_kw}'{RESET}")
+        print(f"{YELLOW}{'=' * 75}{RESET}")
+
+        folder_slug = slugify(seed_kw)
+        existing_plan_file = os.path.join(silos_base_dir, folder_slug, "silo_plan.json")
+        silo_plan = None
+
+        if os.path.exists(existing_plan_file):
+            try:
+                with open(existing_plan_file, "r", encoding="utf-8") as f:
+                    silo_plan = json.load(f)
+                print(f"{GREEN}[OK] Blueprint Silo '{seed_kw}' sudah ada di disk. Menggunakan blueprint tersimpan.{RESET}")
+            except Exception:
+                silo_plan = None
+
+        if not silo_plan:
+            print(f"{CYAN}Sedang meriset search intent & memetakan 1 Pilar + {clusters_per_silo} Cluster...{RESET}")
+            try:
+                silo_plan = silo_engine.research_silo_cluster(
+                    seed_kw,
+                    language=language,
+                    niche_context="Umum",
+                    cluster_count=clusters_per_silo,
+                    business_profile=business_profile,
+                    client=stage1_client
+                )
+                if target_site:
+                    silo_plan["target_site_id"] = target_site.get("id")
+                    silo_plan["target_site_name"] = target_site.get("name")
+                silo_engine.save_silo_project(silo_plan, new_articles=[], output_base_dir=silos_base_dir)
+                print(f"{GREEN}[OK] Blueprint 1 Pilar + {clusters_per_silo} Cluster berhasil dibuat & disimpan!{RESET}")
+            except Exception as e:
+                print(f"{RED}[X] Gagal meriset Silo untuk '{seed_kw}': {e}{RESET}")
+                continue
+
+        # Scan existing completed articles in this silo
+        completed_ids = []
+        silo_item_dir = os.path.join(silos_base_dir, folder_slug)
+        if os.path.exists(silo_item_dir):
+            for fname in os.listdir(silo_item_dir):
+                if fname.endswith(".md") and fname != "SILO_BLUEPRINT.md":
+                    try:
+                        cid = int(fname.split("_")[0])
+                        completed_ids.append(cid)
+                    except ValueError:
+                        pass
+
+        # Eksekusi seluruh artikel dalam silo secara non-stop
+        process_silo_items_generation(
+            silo_engine,
+            silo_plan,
+            completed_existing_ids=completed_ids,
+            language=language,
+            tone=tone,
+            client=client,
+            silos_base_dir=silos_base_dir,
+            target_site=target_site,
+            auto_pilot=True
+        )
+
+        silos_success += 1
+
+        if s_idx < total_silos:
+            print(f"\n{DIM}[Smart Pacing] Jeda {pacing_s} detik sebelum memproses Silo berikutnya...{RESET}")
+            time.sleep(pacing_s)
+
+    elapsed_mins = (time.time() - start_time) / 60
+    print_section("AUTOPILOT BATCH SELESAI")
+    print(f" {GREEN}{BOLD}[OK] Berhasil memproses {silos_success}/{total_silos} Silo Proyek!{RESET}")
+    print(f" [*] Total Estimasi Waktu : {BOLD}{elapsed_mins:.1f} menit{RESET}")
+    print(f" [*] Lokasi Output Silos  : {CYAN}{silos_base_dir}{RESET}\n")
+    press_any_key("Tekan tombol apa saja untuk kembali ke Dashboard Web...")
+
+
+def menu_bulk_settings(site=None):
+    bulk_mgr = BulkSiloManager()
+    while True:
+        clear_screen()
+        print_banner()
+        cfg = bulk_mgr.get_config()
+        site_tag = f" ({site.get('name')})" if site else ""
+        print_section(f"PENGATURAN BULK SILO GENERATOR{site_tag}")
+
+        print(f" [*] {BOLD}Jumlah Cluster per Silo  :{RESET} {BOLD}{cfg.get('clusters_per_silo', 9)} Cluster{RESET} (Total: {1 + cfg.get('clusters_per_silo', 9)} artikel/silo)")
+        print(f" [*] {BOLD}Bahasa Default Artikel   :{RESET} {cfg.get('default_language', 'Bahasa Indonesia')}")
+        print(f" [*] {BOLD}Gaya Bahasa / Tone       :{RESET} {cfg.get('default_tone', 'Informatif, Mengalir Natural & Profesional')[:45]}...")
+        print(f" [*] {BOLD}Target Kata per Artikel  :{RESET} {cfg.get('target_word_count', 2000)} kata")
+        print(f" [*] {BOLD}Jeda Pacing Antar-Silo   :{RESET} {cfg.get('pacing_seconds', 3)} detik\n")
+
+        options = [
+            ("1", f"Ubah Jumlah Cluster per Silo (Saat ini: {cfg.get('clusters_per_silo', 9)})"),
+            ("2", f"Ubah Bahasa Default (Saat ini: {cfg.get('default_language', 'Bahasa Indonesia')})"),
+            ("3", f"Ubah Gaya Bahasa / Tone"),
+            ("4", f"Ubah Jeda Pacing (Saat ini: {cfg.get('pacing_seconds', 3)}s)"),
+            ("0", "Kembali ke Menu Sebelumnya")
+        ]
+
+        c = select_menu(options, title="PILIH PENGATURAN BULK UNTUK DIUBAH")
+        if c == "0":
+            break
+        elif c == "1":
+            new_c = input(f"{BOLD}Masukkan jumlah cluster per silo [misal: 6, 9, 10, 15]:{RESET} ").strip()
+            if new_c.isdigit() and int(new_c) > 0:
+                bulk_mgr.update_config("clusters_per_silo", int(new_c))
+                print(f"{GREEN}[OK] Jumlah cluster per silo diatur ke {new_c}!{RESET}")
+                time.sleep(1)
+        elif c == "2":
+            new_l = input(f"{BOLD}Masukkan bahasa default artikel [misal: Bahasa Indonesia, English]:{RESET} ").strip()
+            if new_l:
+                bulk_mgr.update_config("default_language", new_l)
+                print(f"{GREEN}[OK] Bahasa default diatur ke {new_l}!{RESET}")
+                time.sleep(1)
+        elif c == "3":
+            new_t = input(f"{BOLD}Masukkan gaya bahasa / tone:{RESET} ").strip()
+            if new_t:
+                bulk_mgr.update_config("default_tone", new_t)
+                print(f"{GREEN}[OK] Gaya bahasa berhasil diperbarui!{RESET}")
+                time.sleep(1)
+        elif c == "4":
+            new_p = input(f"{BOLD}Masukkan jeda pacing (detik) [misal: 2, 3, 5]:{RESET} ").strip()
+            if new_p.isdigit() and int(new_p) >= 0:
+                bulk_mgr.update_config("pacing_seconds", int(new_p))
+                print(f"{GREEN}[OK] Jeda pacing diatur ke {new_p} detik!{RESET}")
+                time.sleep(1)
+
+
 def create_new_silo_flow(silo_engine, client, target_site=None, silos_base_dir=None):
     active_model = client.get_working_model()
     wp = WordPressPublisher()
@@ -502,7 +687,7 @@ def expand_silo_flow(silo_engine, silo_plan, completed_ids, client, silos_base_d
     # Lanjut ke pemilihan pembuatan artikel
     process_silo_items_generation(silo_engine, updated_plan, completed_existing_ids=completed_ids, language="Bahasa Indonesia", tone="Informatif, Mengalir Natural & Profesional, Solutif, Bebas Klise AI", client=client, silos_base_dir=silos_base_dir, target_site=target_site)
 
-def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids, language, tone, client, silos_base_dir="output", target_site=None):
+def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids, language, tone, client, silos_base_dir="output", target_site=None, auto_pilot=False):
     pipeline_mgr = AIPipelineManager()
     stage1_client = pipeline_mgr.get_client_for_stage(1, default_gemini_client=client)
     stage2_client = pipeline_mgr.get_client_for_stage(2, default_gemini_client=client)
@@ -554,43 +739,48 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
 
     if not pending_items:
         print(f"\n{GREEN}{BOLD}[!] Semua artikel dalam Silo ini sudah selesai dibuat!{RESET}")
-        press_any_key()
+        if not auto_pilot:
+            press_any_key()
         return
 
-    # Pemilihan Artikel
-    print_section("PILIH ARTIKEL YANG AKAN DIPRODUKSI")
-    default_str = ", ".join(map(str, default_rec_ids)) if default_rec_ids else str(pending_items[0]["id"])
-    print(f"Pilihan input:")
-    print(f" - Ketik nomor pilihan artikel pending (contoh: {CYAN}2, 3{RESET} atau {CYAN}2-5{RESET})")
-    print(f" - Ketik {CYAN}all{RESET} atau {CYAN}semua{RESET} untuk membuat SEMUA {len(pending_items)} cluster yang belum dibuat")
-    print(f" - Tekan {GREEN}[ENTER]{RESET} langsung untuk memilih default rekomendasi ({CYAN}{default_str}{RESET})")
-    print(f" - Ketik {RED}0{RESET} untuk batal (Plan Silo tetap tersimpan aman di disk)")
-    
-    choice = input(f"\n{BOLD}Pilihan Anda:{RESET} ").strip()
-    if choice == "0":
-        return
-
-    if not choice:
-        selected_ids = default_rec_ids if default_rec_ids else [pending_items[0]["id"]]
-    elif choice in ["all", "semua", "a"]:
-        selected_ids = [it["id"] for it in pending_items]
+    if auto_pilot:
+        selected_items = [it for it in items if it["id"] not in completed_existing_ids]
+        print(f"\n{GREEN}[Autopilot] Memproses otomatis seluruh {len(selected_items)} artikel pending...{RESET}")
     else:
-        selected_ids = parse_user_selection(choice, len(items), default_rec_ids)
+        # Pemilihan Artikel
+        print_section("PILIH ARTIKEL YANG AKAN DIPRODUKSI")
+        default_str = ", ".join(map(str, default_rec_ids)) if default_rec_ids else str(pending_items[0]["id"])
+        print(f"Pilihan input:")
+        print(f" - Ketik nomor pilihan artikel pending (contoh: {CYAN}2, 3{RESET} atau {CYAN}2-5{RESET})")
+        print(f" - Ketik {CYAN}all{RESET} atau {CYAN}semua{RESET} untuk membuat SEMUA {len(pending_items)} cluster yang belum dibuat")
+        print(f" - Tekan {GREEN}[ENTER]{RESET} langsung untuk memilih default rekomendasi ({CYAN}{default_str}{RESET})")
+        print(f" - Ketik {RED}0{RESET} untuk batal (Plan Silo tetap tersimpan aman di disk)")
+        
+        choice = input(f"\n{BOLD}Pilihan Anda:{RESET} ").strip()
+        if choice == "0":
+            return
 
-    selected_items = [it for it in items if it["id"] in selected_ids and it["id"] not in completed_existing_ids]
+        if not choice:
+            selected_ids = default_rec_ids if default_rec_ids else [pending_items[0]["id"]]
+        elif choice in ["all", "semua", "a"]:
+            selected_ids = [it["id"] for it in pending_items]
+        else:
+            selected_ids = parse_user_selection(choice, len(items), default_rec_ids)
 
-    if not selected_items:
-        print(f"{RED}Tidak ada artikel pending yang dipilih.{RESET}")
-        press_any_key()
-        return
+        selected_items = [it for it in items if it["id"] in selected_ids and it["id"] not in completed_existing_ids]
 
-    print(f"\n{GREEN}[OK] Anda memilih {len(selected_items)} artikel untuk diproduksi: {[it['id'] for it in selected_items]}{RESET}")
+        if not selected_items:
+            print(f"{RED}Tidak ada artikel pending yang dipilih.{RESET}")
+            press_any_key()
+            return
 
-    confirm_char = get_single_key(f"\n{BOLD}Mulai proses pembuatan konten & kurasi? [Y/N atau 0]:{RESET} ", valid_keys=['y', 'n', '0', '\r', '\n'])
-    if confirm_char.lower() in ['n', '0']:
-        print(f"\n{YELLOW}Dibatalkan oleh pengguna (Plan Silo tetap tersimpan).{RESET}")
-        press_any_key()
-        return
+        print(f"\n{GREEN}[OK] Anda memilih {len(selected_items)} artikel untuk diproduksi: {[it['id'] for it in selected_items]}{RESET}")
+
+        confirm_char = get_single_key(f"\n{BOLD}Mulai proses pembuatan konten & kurasi? [Y/N atau 0]:{RESET} ", valid_keys=['y', 'n', '0', '\r', '\n'])
+        if confirm_char.lower() in ['n', '0']:
+            print(f"\n{YELLOW}Dibatalkan oleh pengguna (Plan Silo tetap tersimpan).{RESET}")
+            press_any_key()
+            return
 
     # Generate Brief, Write, Curate
     print_section("PEMBUATAN KONTEN & KURASI KUALITAS MULTI-STAGE")
@@ -739,7 +929,8 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
         except Exception as e:
             print(f"{RED}[X] Gagal menyimpan file: {e}{RESET}")
 
-    press_any_key()
+    if not auto_pilot:
+        press_any_key()
 
 # ==========================================
 # MENU 2: PUSH TO WORDPRESS (GLOBAL UNSENT)
@@ -1163,12 +1354,14 @@ def menu_website_dashboard(site):
         print(f" {BOLD}Koleksi Silo  :{RESET} {BOLD}{total_silos} Silo{RESET} ({GREEN}{completed_articles} Artikel Selesai{RESET}, {YELLOW}{pending_articles} Pending{RESET})\n")
 
         options = [
-            ("1", "[Target] Riset & Buat Arsitektur Silo Baru (Khusus web ini)"),
-            ("2", f"[Folder] Kelola & Lanjutkan Silo Web Ini ({total_silos} Silo)"),
-            ("3", "[Publish] Publish Artikel ke Web Ini"),
-            ("4", "[Live] Kelola Post Live di Web Ini (WordPress)"),
-            ("5", "[Business] Profil Bisnis & Knowledge Grounding Web Ini"),
-            ("6", "[Key] Pengaturan Kredensial & Uji Koneksi Web Ini"),
+            ("1", "[Target] Riset & Buat Arsitektur Silo Baru (Single Silo)"),
+            ("2", "[Auto]   Bulk Autopilot Silo Generator (Multi-Keyword Non-Stop)"),
+            ("3", f"[Folder] Kelola & Lanjutkan Silo Web Ini ({total_silos} Silo)"),
+            ("4", "[Publish] Publish Artikel ke Web Ini"),
+            ("5", "[Live]   Kelola Post Live di Web Ini (WordPress)"),
+            ("6", "[Business] Profil Bisnis & Knowledge Grounding Web Ini"),
+            ("7", "[Key]    Pengaturan Kredensial & Uji Koneksi Web Ini"),
+            ("8", "[Config] Pengaturan Bulk Silo (Cluster, Bahasa, Pacing)"),
             ("0", "  Kembali ke Daftar Website")
         ]
 
@@ -1186,19 +1379,27 @@ def menu_website_dashboard(site):
                 print(f"{RED}Gemini API Client belum terhubung.{RESET}")
                 press_any_key()
                 continue
-            menu_manage_site_silos(site, silo_engine, client)
+            bulk_silo_autopilot_flow(silo_engine, client, target_site=site)
         elif choice == "3":
-            menu_push_wordpress(target_site=site)
+            if not client:
+                print(f"{RED}Gemini API Client belum terhubung.{RESET}")
+                press_any_key()
+                continue
+            menu_manage_site_silos(site, silo_engine, client)
         elif choice == "4":
+            menu_push_wordpress(target_site=site)
+        elif choice == "5":
             if site.get("type") == "astro":
                 print(f"{CYAN}Website ini adalah website statis Astro. Kelola konten langsung melalui folder Content Astro.{RESET}")
                 press_any_key()
             else:
                 menu_manage_live_wp(wp, target_site=site)
-        elif choice == "5":
-            manage_single_site_profile_flow(wp, site)
         elif choice == "6":
+            manage_single_site_profile_flow(wp, site)
+        elif choice == "7":
             menu_single_site_settings(wp, site)
+        elif choice == "8":
+            menu_bulk_settings(site=site)
 
 def menu_manage_site_silos(site, silo_engine, client):
     wp = WordPressPublisher()

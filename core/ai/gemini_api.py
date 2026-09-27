@@ -7,18 +7,14 @@ from core.config_utils import get_config_path
 GEMINI_CONFIG_FILE = "gemini_config.json"
 
 DEFAULT_FLASH_MODELS = [
-    ("gemini-3.8-flash", "Gemini 3.8 Flash (Paling Cepat, Terbaru & Direkomendasikan untuk SEO)"),
+    ("gemini-flash-latest", "Gemini Flash Latest (Paling Cepat, Rekomendasi Utama)"),
     ("gemini-3.7-flash", "Gemini 3.7 Flash (Cepat & Stabil)"),
-    ("gemini-3.5-flash", "Gemini 3.5 Flash (Sangat Hemat Kuota)"),
-    ("gemini-3-flash-preview", "Gemini 3 Flash Preview"),
-    ("gemini-flash-latest", "Gemini Flash Latest (Otomatis Versi Terbaru)")
+    ("gemini-3.1-flash-lite", "Gemini 3.1 Flash Lite (Ringan & Hemat Kuota)")
 ]
 
 DEFAULT_PRO_MODELS = [
-    ("gemini-3.7-pro", "Gemini 3.7 Pro (Penalaran Mendalam & Analisis Kompleks)"),
-    ("gemini-pro-latest", "Gemini Pro Latest (Versi Pro Terbaru)"),
-    ("gemini-3.1-pro-preview", "Gemini 3.1 Pro Preview"),
-    ("gemini-2.5-pro", "Gemini 2.5 Pro")
+    ("gemini-pro-latest", "Gemini Pro Latest (Penalaran Mendalam)"),
+    ("gemini-3.1-pro-preview", "Gemini 3.1 Pro Preview")
 ]
 
 class GeminiClient:
@@ -28,7 +24,7 @@ class GeminiClient:
         self.api_keys = self._load_keys()
         self.current_key_idx = 0
         self.config = self._load_config()
-        self.active_model = self.config.get("preferred_model", "gemini-3.8-flash")
+        self.active_model = self.config.get("preferred_model", "gemini-flash-latest")
 
     def _load_config(self):
         if os.path.exists(self.config_file):
@@ -37,7 +33,7 @@ class GeminiClient:
                     return json.load(f)
             except Exception:
                 return {}
-        return {"preferred_model": "gemini-3.8-flash"}
+        return {"preferred_model": "gemini-flash-latest"}
 
     def _save_config(self):
         with open(self.config_file, "w", encoding="utf-8") as f:
@@ -53,7 +49,7 @@ class GeminiClient:
         return False
 
     def get_preferred_model(self):
-        return self.config.get("preferred_model", "gemini-3.8-flash")
+        return self.config.get("preferred_model", "gemini-flash-latest")
 
     def _load_keys(self):
         if not os.path.exists(self.key_file):
@@ -205,7 +201,7 @@ class GeminiClient:
         fallback_model_idx = 0
         
         total_keys = max(len(self.api_keys), 1)
-        actual_retries = max(max_retries, total_keys * 2)
+        actual_retries = max(max_retries, total_keys * 3, 10)
         last_error = None
 
         for attempt in range(actual_retries):
@@ -224,11 +220,25 @@ class GeminiClient:
                         return "".join([p.get("text", "") for p in parts]).strip()
                     return ""
                 
-                elif resp.status_code in [400, 403, 429]:
+                elif resp.status_code == 429:
+                    rotated, old_k, new_k = self.rotate_key()
+                    last_error = f"Key #{old_k} (HTTP 429 Rate Limit)"
+                    if fallback_model_idx < len(fallback_models):
+                        current_model = fallback_models[fallback_model_idx]
+                        fallback_model_idx += 1
+                        print(f" [Rate Limit 429 -> Coba model alternatif: {current_model}]", flush=True)
+                        time.sleep(2)
+                    else:
+                        fallback_model_idx = 0
+                        wait_time = 3 if rotated else min(15, 3 * (attempt + 1))
+                        print(f" [Rate Limit 429: Menunggu {wait_time}s...]", flush=True)
+                        time.sleep(wait_time)
+
+                elif resp.status_code in [400, 403]:
                     rotated, old_k, new_k = self.rotate_key()
                     last_error = f"Key #{old_k} (HTTP {resp.status_code})"
                     if rotated:
-                        print(f" [Auto-Failover: Key #{old_k} limit/error -> Beralih ke Key #{new_k}]", flush=True)
+                        print(f" [Auto-Failover: Key #{old_k} error -> Beralih ke Key #{new_k}]", flush=True)
                     time.sleep(1)
 
                 elif resp.status_code == 404:
@@ -244,6 +254,10 @@ class GeminiClient:
                 elif resp.status_code in [500, 503]:
                     rotated, old_k, new_k = self.rotate_key()
                     last_error = f"Model {current_model} (HTTP {resp.status_code})"
+                    if fallback_model_idx < len(fallback_models):
+                        current_model = fallback_models[fallback_model_idx]
+                        fallback_model_idx += 1
+                        print(f" [Auto-Failover: {last_error} -> Beralih ke model {current_model}]", flush=True)
                     time.sleep(2)
 
                 else:
@@ -254,6 +268,9 @@ class GeminiClient:
             except Exception as e:
                 rotated, old_k, new_k = self.rotate_key()
                 last_error = f"Error ({str(e)})"
+                if fallback_model_idx < len(fallback_models):
+                    current_model = fallback_models[fallback_model_idx]
+                    fallback_model_idx += 1
                 time.sleep(2)
         
         raise Exception(f"Gagal memanggil Gemini API setelah {actual_retries} percobaan ({last_error})")
