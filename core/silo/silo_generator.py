@@ -624,3 +624,49 @@ Kembalikan hasil dalam format JSON:
             md.append("")
 
         return "\n".join(md)
+
+    def get_checkpoint_path(self, silo_folder_path, item_id):
+        ckpt_dir = os.path.join(silo_folder_path, ".checkpoints")
+        os.makedirs(ckpt_dir, exist_ok=True)
+        return os.path.join(ckpt_dir, f"item_{item_id}_state.json")
+
+    def load_stage_checkpoint(self, silo_folder_path, item_id):
+        """
+        Memuat progres sementara (Brief, Draft, Kurasi) dari artikel yang terputus di tengah jalan.
+        """
+        try:
+            ckpt_file = self.get_checkpoint_path(silo_folder_path, item_id)
+            if os.path.exists(ckpt_file):
+                with open(ckpt_file, "r", encoding="utf-8") as f:
+                    return json.load(f)
+        except Exception:
+            pass
+        return None
+
+    def save_stage_checkpoint(self, silo_folder_path, item_id, stage_data):
+        """
+        Menyimpan progres draf sementara per tahap (Tahap 1 Brief, Tahap 2 Draf, Tahap 3 Kurasi).
+        """
+        try:
+            ckpt_file = self.get_checkpoint_path(silo_folder_path, item_id)
+            current_data = self.load_stage_checkpoint(silo_folder_path, item_id) or {}
+            current_data.update(stage_data)
+            with open(ckpt_file, "w", encoding="utf-8") as f:
+                json.dump(current_data, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+
+    def clear_stage_checkpoint(self, silo_folder_path, item_id):
+        """
+        Menghapus checkpoint setelah artikel selesai diproduksi dan tersimpan utuh di disk.
+        """
+        try:
+            ckpt_file = self.get_checkpoint_path(silo_folder_path, item_id)
+            if os.path.exists(ckpt_file):
+                os.remove(ckpt_file)
+            ckpt_dir = os.path.dirname(ckpt_file)
+            if os.path.exists(ckpt_dir) and not os.listdir(ckpt_dir):
+                os.rmdir(ckpt_dir)
+        except Exception:
+            pass
+

@@ -604,84 +604,112 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
         print(f"{BOLD}[{idx}/{len(selected_items)}] Memproses: #{item['id']} - {item['keyword']} ({item['role']}){RESET}")
         print(f"{BOLD}{CYAN}-------------------------------------------------------{RESET}")
 
-        # A. Brief & Archetype
-        print(f"  [Doc] [1/4] Merancang Content Brief & Format Arketipe...", end="", flush=True)
-        try:
-            brief = silo_engine.generate_content_brief(
-                item,
-                silo_plan,
-                language=language,
-                business_profile=silo_plan.get("business_profile"),
-                client=stage1_client
-            )
+        # Checkpoint Check for partial resumption (Hemat Waktu & Token AI)
+        silo_folder_name = slugify(silo_plan.get("seed_keyword", silo_plan.get("silo_theme", "silo")))
+        silo_item_dir = os.path.join(silos_base_dir or "output", silo_folder_name)
+        ckpt = silo_engine.load_stage_checkpoint(silo_item_dir, item["id"]) or {}
+
+        # A. Brief & Archetype (Tahap 1)
+        if ckpt.get("brief"):
+            brief = ckpt["brief"]
             arch_data = brief.get("content_archetype", {})
             arch_name = arch_data.get("format_label") or arch_data.get("type", "Standard Guide")
-            print(f" {GREEN}OK{RESET} (Format: {MAGENTA}{BOLD}{arch_name}{RESET}, Target: {brief.get('target_word_count')})")
-        except Exception as e:
-            print(f" {RED}FAILED ({e}){RESET}")
-            continue
+            print(f"  [Doc] [1/4] Merancang Content Brief & Format Arketipe... {CYAN}OK (Dimuat dari Checkpoint - Hemat Token){RESET}")
+        else:
+            print(f"  [Doc] [1/4] Merancang Content Brief & Format Arketipe...", end="", flush=True)
+            try:
+                brief = silo_engine.generate_content_brief(
+                    item,
+                    silo_plan,
+                    language=language,
+                    business_profile=silo_plan.get("business_profile"),
+                    client=stage1_client
+                )
+                arch_data = brief.get("content_archetype", {})
+                arch_name = arch_data.get("format_label") or arch_data.get("type", "Standard Guide")
+                print(f" {GREEN}OK{RESET} (Format: {MAGENTA}{BOLD}{arch_name}{RESET}, Target: {brief.get('target_word_count')})")
+                silo_engine.save_stage_checkpoint(silo_item_dir, item["id"], {"brief": brief})
+            except Exception as e:
+                print(f" {RED}FAILED ({e}){RESET}")
+                continue
 
-        # B. Write Draft
-        print(f"    [2/4] Menulis Draf Sesuai Arketipe Konten...", end="", flush=True)
-        try:
-            draft = silo_engine.write_article_draft(
-                brief,
-                silo_plan,
-                tone=tone,
-                language=language,
-                business_profile=silo_plan.get("business_profile"),
-                client=stage2_client
-            )
+        # B. Write Draft (Tahap 2)
+        if ckpt.get("draft"):
+            draft = ckpt["draft"]
             word_count = len(draft.split())
-            print(f" {GREEN}OK{RESET} ({word_count} kata)")
-        except Exception as e:
-            print(f" {RED}FAILED ({e}){RESET}")
-            continue
+            print(f"    [2/4] Menulis Draf Sesuai Arketipe Konten... {CYAN}OK (Dimuat dari Checkpoint - {word_count} kata - Hemat Token){RESET}")
+        else:
+            print(f"    [2/4] Menulis Draf Sesuai Arketipe Konten...", end="", flush=True)
+            try:
+                draft = silo_engine.write_article_draft(
+                    brief,
+                    silo_plan,
+                    tone=tone,
+                    language=language,
+                    business_profile=silo_plan.get("business_profile"),
+                    client=stage2_client
+                )
+                word_count = len(draft.split())
+                print(f" {GREEN}OK{RESET} ({word_count} kata)")
+                silo_engine.save_stage_checkpoint(silo_item_dir, item["id"], {"brief": brief, "draft": draft})
+            except Exception as e:
+                print(f" {RED}FAILED ({e}){RESET}")
+                continue
 
-        # C. Curate & Polish
-        print(f"   [3/4] Melakukan Kurasi & Polishing Kualitas...", end="", flush=True)
-        try:
-            curation = silo_engine.curate_and_polish_article(
-                draft,
-                brief,
-                silo_plan,
-                business_profile=silo_plan.get("business_profile"),
-                client=stage3_client
-            )
+        # C. Curate & Polish (Tahap 3)
+        if ckpt.get("curation"):
+            curation = ckpt["curation"]
             score = curation.get("overall_score", 90)
             status = curation.get("curation_status", "LULUS")
-            print(f" {GREEN}OK{RESET} (Skor: {BOLD}{score}/100{RESET} - {status})")
-            
-            critiques = curation.get("editorial_critique", [])
-            for crit in critiques[:2]:
-                print(f"     {DIM}- {crit}{RESET}")
-        except Exception as e:
-            print(f" {YELLOW}Warning: Kurasi dilewati ({e}){RESET}")
-            curation = {"overall_score": 85, "final_article_markdown": draft, "curation_status": "DRAFT_ORIGINAL"}
+            print(f"   [3/4] Melakukan Kurasi & Polishing Kualitas... {CYAN}OK (Dimuat dari Checkpoint - Skor {score}/100 - Hemat Token){RESET}")
+        else:
+            print(f"   [3/4] Melakukan Kurasi & Polishing Kualitas...", end="", flush=True)
+            try:
+                curation = silo_engine.curate_and_polish_article(
+                    draft,
+                    brief,
+                    silo_plan,
+                    business_profile=silo_plan.get("business_profile"),
+                    client=stage3_client
+                )
+                score = curation.get("overall_score", 90)
+                status = curation.get("curation_status", "LULUS")
+                print(f" {GREEN}OK{RESET} (Skor: {BOLD}{score}/100{RESET} - {status})")
+                
+                critiques = curation.get("editorial_critique", [])
+                for crit in critiques[:2]:
+                    print(f"     {DIM}- {crit}{RESET}")
+                silo_engine.save_stage_checkpoint(silo_item_dir, item["id"], {"brief": brief, "draft": draft, "curation": curation})
+            except Exception as e:
+                print(f" {YELLOW}Warning: Kurasi dilewati ({e}){RESET}")
+                curation = {"overall_score": 85, "final_article_markdown": draft, "curation_status": "DRAFT_ORIGINAL"}
+                silo_engine.save_stage_checkpoint(silo_item_dir, item["id"], {"brief": brief, "draft": draft, "curation": curation})
 
-        # D. Featured Image Generator (Kie.ai AI Photo + Mesh Gradient Fallback)
-        kie_client = KieImageClient()
+        # D. Featured Image Generator (Tahap 4)
         slug = brief.get("url_slug", f"article_{item['id']}")
-        silo_folder_name = slugify(silo_plan.get("seed_keyword", silo_plan.get("silo_theme", "silo")))
         img_save_path = os.path.join(silos_base_dir or "output", silo_folder_name, "images", f"{slug}.webp")
         category_label = silo_plan.get("silo_theme", "Silo Pillar" if item.get("role", "").lower() == "pillar" else "Silo Cluster")
 
-        print(f"  [Image]  [4/4] Generate Featured Image...", end="", flush=True)
-        try:
-            saved_path, method_used = kie_client.generate_featured_image_auto(
-                title=item["suggested_title"],
-                keyword=item["keyword"],
-                category=category_label,
-                save_path=img_save_path,
-                gemini_client=client
-            )
-            if method_used == "kie_ai":
-                st_name = kie_client.get_image_style().replace("_", " ").title()
-                print(f" {GREEN}OK - Kie.ai ({st_name}){RESET} (`{os.path.basename(img_save_path)}`)")
-            else:
-                print(f" {CYAN}OK - Mesh Gradient Banner (Fallback){RESET} (`{os.path.basename(img_save_path)}`)")
-        except Exception as ie:
-            print(f" {YELLOW}Dilewati ({ie}){RESET}")
+        if os.path.exists(img_save_path) and os.path.getsize(img_save_path) > 1024:
+            print(f"  [Image]  [4/4] Featured Image... {CYAN}OK (File Gambar Sudah Ada di Disk - Hemat Kuota){RESET} (`{os.path.basename(img_save_path)}`)")
+        else:
+            print(f"  [Image]  [4/4] Generate Featured Image...", end="", flush=True)
+            kie_client = KieImageClient()
+            try:
+                saved_path, method_used = kie_client.generate_featured_image_auto(
+                    title=item["suggested_title"],
+                    keyword=item["keyword"],
+                    category=category_label,
+                    save_path=img_save_path,
+                    gemini_client=client
+                )
+                if method_used == "kie_ai":
+                    st_name = kie_client.get_image_style().replace("_", " ").title()
+                    print(f" {GREEN}OK - Kie.ai ({st_name}){RESET} (`{os.path.basename(img_save_path)}`)")
+                else:
+                    print(f" {CYAN}OK - Mesh Gradient Banner (Fallback){RESET} (`{os.path.basename(img_save_path)}`)")
+            except Exception as ie:
+                print(f" {YELLOW}Dilewati ({ie}){RESET}")
 
         new_completed.append({
             "item_id": item["id"],
@@ -690,6 +718,9 @@ def process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids
             "draft": draft,
             "curation": curation
         })
+
+        # Bersihkan checkpoint untuk item yang sudah selesai
+        silo_engine.clear_stage_checkpoint(silo_item_dir, item["id"])
 
     # Simpan hasil incremental
     if not new_completed:
