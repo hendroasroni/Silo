@@ -109,11 +109,37 @@ class AgnesClient:
         keys = self.reload_keys()
         if 0 <= index < len(keys):
             removed = keys.pop(index)
-            with open(self.key_file, "w", encoding="utf-8") as f:
-                f.write("\n".join(keys) + "\n")
+            self._save_keys(keys)
             self.reload_keys()
             return removed
         return None
+
+    def remove_keys_by_values(self, keys_to_remove):
+        keys_set = set(k.strip() for k in keys_to_remove if k and k.strip())
+        if not keys_set:
+            return 0
+        current_keys = self.reload_keys()
+        remaining_keys = [k for k in current_keys if k not in keys_set]
+        removed_count = len(current_keys) - len(remaining_keys)
+        self._save_keys(remaining_keys)
+        self.reload_keys()
+        return removed_count
+
+    def _save_keys(self, keys_list):
+        header_lines = []
+        if os.path.exists(self.key_file):
+            try:
+                with open(self.key_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if line.strip().startswith("#"):
+                            header_lines.append(line.rstrip())
+            except Exception:
+                pass
+        
+        with open(self.key_file, "w", encoding="utf-8") as f:
+            if header_lines:
+                f.write("\n".join(header_lines) + "\n\n")
+            f.write("\n".join(keys_list) + "\n")
 
     def get_active_key(self):
         if not self.api_keys:

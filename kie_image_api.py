@@ -238,11 +238,41 @@ class KieImageClient:
         keys = self.reload_keys()
         if 0 <= index < len(keys):
             removed = keys.pop(index)
-            with open(self.key_file, "w", encoding="utf-8") as f:
-                f.write("\n".join(keys) + "\n")
+            self._save_keys(keys)
             self.reload_keys()
             return removed
         return None
+
+    def remove_keys_by_values(self, keys_to_remove):
+        """
+        Menghapus sekumpulan key berdasarkan string key-nya secara bersamaan.
+        """
+        keys_set = set(k.strip() for k in keys_to_remove if k and k.strip())
+        if not keys_set:
+            return 0
+        current_keys = self.reload_keys()
+        remaining_keys = [k for k in current_keys if k not in keys_set]
+        removed_count = len(current_keys) - len(remaining_keys)
+        self._save_keys(remaining_keys)
+        self.reload_keys()
+        return removed_count
+
+    def _save_keys(self, keys_list):
+        # Mempertahankan baris komentar di file key jika ada
+        header_lines = []
+        if os.path.exists(self.key_file):
+            try:
+                with open(self.key_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if line.strip().startswith("#"):
+                            header_lines.append(line.rstrip())
+            except Exception:
+                pass
+        
+        with open(self.key_file, "w", encoding="utf-8") as f:
+            if header_lines:
+                f.write("\n".join(header_lines) + "\n\n")
+            f.write("\n".join(keys_list) + "\n")
 
     def get_active_key(self):
         if not self.api_keys:
@@ -267,15 +297,25 @@ class KieImageClient:
                 data = resp.json()
                 if data.get("code") == 200:
                     credit = data.get("data")
-                    return True, f"Kredit Tersedia: {credit}"
+                    try:
+                        credit_num = float(credit) if credit is not None else 0.0
+                    except (ValueError, TypeError):
+                        credit_num = 0.0
+                    
+                    if credit_num > 0:
+                        return True, f"Kredit Tersedia: {credit}", credit_num
+                    elif credit_num == 0:
+                        return False, f"Kredit Habis (Saldo: {credit})", credit_num
+                    else:
+                        return False, f"Kredit Minus / Limit (Saldo: {credit})", credit_num
                 else:
-                    return False, f"Respon Error ({data.get('code')}): {data.get('msg', 'Unknown')}"
+                    return False, f"Respon Error ({data.get('code')}): {data.get('msg', 'Unknown')}", None
             elif resp.status_code in [401, 403]:
-                return False, f"Auth Gagal / Key Tidak Valid (HTTP {resp.status_code})"
+                return False, f"Auth Gagal / Key Tidak Valid (HTTP {resp.status_code})", None
             else:
-                return False, f"HTTP Error {resp.status_code}: {resp.text[:100]}"
+                return False, f"HTTP Error {resp.status_code}: {resp.text[:100]}", None
         except requests.exceptions.RequestException as e:
-            return False, f"Koneksi Gagal: {str(e)[:100]}"
+            return False, f"Koneksi Gagal: {str(e)[:100]}", None
 
     def test_all_keys(self):
         results = []
@@ -285,13 +325,14 @@ class KieImageClient:
 
         for i, k in enumerate(keys, 1):
             masked = f"{k[:8]}...{k[-4:]}" if len(k) >= 12 else k
-            is_valid, msg = self.check_key_validity(k)
+            is_valid, msg, credit_num = self.check_key_validity(k)
             results.append({
                 "index": i,
                 "key": k,
                 "masked": masked,
                 "is_valid": is_valid,
-                "message": msg
+                "message": msg,
+                "credit": credit_num
             })
         return results
 

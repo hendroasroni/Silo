@@ -2076,9 +2076,27 @@ def menu_gemini_keys():
             print_section("UJI API KEY GEMINI")
             print(f"{CYAN}Menguji API key ke endpoint Gemini...{RESET}\n")
             results = client.test_all_keys()
+            valid_keys = []
+            invalid_keys = []
             for r in results:
-                st_icon = f"{GREEN}✔ VALID{RESET}" if r["is_valid"] else f"{RED}✖ GAGAL{RESET}"
+                if r["is_valid"]:
+                    st_icon = f"{GREEN}✔ VALID{RESET}"
+                    valid_keys.append(r)
+                else:
+                    st_icon = f"{RED}✖ GAGAL{RESET}"
+                    invalid_keys.append(r)
                 print(f"• Key #{r['index']} ({r['masked']}): {st_icon} -> {r['message']}")
+            
+            print("-" * 60)
+            print(f"📊 {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid{RESET} | {RED}{len(invalid_keys)} Gagal/Invalid{RESET}")
+
+            if invalid_keys:
+                print(f"\n{YELLOW}⚠️  Ditemukan {len(invalid_keys)} key yang tidak valid / gagal.{RESET}")
+                del_choice = get_single_key(f"{BOLD}Hapus otomatis semua {len(invalid_keys)} key invalid tersebut? [Y/N]:{RESET} ", valid_keys=['y', 'n', '0'])
+                if del_choice.lower() == 'y':
+                    keys_to_del = [r["key"] for r in invalid_keys]
+                    cnt = client.remove_keys_by_values(keys_to_del)
+                    print(f"\n{GREEN}✔ Berhasil menghapus {cnt} API key invalid! (Sisa {len(valid_keys)} key aktif){RESET}")
             press_any_key()
 
         elif opt == "3":
@@ -2087,19 +2105,32 @@ def menu_gemini_keys():
                 press_any_key()
                 continue
             
-            del_options = []
+            del_options = [
+                ("A", "🧹 Bersihkan Otomatis Semua Key Invalid (Scan Cepat)"),
+            ]
             for i, k in enumerate(keys, 1):
                 masked = f"{k[:8]}...{k[-4:]}" if len(k) >= 12 else k
-                del_options.append((str(i), masked))
+                del_options.append((str(i), f"Hapus #{i} ({masked})"))
             del_options.append(("0", "Kembali"))
 
             c = select_menu(del_options, title="HAPUS API KEY GEMINI")
             if c == "0":
                 continue
-            idx = int(c) - 1
-            del_k = client.remove_key(idx)
-            print(f"\n{GREEN}✔ Key #{idx + 1} berhasil dihapus.{RESET}")
-            press_any_key()
+            elif c.upper() == "A":
+                print(f"\n{CYAN}Memindai seluruh API key Gemini...{RESET}")
+                results = client.test_all_keys()
+                bad_keys = [r["key"] for r in results if not r["is_valid"]]
+                if bad_keys:
+                    cnt = client.remove_keys_by_values(bad_keys)
+                    print(f"\n{GREEN}✔ Berhasil menghapus {cnt} key invalid!{RESET}")
+                else:
+                    print(f"\n{GREEN}✔ Semua key ({len(keys)}) valid! Tidak ada yang dihapus.{RESET}")
+                press_any_key()
+            else:
+                idx = int(c) - 1
+                del_k = client.remove_key(idx)
+                print(f"\n{GREEN}✔ Key #{idx + 1} berhasil dihapus.{RESET}")
+                press_any_key()
 
         elif opt == "4":
             menu_change_model_flow(client)
@@ -2170,12 +2201,38 @@ def menu_kie_keys(gemini_client=None):
             press_any_key()
 
         elif opt == "2":
-            print_section("UJI API KEY KIE.AI")
-            print(f"{CYAN}Menguji API key ke endpoint Kie.ai...{RESET}\n")
+            print_section("UJI API KEY & KREDIT KIE.AI")
+            print(f"{CYAN}Menguji status API key & mengecek sisa saldo/kredit Kie.ai...{RESET}\n")
             results = kie.test_all_keys()
+            valid_keys = []
+            zero_or_invalid_keys = []
+
             for r in results:
-                st_icon = f"{GREEN}✔ VALID{RESET}" if r["is_valid"] else f"{RED}✖ GAGAL{RESET}"
+                credit_val = r.get("credit")
+                if r["is_valid"]:
+                    st_icon = f"{GREEN}✔ VALID{RESET}"
+                    valid_keys.append(r)
+                elif credit_val is not None and credit_val == 0:
+                    st_icon = f"{YELLOW}✖ KREDIT 0{RESET}"
+                    zero_or_invalid_keys.append(r)
+                elif credit_val is not None and credit_val < 0:
+                    st_icon = f"{RED}✖ MINUS{RESET}"
+                    zero_or_invalid_keys.append(r)
+                else:
+                    st_icon = f"{RED}✖ GAGAL{RESET}"
+                    zero_or_invalid_keys.append(r)
                 print(f"• Key #{r['index']} ({r['masked']}): {st_icon} -> {r['message']}")
+            
+            print("-" * 60)
+            print(f"📊 {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid / Ada Kredit{RESET} | {RED}{len(zero_or_invalid_keys)} Habis / Minus / Invalid{RESET}")
+
+            if zero_or_invalid_keys:
+                print(f"\n{YELLOW}⚠️  Ditemukan {len(zero_or_invalid_keys)} key yang kreditnya 0, minus, atau tidak valid.{RESET}")
+                del_choice = get_single_key(f"{BOLD}Hapus otomatis semua {len(zero_or_invalid_keys)} key tersebut dari daftar? [Y/N]:{RESET} ", valid_keys=['y', 'n', '0'])
+                if del_choice.lower() == 'y':
+                    keys_to_del = [r["key"] for r in zero_or_invalid_keys]
+                    removed_count = kie.remove_keys_by_values(keys_to_del)
+                    print(f"\n{GREEN}✔ Berhasil menghapus {removed_count} API key yang habis/invalid! (Sisa {len(valid_keys)} key aktif){RESET}")
             press_any_key()
 
         elif opt == "3":
@@ -2184,19 +2241,32 @@ def menu_kie_keys(gemini_client=None):
                 press_any_key()
                 continue
             
-            del_options = []
+            del_options = [
+                ("A", "🧹 Bersihkan Otomatis Semua Key Habis / 0 / Invalid (Scan Cepat)"),
+            ]
             for i, k in enumerate(keys, 1):
                 masked = f"{k[:8]}...{k[-4:]}" if len(k) >= 12 else k
-                del_options.append((str(i), masked))
+                del_options.append((str(i), f"Hapus #{i} ({masked})"))
             del_options.append(("0", "Kembali"))
 
             c = select_menu(del_options, title="HAPUS API KEY KIE.AI")
             if c == "0":
                 continue
-            idx = int(c) - 1
-            del_k = kie.remove_key(idx)
-            print(f"\n{GREEN}✔ Key #{idx + 1} berhasil dihapus.{RESET}")
-            press_any_key()
+            elif c.upper() == "A":
+                print(f"\n{CYAN}Memindai seluruh key untuk mencari key yang 0/minus/invalid...{RESET}")
+                results = kie.test_all_keys()
+                bad_keys = [r["key"] for r in results if not r["is_valid"] or (r.get("credit") is not None and r.get("credit") <= 0)]
+                if bad_keys:
+                    cnt = kie.remove_keys_by_values(bad_keys)
+                    print(f"\n{GREEN}✔ Berhasil menghapus {cnt} key yang habis/invalid! (Sisa {len(results) - cnt} key aktif){RESET}")
+                else:
+                    print(f"\n{GREEN}✔ Semua key ({len(keys)}) masih memiliki kredit aktif! Tidak ada yang dihapus.{RESET}")
+                press_any_key()
+            else:
+                idx = int(c) - 1
+                del_k = kie.remove_key(idx)
+                print(f"\n{GREEN}✔ Key #{idx + 1} berhasil dihapus.{RESET}")
+                press_any_key()
 
         elif opt == "4":
             mode_opts = [
@@ -2356,9 +2426,27 @@ def menu_agnes_keys():
             print_section("UJI API KEY & KONEKSI AGNES AI")
             print(f"{CYAN}Menguji koneksi ke endpoint Agnes AI (apihub.agnes-ai.com)...{RESET}\n")
             results = agnes.test_all_keys()
+            valid_keys = []
+            invalid_keys = []
             for r in results:
-                st_icon = f"{GREEN}✔ VALID{RESET}" if r["is_valid"] else f"{RED}✖ GAGAL{RESET}"
+                if r["is_valid"]:
+                    st_icon = f"{GREEN}✔ VALID{RESET}"
+                    valid_keys.append(r)
+                else:
+                    st_icon = f"{RED}✖ GAGAL{RESET}"
+                    invalid_keys.append(r)
                 print(f"• Key #{r['index']} ({r['masked']}): {st_icon} -> {r['message']}")
+            
+            print("-" * 60)
+            print(f"📊 {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid{RESET} | {RED}{len(invalid_keys)} Gagal/Invalid{RESET}")
+
+            if invalid_keys:
+                print(f"\n{YELLOW}⚠️  Ditemukan {len(invalid_keys)} key yang tidak valid / gagal.{RESET}")
+                del_choice = get_single_key(f"{BOLD}Hapus otomatis semua {len(invalid_keys)} key invalid tersebut? [Y/N]:{RESET} ", valid_keys=['y', 'n', '0'])
+                if del_choice.lower() == 'y':
+                    keys_to_del = [r["key"] for r in invalid_keys]
+                    cnt = agnes.remove_keys_by_values(keys_to_del)
+                    print(f"\n{GREEN}✔ Berhasil menghapus {cnt} API key invalid! (Sisa {len(valid_keys)} key aktif){RESET}")
             press_any_key()
 
         elif opt == "3":
@@ -2367,19 +2455,32 @@ def menu_agnes_keys():
                 press_any_key()
                 continue
             
-            del_options = []
+            del_options = [
+                ("A", "🧹 Bersihkan Otomatis Semua Key Invalid (Scan Cepat)"),
+            ]
             for i, k in enumerate(keys, 1):
                 masked = f"{k[:8]}...{k[-4:]}" if len(k) >= 12 else k
-                del_options.append((str(i), masked))
+                del_options.append((str(i), f"Hapus #{i} ({masked})"))
             del_options.append(("0", "Kembali"))
 
             c = select_menu(del_options, title="HAPUS API KEY AGNES AI")
             if c == "0":
                 continue
-            idx = int(c) - 1
-            del_k = agnes.remove_key(idx)
-            print(f"\n{GREEN}✔ Key #{idx + 1} berhasil dihapus.{RESET}")
-            press_any_key()
+            elif c.upper() == "A":
+                print(f"\n{CYAN}Memindai seluruh API key Agnes AI...{RESET}")
+                results = agnes.test_all_keys()
+                bad_keys = [r["key"] for r in results if not r["is_valid"]]
+                if bad_keys:
+                    cnt = agnes.remove_keys_by_values(bad_keys)
+                    print(f"\n{GREEN}✔ Berhasil menghapus {cnt} key invalid!{RESET}")
+                else:
+                    print(f"\n{GREEN}✔ Semua key ({len(keys)}) valid! Tidak ada yang dihapus.{RESET}")
+                press_any_key()
+            else:
+                idx = int(c) - 1
+                del_k = agnes.remove_key(idx)
+                print(f"\n{GREEN}✔ Key #{idx + 1} berhasil dihapus.{RESET}")
+                press_any_key()
 
         elif opt == "4":
             current_m = agnes.get_preferred_text_model()
