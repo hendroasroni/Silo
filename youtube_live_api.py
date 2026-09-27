@@ -72,7 +72,7 @@ class YouTubeLiveClient:
 
     def _extract_client_credentials(self):
         if not os.path.exists(self.client_secrets_file):
-            return None, None
+            return None, None, "http://localhost"
 
         try:
             with open(self.client_secrets_file, "r", encoding="utf-8") as f:
@@ -82,17 +82,118 @@ class YouTubeLiveClient:
             obj = data.get("installed") or data.get("web") or data.get("device") or data
             client_id = obj.get("client_id", "").strip()
             client_secret = obj.get("client_secret", "").strip()
+            redirect_uris = obj.get("redirect_uris", ["http://localhost"])
+            redirect_uri = redirect_uris[0] if redirect_uris else "http://localhost"
+            
             if client_id and client_secret:
-                return client_id, client_secret
+                return client_id, client_secret, redirect_uri
         except Exception:
             pass
-        return None, None
+        return None, None, "http://localhost"
 
-    def authenticate(self, channel_id="default", force_new=False, on_code_display=None):
+    def get_authorization_url(self):
         """
-        Otentikasi OAuth 2.0 menggunakan TV & Limited Input Device Flow (Headless / Device Code Flow).
-        Bekerja 100% di terminal CLI / VPS tanpa butuh local redirect server.
-        Pengguna cukup membuka https://www.google.com/device dan memasukkan kode di layar.
+        Menghasilkan URL otentikasi Google OAuth untuk dibuka di browser.
+        """
+        client_id, client_secret, redirect_uri = self._extract_client_credentials()
+        if not client_id:
+            raise FileNotFoundError(
+                f"File kredensial '{self.client_secrets_file}' tidak ditemukan atau tidak valid."
+            )
+
+        import urllib.parse
+        params = {
+            "client_id": client_id,
+            "redirect_uri": redirect_uri,
+            "response_type": "code",
+            "scope": " ".join(YOUTUBE_SCOPES),
+            "access_type": "offline",
+            "prompt": "consent"
+        }
+        return f"https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}"
+
+    def exchange_code_for_tokens(self, raw_input_or_code, channel_id="default"):
+        """
+        Menukar authorization code (atau full redirect URL yang di-paste pengguna)
+        menjadi access_token & refresh_token permanen.
+        """
+        import requests
+        import urllib.parse
+        import re
+
+        client_id, client_secret, redirect_uri = self._extract_client_credentials()
+        if not client_id or not client_secret:
+            raise ValueError("Kredensial client_id atau client_secret tidak ditemukan di client_secret.json.")
+
+        # Ekstrak 'code' jika user mem-paste full URL
+        raw_str = raw_input_or_code.strip()
+        auth_code = raw_str
+
+        if "code=" in raw_str:
+            parsed = urllib.parse.urlparse(raw_str)
+            qs = urllib.parse.parse_qs(parsed.query)
+            if "code" in qs:
+                auth_code = qs["code"][0]
+            else:
+                m = re.search(r'code=([^&]+)', raw_str)
+                if m:
+                    auth_code = urllib.parse.unquote(m.group(1))
+
+        if not auth_code:
+            raise ValueError("Kode otentikasi tidak ditemukan dalam teks yang Anda masukkan.")
+
+        token_url = "https://oauth2.googleapis.com/token"
+        
+        # Coba redirect_uri dari file, jika gagal coba http://localhost atau http://127.0.0.1
+        uris_to_try = [redirect_uri, "http://localhost", "http://127.0.0.1", "http://localhost:8080"]
+        # Hilangkan duplikat urutan
+        uris_to_try = list(dict.fromkeys(uris_to_try))
+
+        last_resp_text = ""
+        creds_obj = None
+
+        for test_uri in uris_to_try:
+            payload = {
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "code": auth_code,
+                "grant_type": "authorization_code",
+                "redirect_uri": test_uri
+            }
+
+            try:
+                resp = requests.post(token_url, data=payload, timeout=20)
+                if resp.status_code == 200:
+                    t_data = resp.json()
+                    access_token = t_data.get("access_token")
+                    refresh_token = t_data.get("refresh_token")
+                    
+                    creds_obj = Credentials(
+                        token=access_token,
+                        refresh_token=refresh_token,
+                        token_uri=token_url,
+                        client_id=client_id,
+                        client_secret=client_secret,
+                        scopes=YOUTUBE_SCOPES
+                    )
+                    break
+                else:
+                    last_resp_text = resp.text
+            except requests.exceptions.RequestException as e:
+                last_resp_text = str(e)
+                continue
+
+        if not creds_obj:
+            raise RuntimeError(f"Gagal menukar kode otentikasi dengan token Google:\n{last_resp_text}")
+
+        self.creds = creds_obj
+        self.save_credentials(creds_obj, channel_id)
+        self.service = build("youtube", "v3", credentials=self.creds)
+        return True, "Otentikasi Headless YouTube berhasil! Token tersimpan secara permanen."
+
+    def authenticate(self, channel_id="default", force_new=False):
+        """
+        Otentikasi OAuth 2.0 Headless dengan alur Paste Code / Redirect URL langsung di CLI.
         """
         if not GOOGLE_API_AVAILABLE:
             raise RuntimeError("Library Google API belum terpasang. Jalankan: pip install google-api-python-client google-auth-oauthlib")
@@ -104,115 +205,33 @@ class YouTubeLiveClient:
                 self.service = build("youtube", "v3", credentials=self.creds)
                 return True, "Otentikasi berhasil menggunakan token tersimpan."
 
-        client_id, client_secret = self._extract_client_credentials()
-        if not client_id or not client_secret:
-            raise FileNotFoundError(
-                f"File kredensial '{self.client_secrets_file}' tidak valid atau belum ada.\n"
-                "Pastikan file tersebut berisi 'client_id' dan 'client_secret' dari Google Cloud Console."
-            )
+        auth_url = self.get_authorization_url()
 
-        # 1. Request Device Code dari Google OAuth
-        import requests
-        device_code_url = "https://oauth2.googleapis.com/device/code"
-        device_payload = {
-            "client_id": client_id,
-            "scope": " ".join(YOUTUBE_SCOPES)
-        }
+        print("\n" + "=" * 70)
+        print("🔐 OTENTIKASI OAUTH YOUTUBE (HEADLESS / PASTE DI TERMINAL)")
+        print("=" * 70)
+        print(f"1. Buka tautan otentikasi Google berikut di browser (HP / Laptop / PC):")
+        print(f"   👉 \033[96m\033[1m{auth_url}\033[0m\n")
+        print("2. Pilih akun Google channel YouTube Anda dan klik 'Allow / Izinkan'.\n")
+        print("3. Setelah klik Izinkan, browser akan dialihkan ke alamat seperti:")
+        print("   \033[93mhttp://localhost/?code=4/0AcvD...&scope=...\033[0m")
+        print("   \033[2m(Jika browser menampilkan 'Site can't be reached / Halaman tidak dapat diakses', itu normal!)\033[0m\n")
+        print("4. SALIN SELURUH ALAMAT URL (atau kode setelah 'code=') dari browser,")
+        print("   lalu PASTE DI BAWAH INI:")
+        print("=" * 70)
 
+        # Coba buka browser otomatis jika memungkinkan
         try:
-            resp = requests.post(device_code_url, data=device_payload, timeout=20)
-            if resp.status_code != 200:
-                raise RuntimeError(f"Gagal meminta Device Code dari Google: (HTTP {resp.status_code}) {resp.text}")
-            device_data = resp.json()
-        except requests.exceptions.RequestException as e:
-            raise RuntimeError(f"Koneksi ke endpoint OAuth Google gagal: {e}")
+            webbrowser.open(auth_url)
+        except Exception:
+            pass
 
-        device_code = device_data.get("device_code")
-        user_code = device_data.get("user_code")
-        verification_url = device_data.get("verification_url", "https://www.google.com/device")
-        expires_in = int(device_data.get("expires_in", 1800))
-        interval = int(device_data.get("interval", 5))
+        pasted = input("\n\033[1mPaste URL Redirect / Authorization Code:\033[0m ").strip()
+        if not pasted or pasted == "0":
+            raise RuntimeError("Otentikasi dibatalkan oleh pengguna.")
 
-        if on_code_display:
-            on_code_display(verification_url, user_code, expires_in)
-        else:
-            print("\n" + "=" * 65)
-            print("📺 OTENTIKASI OAUTH YOUTUBE (TV & LIMITED DEVICE / HEADLESS)")
-            print("=" * 65)
-            print(f"1. Buka tautan berikut di browser Anda (HP / Laptop / PC):")
-            print(f"   👉 \033[96m\033[1m{verification_url}\033[0m")
-            print(f"\n2. Masukkan kode berikut:")
-            print(f"   🔑 \033[92m\033[1m[ {user_code} ]\033[0m")
-            print(f"\n3. Login dengan akun Google channel Anda dan klik 'Allow / Izinkan'.")
-            print("=" * 65)
-            print(f"\n⏳ Menunggu otorisasi dari perangkat Anda (Polling setiap {interval}s)...", end="", flush=True)
-
-        # 2. Polling Token Endpoint
-        import time
-        token_url = "https://oauth2.googleapis.com/token"
-        token_payload = {
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "device_code": device_code,
-            "grant_type": "urn:ietf:params:oauth:grant-type:device_code"
-        }
-
-        start_time = time.time()
-        creds_obj = None
-
-        while (time.time() - start_time) < expires_in:
-            time.sleep(interval)
-            print(".", end="", flush=True)
-
-            try:
-                t_resp = requests.post(token_url, data=token_payload, timeout=20)
-                if t_resp.status_code == 200:
-                    t_data = t_resp.json()
-                    access_token = t_data.get("access_token")
-                    refresh_token = t_data.get("refresh_token")
-                    token_expiry = t_data.get("expires_in")
-                    
-                    # Buat Credentials objek
-                    creds_obj = Credentials(
-                        token=access_token,
-                        refresh_token=refresh_token,
-                        token_uri=token_url,
-                        client_id=client_id,
-                        client_secret=client_secret,
-                        scopes=YOUTUBE_SCOPES
-                    )
-                    break
-                else:
-                    err_json = {}
-                    try:
-                        err_json = t_resp.json()
-                    except Exception:
-                        pass
-                    
-                    err_type = err_json.get("error")
-                    if err_type == "authorization_pending":
-                        continue
-                    elif err_type == "slow_down":
-                        interval += 5
-                        continue
-                    elif err_type == "expired_token":
-                        raise RuntimeError("\nWaktu otentikasi telah habis (expired). Silakan coba lagi.")
-                    elif err_type == "access_denied":
-                        raise RuntimeError("\nOtentikasi ditolak oleh pengguna di browser (access_denied).")
-                    else:
-                        err_desc = err_json.get("error_description", t_resp.text)
-                        raise RuntimeError(f"\nError OAuth: {err_type} - {err_desc}")
-            except requests.exceptions.RequestException as e:
-                continue
-
-        if not creds_obj:
-            raise RuntimeError("\nWaktu otentikasi habis sebelum selesai.")
-
-        print("\n\033[92m✔ Otentikasi Berhasil Diterima!\033[0m")
-        self.creds = creds_obj
-        self.save_credentials(creds_obj, channel_id)
-        self.service = build("youtube", "v3", credentials=self.creds)
-        return True, "Otentikasi Headless (Device Flow) YouTube berhasil diselesaikan!"
+        print(f"\n\033[96mSedang memverifikasi kode dengan server Google OAuth...\033[0m")
+        return self.exchange_code_for_tokens(pasted, channel_id=channel_id)
 
     def get_service(self, channel_id="default"):
         if not self.service:
