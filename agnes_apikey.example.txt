@@ -1,0 +1,2 @@
+# Masukkan API Key Agnes AI (https://platform.agnes-ai.com/)
+sk-your_agnes_ai_api_key_here

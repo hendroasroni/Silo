@@ -17,6 +17,7 @@ if sys.stdout.encoding != 'utf-8':
 from gemini_api import GeminiClient, DEFAULT_FLASH_MODELS, DEFAULT_PRO_MODELS
 from kie_image_api import KieImageClient, DEFAULT_KIE_MODELS, DEFAULT_IMAGE_STYLES, IMAGE_STYLE_DESCS, clean_text_for_rendering
 from kie_chat_api import KieChatClient
+from agnes_api import AgnesClient, DEFAULT_AGNES_TEXT_MODELS, DEFAULT_AGNES_IMAGE_MODELS
 from ai_pipeline import AIPipelineManager, AVAILABLE_ENGINES, STAGE_NAMES
 from silo_generator import SiloGenerator
 from wp_publisher import WordPressPublisher
@@ -1897,12 +1898,15 @@ def menu_manage_wp_categories(wp=None):
 # ==========================================
 # MENU: API KEY & MODEL MANAGER (GEMINI & KIE.AI)
 # ==========================================
+# MENU: API KEY & MODEL MANAGER (GEMINI, KIE.AI & AGNES AI)
+# ==========================================
 def menu_ai_settings():
     while True:
         options = [
             ("1", "Model & API Key Gemini"),
             ("2", "Model & API Key Kie.ai (Featured Image)"),
-            ("3", "Konfigurasi Model Tiap Tahap (Pipeline Multi-Model: Gemini / GPT-6 Luna)"),
+            ("3", "Model & API Key Agnes AI (Teks, JSON & Gambar)"),
+            ("4", "Konfigurasi Model Tiap Tahap (Pipeline Multi-Model: Gemini / Agnes AI / GPT-6 Luna)"),
             ("0", "Kembali ke Menu Utama")
         ]
         choice = select_menu(options, title="PENGATURAN AI & API KEY")
@@ -1914,6 +1918,8 @@ def menu_ai_settings():
             gemini_c = GeminiClient(key_file="apikey.txt")
             menu_kie_keys(gemini_client=gemini_c)
         elif choice == "3":
+            menu_agnes_keys()
+        elif choice == "4":
             menu_pipeline_settings()
 
 def menu_pipeline_settings():
@@ -1932,13 +1938,13 @@ def menu_pipeline_settings():
         print(f"📝 {BOLD}Tahap 1: Riset & Content Brief{RESET}   ➔ {CYAN}{BOLD}{s1_name}{RESET}")
         print(f"✍️  {BOLD}Tahap 2: Penulisan Draf Artikel{RESET}  ➔ {MAGENTA}{BOLD}{s2_name}{RESET}")
         print(f"🔍 {BOLD}Tahap 3: Kurasi Kualitas & Redaksi{RESET} ➔ {GREEN}{BOLD}{s3_name}{RESET}")
-        print(f"🖼️  {BOLD}Tahap 4: Featured Image Banner{RESET}    ➔ {YELLOW}{BOLD}Kie.ai Z-Image / Mesh Gradient{RESET}\n")
+        print(f"🖼️  {BOLD}Tahap 4: Featured Image Banner{RESET}    ➔ {YELLOW}{BOLD}Kie.ai Z-Image / Agnes Image / Mesh Gradient{RESET}\n")
 
         options = [
             ("1", "Ubah Model Tahap 1 (Riset & Content Brief)"),
             ("2", "Ubah Model Tahap 2 (Penulisan Draf Artikel)"),
             ("3", "Ubah Model Tahap 3 (Kurasi Kualitas & Redaksi)"),
-            ("P", "⚡ Pilih Preset Cepat (Gemini / Hybrid GPT-6 / Full GPT-6)"),
+            ("P", "⚡ Pilih Preset Cepat (Gemini / Agnes AI / Hybrid / Full GPT-6)"),
             ("0", "Kembali")
         ]
 
@@ -1951,9 +1957,11 @@ def menu_pipeline_settings():
         elif choice.upper() == "P":
             preset_options = [
                 ("1", "Full Gemini (100% Gratis, Cepat & Tanpa Biaya)"),
-                ("2", "Hybrid Smart (Tahap 1-2 Gemini + Tahap 3 Kie.ai GPT-6 Luna) ⭐ Rekomendasi Akurasi"),
-                ("3", "Hybrid Draft & Kurasi (Tahap 1 Gemini + Tahap 2-3 Kie.ai GPT-6 Luna)"),
-                ("4", "Full Kie.ai GPT-6 Luna (Tahap 1, 2, 3 Semua GPT-6 Luna)"),
+                ("2", "Full Agnes AI 3.0 Flash (Cepat, Cerdas & Ringan) ⭐"),
+                ("3", "Hybrid Agnes (Tahap 1-2 Gemini + Tahap 3 Agnes 2.5 Pro Kurasi)"),
+                ("4", "Hybrid Smart GPT-6 (Tahap 1-2 Gemini + Tahap 3 Kie.ai GPT-6 Luna) ⭐"),
+                ("5", "Hybrid Draft & Kurasi GPT-6 (Tahap 1 Gemini + Tahap 2-3 GPT-6 Luna)"),
+                ("6", "Full Kie.ai GPT-6 Luna (Tahap 1, 2, 3 Semua GPT-6 Luna)"),
                 ("0", "Batal")
             ]
             p_choice = select_menu(preset_options, title="PILIH PRESET PIPELINE")
@@ -1962,14 +1970,22 @@ def menu_pipeline_settings():
                 print(f"\n{GREEN}✔ Preset 'Full Gemini' berhasil diterapkan!{RESET}")
                 press_any_key()
             elif p_choice == "2":
+                pipeline_mgr.apply_preset("all_agnes")
+                print(f"\n{GREEN}✔ Preset 'Full Agnes AI 3.0 Flash' berhasil diterapkan!{RESET}")
+                press_any_key()
+            elif p_choice == "3":
+                pipeline_mgr.apply_preset("hybrid_agnes_curation")
+                print(f"\n{GREEN}✔ Preset 'Hybrid Agnes (Kurasi Agnes 2.5 Pro)' berhasil diterapkan!{RESET}")
+                press_any_key()
+            elif p_choice == "4":
                 pipeline_mgr.apply_preset("hybrid_gpt6_curation")
                 print(f"\n{GREEN}✔ Preset 'Hybrid Smart (Kie.ai GPT-6 Luna pada Kurasi)' berhasil diterapkan!{RESET}")
                 press_any_key()
-            elif p_choice == "3":
+            elif p_choice == "5":
                 pipeline_mgr.apply_preset("hybrid_gpt6_draft_curation")
                 print(f"\n{GREEN}✔ Preset 'Hybrid Draft & Kurasi GPT-6 Luna' berhasil diterapkan!{RESET}")
                 press_any_key()
-            elif p_choice == "4":
+            elif p_choice == "6":
                 pipeline_mgr.apply_preset("full_gpt6")
                 print(f"\n{GREEN}✔ Preset 'Full Kie.ai GPT-6 Luna' berhasil diterapkan!{RESET}")
                 press_any_key()
@@ -2282,6 +2298,152 @@ def menu_kie_keys(gemini_client=None):
 
         elif opt == "8":
             menu_batch_generate_missing_thumbnails(gemini_client)
+
+        elif opt == "0":
+            break
+
+def menu_agnes_keys():
+    while True:
+        clear_screen()
+        print_banner()
+        print_section("PENGATURAN AGNES AI (TEKS, JSON & GAMBAR)")
+
+        agnes = AgnesClient(key_file="agnes_apikey.txt")
+        keys = agnes.reload_keys()
+        current_text_model = agnes.get_preferred_text_model()
+        current_image_model = agnes.get_preferred_image_model()
+
+        print(f"📝 {BOLD}Model Teks Aktif   :{RESET} {CYAN}{BOLD}{current_text_model}{RESET}")
+        print(f"🖼️  {BOLD}Model Gambar Aktif :{RESET} {MAGENTA}{BOLD}{current_image_model}{RESET}\n")
+
+        print(f"{BOLD}Daftar API Key Agnes AI ({len(keys)} Key Terdaftar):{RESET}")
+        if not keys:
+            print(f"{YELLOW}Belum ada API Key di 'agnes_apikey.txt'. Tambahkan minimal 1 API Key.{RESET}\n")
+        else:
+            print(f"{BOLD}{'No':<4} {'API Key (Masked)':<25} {'Posisi'}{RESET}")
+            print("-" * 50)
+            for i, k in enumerate(keys, 1):
+                masked = f"{k[:8]}...{k[-4:]}" if len(k) >= 12 else k
+                active_tag = f"{GREEN}[Aktif]{RESET}" if i == 1 else f"{DIM}(Cadangan #{i}){RESET}"
+                print(f"#{i:<3} {masked:<25} {active_tag}")
+            print("")
+
+        options = [
+            ("1", "Tambah API Key Baru"),
+            ("2", "Uji Semua API Key & Koneksi Agnes AI"),
+            ("3", "Hapus API Key"),
+            ("4", "Ganti Model Teks Agnes AI (3.0 Flash / 2.5 Flash / 2.5 Pro)"),
+            ("5", "Ganti Model Gambar Agnes AI (Image 2.0 Flash / 2.5 Flash)"),
+            ("6", "Test Generate Gambar Agnes AI (Simpan ke output/test_agnes.webp)"),
+            ("0", "Kembali")
+        ]
+        opt = select_menu(options, title="PENGATURAN AGNES AI")
+
+        if opt == "1":
+            print_section("TAMBAH API KEY AGNES AI")
+            print(f"{DIM}Dapatkan API Key di https://agnes-ai.com/ (0 untuk batal){RESET}\n")
+            new_key = input(f"{BOLD}API Key Agnes AI baru:{RESET} ").strip()
+            if new_key == "0" or not new_key:
+                continue
+            ok = agnes.add_key(new_key)
+            if ok:
+                print(f"\n{GREEN}✔ API Key Agnes AI berhasil ditambahkan!{RESET}")
+            else:
+                print(f"\n{YELLOW}API Key sudah ada di daftar.{RESET}")
+            press_any_key()
+
+        elif opt == "2":
+            print_section("UJI API KEY & KONEKSI AGNES AI")
+            print(f"{CYAN}Menguji koneksi ke endpoint Agnes AI (apihub.agnes-ai.com)...{RESET}\n")
+            results = agnes.test_all_keys()
+            for r in results:
+                st_icon = f"{GREEN}✔ VALID{RESET}" if r["is_valid"] else f"{RED}✖ GAGAL{RESET}"
+                print(f"• Key #{r['index']} ({r['masked']}): {st_icon} -> {r['message']}")
+            press_any_key()
+
+        elif opt == "3":
+            if not keys:
+                print(f"{YELLOW}Tidak ada API key untuk dihapus.{RESET}")
+                press_any_key()
+                continue
+            
+            del_options = []
+            for i, k in enumerate(keys, 1):
+                masked = f"{k[:8]}...{k[-4:]}" if len(k) >= 12 else k
+                del_options.append((str(i), masked))
+            del_options.append(("0", "Kembali"))
+
+            c = select_menu(del_options, title="HAPUS API KEY AGNES AI")
+            if c == "0":
+                continue
+            idx = int(c) - 1
+            del_k = agnes.remove_key(idx)
+            print(f"\n{GREEN}✔ Key #{idx + 1} berhasil dihapus.{RESET}")
+            press_any_key()
+
+        elif opt == "4":
+            current_m = agnes.get_preferred_text_model()
+            m_options = []
+            for idx, (code, desc) in enumerate(DEFAULT_AGNES_TEXT_MODELS, 1):
+                badge = f" {GREEN}[Aktif]{RESET}" if code == current_m else ""
+                m_options.append((str(idx), f"{code:<20} - {desc}{badge}"))
+            m_options.append(("C", "Ketik Nama Model Kustom"))
+            m_options.append(("0", "Batal"))
+
+            m_choice = select_menu(m_options, title="PILIH MODEL TEKS AGNES AI")
+            if m_choice == "0":
+                continue
+            elif m_choice.upper() == "C":
+                custom_m = input("\nNama model teks Agnes AI: ").strip()
+                if custom_m and custom_m != "0":
+                    agnes.set_preferred_text_model(custom_m)
+                    print(f"\n{GREEN}✔ Model teks diubah ke: {BOLD}{custom_m}{RESET}")
+            else:
+                chosen_code = DEFAULT_AGNES_TEXT_MODELS[int(m_choice) - 1][0]
+                agnes.set_preferred_text_model(chosen_code)
+                print(f"\n{GREEN}✔ Model teks diubah ke: {BOLD}{chosen_code}{RESET}")
+            press_any_key()
+
+        elif opt == "5":
+            current_m = agnes.get_preferred_image_model()
+            m_options = []
+            for idx, (code, desc) in enumerate(DEFAULT_AGNES_IMAGE_MODELS, 1):
+                badge = f" {GREEN}[Aktif]{RESET}" if code == current_m else ""
+                m_options.append((str(idx), f"{code:<25} - {desc}{badge}"))
+            m_options.append(("C", "Ketik Nama Model Gambar Kustom"))
+            m_options.append(("0", "Batal"))
+
+            m_choice = select_menu(m_options, title="PILIH MODEL GAMBAR AGNES AI")
+            if m_choice == "0":
+                continue
+            elif m_choice.upper() == "C":
+                custom_m = input("\nNama model gambar Agnes AI: ").strip()
+                if custom_m and custom_m != "0":
+                    agnes.set_preferred_image_model(custom_m)
+                    print(f"\n{GREEN}✔ Model gambar diubah ke: {BOLD}{custom_m}{RESET}")
+            else:
+                chosen_code = DEFAULT_AGNES_IMAGE_MODELS[int(m_choice) - 1][0]
+                agnes.set_preferred_image_model(chosen_code)
+                print(f"\n{GREEN}✔ Model gambar diubah ke: {BOLD}{chosen_code}{RESET}")
+            press_any_key()
+
+        elif opt == "6":
+            print_section("TEST GENERATE GAMBAR AGNES AI")
+            test_prompt = input(f"{BOLD}Masukkan prompt gambar (Enter untuk default):{RESET} ").strip()
+            if not test_prompt:
+                test_prompt = "modern flat vector illustration of digital marketing strategy, clean gradient background, minimal, 4k"
+            print(f"\n{CYAN}Sedang generate gambar dengan Agnes AI [{agnes.get_preferred_image_model()}]...{RESET}")
+            try:
+                out_path = "output/test_agnes_preview.webp"
+                saved, url = agnes.generate_and_save(test_prompt, out_path)
+                print(f"{GREEN}✔ Gambar berhasil dibuat & disimpan di: {saved}{RESET}")
+                try:
+                    webbrowser.open(f"file:///{os.path.abspath(saved).replace('\\', '/')}")
+                except Exception:
+                    pass
+            except Exception as e:
+                print(f"{RED}✖ Gagal generate gambar: {e}{RESET}")
+            press_any_key()
 
         elif opt == "0":
             break

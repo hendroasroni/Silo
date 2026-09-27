@@ -8,6 +8,7 @@ __pycache__/
 # Local API Keys & Passwords (Keep private)
 apikey.txt
 kie_apikey.txt
+agnes_apikey.txt
 
 # Output directory for generated Silo markdown & images
 output/
