@@ -1,27 +1,27 @@
-# 🏛️ Cetak Biru Konsep Menu & Arsitektur Project-Centric
+# Cetak Biru Konsep Menu & Arsitektur Project-Centric
 
 Dokumen ini berisi rancangan struktur menu CLI dan arsitektur data **Project-Centric** untuk menyederhanakan antarmuka pengguna (*User Interface*) dan mengisolasi data per website serta per channel YouTube.
 
 ---
 
-## 🌟 1. Menu Utama (5 Menu Ringkas + Clean Status List di Bawah)
+## 1. Menu Utama (5 Menu Ringkas + Status List Bersih)
 
 ```text
-🏛️  AI SILO BUILDER & PUBLISHER
+=== AI SILO BUILDER & YOUTUBE AUTOMATION SUITE ===
 ============================================================
-▶ MENU UTAMA
+[>] MENU UTAMA
 ------------------------------------------------------------
- ➔ [1]  🌐 Website Projects       (Silo, Artikel & Live Publishing per Web) ◀
-    [2]  🎬 YouTube Channels       (Upload, Live Video, CTR & Metadata)
-    [3]  📄 Global Articles Hub    (Arsip, Pencarian & Export Lintas Web)
-    [4]  ⚙️ Global Settings        (AI Model, API Keys & Visual Style)
-    [0]  🚪 Keluar
+ ➔ [1]  Website Projects       (Silo, Artikel & Live Publishing per Web) ◀
+    [2]  YouTube Channels       (Upload, Live Video, CTR & Metadata)
+    [3]  Global Articles Hub    (Arsip, Pencarian & Export Lintas Web)
+    [4]  Global Settings        (AI Model, API Keys & Visual Style)
+    [0]  Keluar
 ------------------------------------------------------------
- 📌 STATUS SISTEM & INTEGRASI:
-  • ✍️  Text AI   : gemini-3.5-flash (3 keys)
-  • 🖼️  Images    : gpt-6-luna • Illustration (15 keys)
-  • 🎬 YouTube   : 2 Channel (Soft Piano Rain, Elaina...) [2/2 OAuth Live]
-  • 🌐 Website   : spotty [WordPress] (total 3 web)
+ [STATUS SISTEM & INTEGRASI]
+  - Text AI   : gemini-3.5-flash (3 keys)
+  - Images    : gpt-6-luna - Illustration (15 keys)
+  - YouTube   : 2 Channel (Soft Piano Rain, Elaina...) [2/2 OAuth Live]
+  - Website   : spotty [WordPress] (total 3 web)
 ------------------------------------------------------------
 Pilih [↑/↓ + Enter] atau tekan angka/huruf:
 ```

@@ -42,11 +42,11 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def print_banner():
-    print(f"\n{CYAN}{BOLD}🏛️  AI SILO BUILDER & PUBLISHER{RESET}")
+    print(f"\n{CYAN}{BOLD}=== AI SILO BUILDER & YOUTUBE AUTOMATION SUITE ==={RESET}")
     print(f"{DIM}{'=' * 60}{RESET}")
 
 def print_section(title):
-    print(f"\n{YELLOW}{BOLD}▶ {title}{RESET}")
+    print(f"\n{YELLOW}{BOLD}[>] {title}{RESET}")
     print(f"{DIM}{'-' * 60}{RESET}")
 
 def read_raw_key():
@@ -4497,19 +4497,19 @@ def main():
             web_status_clean = f"{YELLOW}Belum Terdaftar{RESET}"
 
         footer_list = [
-            f" {YELLOW}{BOLD}📌 STATUS SISTEM & INTEGRASI:{RESET}",
-            f"  • ✍️  {BOLD}Text AI{RESET}   : {CYAN}{active_model}{RESET} {DIM}({gemini_keys_count} keys){RESET}",
-            f"  • 🖼️  {BOLD}Images{RESET}    : {MAGENTA}{kie_model}{RESET} {DIM}• {kie_style_name} ({kie_keys_count} keys){RESET}",
-            f"  • 🎬 {BOLD}YouTube{RESET}   : {GREEN}{total_yt} Channel{RESET} {DIM}({names_preview}){RESET} [{GREEN}{active_cnt}/{total_yt} OAuth Live{RESET}]",
-            f"  • 🌐 {BOLD}Website{RESET}   : {web_status_clean}"
+            f" {YELLOW}{BOLD}[STATUS SISTEM & INTEGRASI]{RESET}",
+            f"  - {BOLD}Text AI{RESET}   : {CYAN}{active_model}{RESET} {DIM}({gemini_keys_count} keys){RESET}",
+            f"  - {BOLD}Images{RESET}    : {MAGENTA}{kie_model}{RESET} {DIM}- {kie_style_name} ({kie_keys_count} keys){RESET}",
+            f"  - {BOLD}YouTube{RESET}   : {GREEN}{total_yt} Channel{RESET} {DIM}({names_preview}){RESET} [{GREEN}{active_cnt}/{total_yt} OAuth Live{RESET}]",
+            f"  - {BOLD}Website{RESET}   : {web_status_clean}"
         ]
 
         menu_options = [
-            ("1", "🌐 Website Projects       (Silo, Artikel & Live Publishing per Web)"),
-            ("2", "🎬 YouTube Channels       (Upload, Live Video, CTR & Metadata)"),
-            ("3", "📄 Global Articles Hub    (Arsip, Pencarian & Export Lintas Web)"),
-            ("4", "⚙️ Global Settings        (AI Model, API Keys & Visual Style)"),
-            ("0", "🚪 Keluar")
+            ("1", "Website Projects       (Silo, Artikel & Live Publishing per Web)"),
+            ("2", "YouTube Channels       (Upload, Live Video, CTR & Metadata)"),
+            ("3", "Global Articles Hub    (Arsip, Pencarian & Export Lintas Web)"),
+            ("4", "Global Settings        (AI Model, API Keys & Visual Style)"),
+            ("0", "Keluar")
         ]
 
         pilihan = select_menu(menu_options, title="MENU UTAMA", footer=footer_list)
