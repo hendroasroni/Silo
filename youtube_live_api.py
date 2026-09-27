@@ -191,36 +191,73 @@ class YouTubeLiveClient:
         self.service = build("youtube", "v3", credentials=self.creds)
         return True, "Otentikasi Headless YouTube berhasil! Token tersimpan secara permanen."
 
-    def authenticate(self, channel_id="default", force_new=False):
+    def authenticate_auto(self, channel_id="default", port=8080):
         """
-        Otentikasi OAuth 2.0 Headless dengan alur Paste Code / Redirect URL langsung di CLI.
+        Mode 1-Click Login Otomatis (Tanpa Copy-Paste):
+        Membuka browser otomatis, menangkap callback Google secara otomatis,
+        dan langsung terhubung tanpa perlu menyalin/menempel kode sama sekali.
         """
         if not GOOGLE_API_AVAILABLE:
             raise RuntimeError("Library Google API belum terpasang. Jalankan: pip install google-api-python-client google-auth-oauthlib")
 
-        if not force_new:
-            existing_creds = self.load_credentials(channel_id)
-            if existing_creds:
-                self.creds = existing_creds
-                self.service = build("youtube", "v3", credentials=self.creds)
-                return True, "Otentikasi berhasil menggunakan token tersimpan."
+        if not self.is_secret_file_present():
+            raise FileNotFoundError(
+                f"File kredensial '{self.client_secrets_file}' tidak ditemukan di root folder proyek.\n"
+                "Silakan unduh Client Secret JSON dari Google Cloud Console dan simpan sebagai 'client_secret.json'."
+            )
 
+        flow = InstalledAppFlow.from_client_secrets_file(
+            self.client_secrets_file,
+            scopes=YOUTUBE_SCOPES
+        )
+
+        ports_to_try = [port, 8090, 8888, 0]
+        creds = None
+        last_err = None
+
+        print("\n" + "=" * 70)
+        print("🌐 OTENTIKASI OTOMATIS (1-CLICK LOGIN - TANPA COPY PASTE)")
+        print("=" * 70)
+        print("Sedang membuka browser default Anda untuk login Google...")
+        print("Cukup pilih akun Google channel Anda dan klik 'Allow / Izinkan'.\n")
+
+        for p in ports_to_try:
+            try:
+                creds = flow.run_local_server(
+                    port=p,
+                    prompt="consent",
+                    authorization_prompt_message="Menunggu izin otorisasi dari browser...",
+                    success_message="Otentikasi Berhasil! Anda dapat menutup tab browser ini dan kembali ke terminal Silo."
+                )
+                break
+            except Exception as e:
+                last_err = e
+                continue
+
+        if not creds:
+            raise RuntimeError(f"Gagal otentikasi otomatis: {last_err}")
+
+        self.creds = creds
+        self.save_credentials(creds, channel_id)
+        self.service = build("youtube", "v3", credentials=self.creds)
+        return True, "Otentikasi 1-Click Otomatis YouTube berhasil! Token tersimpan secara permanen."
+
+    def authenticate_manual(self, channel_id="default"):
+        """
+        Mode Manual Copy-Paste:
+        Berguna jika menggunakan VPS remote / SSH tanpa browser lokal.
+        """
         auth_url = self.get_authorization_url()
 
         print("\n" + "=" * 70)
-        print("🔐 OTENTIKASI OAUTH YOUTUBE (HEADLESS / PASTE DI TERMINAL)")
+        print("📋 OTENTIKASI MANUAL (PASTE DI TERMINAL)")
         print("=" * 70)
-        print(f"1. Buka tautan otentikasi Google berikut di browser (HP / Laptop / PC):")
+        print(f"1. Buka tautan berikut di browser:")
         print(f"   👉 \033[96m\033[1m{auth_url}\033[0m\n")
         print("2. Pilih akun Google channel YouTube Anda dan klik 'Allow / Izinkan'.\n")
-        print("3. Setelah klik Izinkan, browser akan dialihkan ke alamat seperti:")
-        print("   \033[93mhttp://localhost/?code=4/0AcvD...&scope=...\033[0m")
-        print("   \033[2m(Jika browser menampilkan 'Site can't be reached / Halaman tidak dapat diakses', itu normal!)\033[0m\n")
-        print("4. SALIN SELURUH ALAMAT URL (atau kode setelah 'code=') dari browser,")
-        print("   lalu PASTE DI BAWAH INI:")
+        print("3. SALIN URL redirect dari browser, lalu PASTE DI BAWAH:")
         print("=" * 70)
 
-        # Coba buka browser otomatis jika memungkinkan
         try:
             webbrowser.open(auth_url)
         except Exception:
@@ -232,6 +269,27 @@ class YouTubeLiveClient:
 
         print(f"\n\033[96mSedang memverifikasi kode dengan server Google OAuth...\033[0m")
         return self.exchange_code_for_tokens(pasted, channel_id=channel_id)
+
+    def authenticate(self, channel_id="default", force_new=False):
+        """
+        Otentikasi utama: Otomatis mencoba 1-Click Login tanpa copy-paste.
+        Jika gagal, fallback ke alur manual.
+        """
+        if not GOOGLE_API_AVAILABLE:
+            raise RuntimeError("Library Google API belum terpasang. Jalankan: pip install google-api-python-client google-auth-oauthlib")
+
+        if not force_new:
+            existing_creds = self.load_credentials(channel_id)
+            if existing_creds:
+                self.creds = existing_creds
+                self.service = build("youtube", "v3", credentials=self.creds)
+                return True, "Otentikasi berhasil menggunakan token tersimpan."
+
+        try:
+            return self.authenticate_auto(channel_id=channel_id)
+        except Exception as e:
+            print(f"\n\033[93m⚠️ Otentikasi otomatis via browser lokal mengalami kendala ({e}).\nBeralih ke mode manual...\033[0m")
+            return self.authenticate_manual(channel_id=channel_id)
 
     def get_service(self, channel_id="default"):
         if not self.service:

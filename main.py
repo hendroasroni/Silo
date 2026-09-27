@@ -3131,12 +3131,13 @@ def menu_yt_oauth_settings(yt_live, active_profile, yt_profile_mgr):
             except Exception as e:
                 print(f"{YELLOW}⚠️ Catatan: {e}{RESET}\n")
         else:
-            print(f"{YELLOW}Status Koneksi: BELUM TERHUBUNG (Pilih menu 1 untuk login Headless){RESET}\n")
+            print(f"{YELLOW}Status Koneksi: BELUM TERHUBUNG (Pilih menu 1 untuk login instan){RESET}\n")
 
         options = [
-            ("1", "🔑 Login & Hubungkan Akun Google / YouTube (Headless / Paste Code di CLI)"),
-            ("2", "🔄 Sinkronkan Nama & Deskripsi Channel dari YouTube ke Profil Silo"),
-            ("3", "🔓 Putuskan Koneksi OAuth (Logout)"),
+            ("1", "🚀 Login Otomatis (1-Click Browser - Tanpa Copy Paste) ⭐ [Rekomendasi]"),
+            ("2", "📋 Login Manual (Paste URL / Auth Code di CLI)"),
+            ("3", "🔄 Sinkronkan Nama & Deskripsi Channel dari YouTube ke Profil Silo"),
+            ("4", "🔓 Putuskan Koneksi OAuth (Logout)"),
             ("0", "Kembali")
         ]
 
@@ -3144,9 +3145,9 @@ def menu_yt_oauth_settings(yt_live, active_profile, yt_profile_mgr):
         if c == "0":
             break
         elif c == "1":
-            print_section("LOGIN OAUTH GOOGLE YOUTUBE (HEADLESS / PASTE CODE)")
+            print_section("LOGIN OTOMATIS YOUTUBE (1-CLICK BROWSER)")
             try:
-                ok, msg = yt_live.authenticate(channel_id=ch_id, force_new=True)
+                ok, msg = yt_live.authenticate_auto(channel_id=ch_id)
                 print(f"\n{GREEN}✔ {msg}{RESET}")
                 try:
                     info = yt_live.get_channel_profile_live(ch_id)
@@ -3159,6 +3160,21 @@ def menu_yt_oauth_settings(yt_live, active_profile, yt_profile_mgr):
                 print(f"\n{RED}✖ Gagal otentikasi: {e}{RESET}")
             press_any_key()
         elif c == "2":
+            print_section("LOGIN MANUAL (PASTE DI CLI)")
+            try:
+                ok, msg = yt_live.authenticate_manual(channel_id=ch_id)
+                print(f"\n{GREEN}✔ {msg}{RESET}")
+                try:
+                    info = yt_live.get_channel_profile_live(ch_id)
+                    if info.get("title") and active_profile.get("name") in ["My YouTube Channel", "Default Channel", ""]:
+                        yt_profile_mgr.update_profile(ch_id, {"name": info.get("title")})
+                        print(f"{GREEN}✔ Nama channel lokal diperbarui menjadi '{info.get('title')}'!{RESET}")
+                except Exception:
+                    pass
+            except Exception as e:
+                print(f"\n{RED}✖ Gagal otentikasi: {e}{RESET}")
+            press_any_key()
+        elif c == "3":
             try:
                 print(f"\n{CYAN}Mengambil data profil dari YouTube...{RESET}")
                 info = yt_live.get_channel_profile_live(ch_id)
@@ -3172,7 +3188,7 @@ def menu_yt_oauth_settings(yt_live, active_profile, yt_profile_mgr):
             except Exception as e:
                 print(f"\n{RED}✖ Gagal sinkronisasi: {e}{RESET}")
             press_any_key()
-        elif c == "3":
+        elif c == "4":
             ok, msg = yt_live.disconnect_channel(ch_id)
             print(f"\n{GREEN}✔ {msg}{RESET}")
             press_any_key()
