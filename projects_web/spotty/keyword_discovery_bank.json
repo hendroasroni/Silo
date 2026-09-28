@@ -1,0 +1,89 @@
+{
+  "site_id": "site_1",
+  "site_name": "spotty",
+  "last_discovered_at": "2026-09-28T06:21:13.148487",
+  "total_keywords": 6,
+  "pending_count": 4,
+  "processed_count": 2,
+  "keywords": [
+    {
+      "id": "kw_1790550134_1",
+      "keyword": "jasa uji kuat tekan beton",
+      "type": "pillar_baru",
+      "parent_pillar": null,
+      "search_intent": "Komersial",
+      "authority_value": "Sangat Tinggi",
+      "reason": "Membuka silo baru pengujian mutu material konstruksi beton yang sangat esensial bagi laboratorium uji teknik sipil.",
+      "status": "processed",
+      "discovered_at": "2026-09-28T06:02:14.570698",
+      "processed_at": "2026-09-28T06:22:53.425689",
+      "silo_folder": "jasa-uji-kuat-tekan-beton"
+    },
+    {
+      "id": "kw_1790550134_3",
+      "keyword": "standar sni uji sondir tanah",
+      "type": "cluster_expansion",
+      "parent_pillar": "Sondir Tanah",
+      "search_intent": "Spesifikasi Teknis",
+      "authority_value": "Tinggi",
+      "reason": "Memperkuat technical authority cluster sondir tanah dengan mengacu pada regulasi baku SNI pengujian penetrasi konus.",
+      "status": "processed",
+      "discovered_at": "2026-09-28T06:02:14.570698",
+      "processed_at": "2026-09-28T06:24:22.439693",
+      "silo_folder": "standar-sni-uji-sondir-tanah"
+    },
+    {
+      "id": "kw_1790550134_5",
+      "keyword": "kedalaman sondir tanah rumah 2 lantai",
+      "type": "cluster_expansion",
+      "parent_pillar": "Sondir Tanah",
+      "search_intent": "Informational",
+      "authority_value": "Tinggi",
+      "reason": "Menjawab kueri spesifik pemilik proyek residensial yang membutuhkan justifikasi teknis sebelum mengajukan PBG/konstruksi.",
+      "status": "pending",
+      "discovered_at": "2026-09-28T06:02:14.570698",
+      "processed_at": null,
+      "silo_folder": null
+    },
+    {
+      "id": "kw_1790551273_4",
+      "keyword": "jasa uji laboratorium mekanika tanah",
+      "type": "pillar_baru",
+      "parent_pillar": null,
+      "search_intent": "Komersial",
+      "authority_value": "Sangat Tinggi",
+      "reason": "Membangun silo baru yang melengkapi layanan sondir dengan pengujian lab untuk memperkuat posisi sebagai lab konstruksi terpadu.",
+      "status": "pending",
+      "discovered_at": "2026-09-28T06:21:13.148487",
+      "processed_at": null,
+      "silo_folder": null
+    },
+    {
+      "id": "kw_1790551273_6",
+      "keyword": "tahapan pengujian laboratorium tanah untuk pondasi bangunan",
+      "type": "cluster_expansion",
+      "parent_pillar": "jasa uji kuat tekan beton",
+      "search_intent": "Informational",
+      "authority_value": "Tinggi",
+      "reason": "Memberikan edukasi teknis mendalam yang dicari audiens sebelum melakukan pemesanan jasa pengujian struktur.",
+      "status": "pending",
+      "discovered_at": "2026-09-28T06:21:13.148487",
+      "processed_at": null,
+      "silo_folder": null
+    },
+    {
+      "id": "kw_1790551273_8",
+      "keyword": "biaya uji laboratorium mekanika tanah per sampel",
+      "type": "cluster_expansion",
+      "parent_pillar": "jasa uji kuat tekan beton",
+      "search_intent": "Komersial",
+      "authority_value": "Tinggi",
+      "reason": "Menargetkan audiens dengan niat beli tinggi yang sedang melakukan riset anggaran untuk kebutuhan konstruksi.",
+      "status": "pending",
+      "discovered_at": "2026-09-28T06:21:13.148487",
+      "processed_at": null,
+      "silo_folder": null
+    }
+  ],
+  "last_analysis_summary": "Website saat ini memiliki fokus pada pengujian geoteknik namun masih mencampur topik tidak relevan (kesehatan/reksadana/kuliner), sehingga diperlukan pembersihan fokus ke arah konstruksi dan penambahan topik struktural untuk membangun otoritas yang kohesif."
+}

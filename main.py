@@ -25,7 +25,7 @@ from core.youtube import (
     YouTubeProfileManager, YouTubeGenerator, YOUTUBE_OUTPUT_DIR, CHANNELS_BASE_DIR,
     get_channel_dir, clean_channel_slug, YouTubeLiveClient
 )
-from core.silo import SiloGenerator, WordPressPublisher, BulkSiloManager, slugify
+from core.silo import SiloGenerator, WordPressPublisher, BulkSiloManager, KeywordDiscoveryManager, slugify
 from core.config_utils import get_config_path, get_project_root, get_config_dir, CONFIG_DIR
 
 # ANSI color styling
@@ -304,11 +304,12 @@ def menu_generate_silo(target_site=None):
 
     create_new_silo_flow(silo_engine, client, target_site=target_site, silos_base_dir=silos_base_dir)
 
-def bulk_silo_autopilot_flow(silo_engine, client, target_site=None):
+def bulk_silo_autopilot_flow(silo_engine, client, target_site=None, predefined_keywords=None):
     clear_screen()
     print_banner()
     wp = WordPressPublisher()
     bulk_mgr = BulkSiloManager()
+    disc_mgr = KeywordDiscoveryManager(wp)
     cfg = bulk_mgr.get_config()
 
     silos_base_dir = wp.get_site_silos_dir(target_site) if target_site else "output"
@@ -318,21 +319,24 @@ def bulk_silo_autopilot_flow(silo_engine, client, target_site=None):
     pacing_s = cfg.get("pacing_seconds", 3)
     site_name = target_site.get("name", "Website") if target_site else "Default Project"
 
-    print_section(f"BULK AUTOPILOT SILO GENERATOR - {site_name.upper()}")
-    print(f" {DIM}Mode batch otomatis: Cukup masukkan keyword, sistem menghitung total silo & artikel lalu generate non-stop.{RESET}\n")
-    print(f" {BOLD}Format Input:{RESET} Ketik/paste keyword dipisahkan dengan koma (,) atau baris baru.")
-    print(f" {DIM}Contoh: geoteknik pondasi, uji tanah sondir, soil stabilization, retaining wall, bored pile{RESET}")
-    print(f" {DIM}Ketik '0' untuk membatalkan dan kembali.{RESET}\n")
+    if predefined_keywords:
+        keywords = predefined_keywords
+    else:
+        print_section(f"BULK AUTOPILOT SILO GENERATOR - {site_name.upper()}")
+        print(f" {DIM}Mode batch otomatis: Cukup masukkan keyword, sistem menghitung total silo & artikel lalu generate non-stop.{RESET}\n")
+        print(f" {BOLD}Format Input:{RESET} Ketik/paste keyword dipisahkan dengan koma (,) atau baris baru.")
+        print(f" {DIM}Contoh: geoteknik pondasi, uji tanah sondir, soil stabilization, retaining wall, bored pile{RESET}")
+        print(f" {DIM}Ketik '0' untuk membatalkan dan kembali.{RESET}\n")
 
-    raw_input = input(f"{BOLD}Masukkan Seed Keywords:{RESET}\n> ").strip()
-    if raw_input == "0" or not raw_input:
-        return
+        raw_input = input(f"{BOLD}Masukkan Seed Keywords:{RESET}\n> ").strip()
+        if raw_input == "0" or not raw_input:
+            return
 
-    keywords = BulkSiloManager.parse_bulk_keywords(raw_input)
-    if not keywords:
-        print(f"\n{RED}[X] Tidak ada keyword valid yang terdeteksi.{RESET}")
-        press_any_key()
-        return
+        keywords = BulkSiloManager.parse_bulk_keywords(raw_input)
+        if not keywords:
+            print(f"\n{RED}[X] Tidak ada keyword valid yang terdeteksi.{RESET}")
+            press_any_key()
+            return
 
     total_silos = len(keywords)
     total_articles = total_silos * (1 + clusters_per_silo)
@@ -424,6 +428,9 @@ def bulk_silo_autopilot_flow(silo_engine, client, target_site=None):
         )
 
         silos_success += 1
+        
+        # Auto-update status di Bank Ide jika keyword ini berasal dari discovery
+        disc_mgr.mark_keywords_processed(target_site, [seed_kw], silo_folder=folder_slug)
 
         if s_idx < total_silos:
             print(f"\n{DIM}[Smart Pacing] Jeda {pacing_s} detik sebelum memproses Silo berikutnya...{RESET}")
@@ -435,6 +442,136 @@ def bulk_silo_autopilot_flow(silo_engine, client, target_site=None):
     print(f" [*] Total Estimasi Waktu : {BOLD}{elapsed_mins:.1f} menit{RESET}")
     print(f" [*] Lokasi Output Silos  : {CYAN}{silos_base_dir}{RESET}\n")
     press_any_key("Tekan tombol apa saja untuk kembali ke Dashboard Web...")
+
+
+def menu_keyword_discovery(site, client, silo_engine):
+    wp = WordPressPublisher()
+    disc_mgr = KeywordDiscoveryManager(wp)
+    
+    while True:
+        clear_screen()
+        print_banner()
+        bank = disc_mgr.load_bank(site)
+        pending_list = [k for k in bank.get("keywords", []) if k.get("status") == "pending"]
+        processed_list = [k for k in bank.get("keywords", []) if k.get("status") == "processed"]
+        
+        print_section(f"AI KEYWORD & TOPICAL GAP DISCOVERY BANK - {site['name'].upper()}")
+        brand_label = site.get('profile', {}).get('brand_name') or site['name']
+        print(f" [*] {BOLD}Niche Website   :{RESET} {brand_label}")
+        print(f" [*] {BOLD}Total Stok Ide  :{RESET} {BOLD}{len(bank.get('keywords', []))} Keyword{RESET} ({YELLOW}{len(pending_list)} Pending{RESET}, {GREEN}{len(processed_list)} Selesai{RESET})")
+        if bank.get("last_discovered_at"):
+            last_date = bank['last_discovered_at'].split("T")[0]
+            print(f" [*] {BOLD}Discovery Akhir :{RESET} {last_date}")
+        print("")
+
+        if pending_list:
+            print(f"{YELLOW}{BOLD}[>] DAFTAR STOK KEYWORD PENDING (SIAP DIPRODUKSI):{RESET}")
+            print(f"{BOLD}{'No':<4} {'Tipe':<16} {'Keyword Peluang':<36} {'Intent':<20} {'Nilai'}{RESET}")
+            print("-" * 80)
+            for idx, item in enumerate(pending_list[:15], 1):
+                type_tag = f"{MAGENTA}[Pillar Baru]{RESET}" if item.get("type") == "pillar_baru" else f"{CYAN}[Cluster Induk]{RESET}"
+                kw_disp = (item["keyword"][:34] + '..') if len(item["keyword"]) > 34 else item["keyword"]
+                intent_disp = (item.get("search_intent", "Info")[:18] + '..') if len(item.get("search_intent", "Info")) > 18 else item.get("search_intent", "Info")
+                val_disp = item.get("authority_value", "Tinggi")
+                print(f"#{idx:<3} {type_tag:<25} {BOLD}{kw_disp:<36}{RESET} {intent_disp:<20} {val_disp}")
+            if len(pending_list) > 15:
+                print(f"{DIM}  ... dan {len(pending_list) - 15} keyword pending lainnya di bank{RESET}")
+            print("")
+        else:
+            print(f"{DIM}Belum ada ide keyword pending di Bank. Jalankan AI Discovery untuk mencari ide baru!{RESET}\n")
+
+        options = []
+        if pending_list:
+            options.append(("1", f"[!] Kerjakan SEMUA {len(pending_list)} Keyword PENDING (Direct Bulk Autopilot)"))
+            options.append(("2", "[>] Pilih Beberapa Keyword Pending untuk Diproduksi"))
+        options.append(("3", "[+] Jalankan AI Discovery (Cari 10-15 Peluang Topik Baru Otomatis)"))
+        options.append(("4", f"[=] Buka Seluruh Riwayat Ide Bank ({len(bank.get('keywords', []))} Keyword)"))
+        options.append(("0", "  Kembali ke Dashboard Web"))
+
+        c = select_menu(options, title=f"MENU TOPICAL GAP & KEYWORD BANK: {site['name']}")
+        if c == "0":
+            break
+        elif c == "1" and pending_list:
+            kws_to_run = [k["keyword"] for k in pending_list]
+            bulk_silo_autopilot_flow(silo_engine, client, target_site=site, predefined_keywords=kws_to_run)
+        elif c == "2" and pending_list:
+            print_section("PILIH KEYWORD PENDING UNTUK DIPRODUKSI")
+            for idx, item in enumerate(pending_list, 1):
+                print(f"  #{idx:<2}. {item['keyword']} ({item.get('type')})")
+            sel_input = input(f"\n{BOLD}Masukkan nomor pilihan (misal: 1, 2, 4 atau 1-3, ketik '0' untuk batal):{RESET} ").strip()
+            if sel_input != "0" and sel_input:
+                selected_indices = parse_user_selection(sel_input, len(pending_list))
+                chosen_kws = [pending_list[i - 1]["keyword"] for i in selected_indices if 1 <= i <= len(pending_list)]
+                if chosen_kws:
+                    bulk_silo_autopilot_flow(silo_engine, client, target_site=site, predefined_keywords=chosen_kws)
+        elif c == "3":
+            print_section(f"MENJALANKAN AI TOPICAL GAP DISCOVERY - {site['name'].upper()}")
+            print(f"{CYAN}Sedang memindai seluruh jejak konten web & menganalisis search intent celah topik...{RESET}")
+            try:
+                new_added, updated_bank = disc_mgr.discover_topical_gaps(site, client, count=15)
+                print(f"\n{GREEN}{BOLD}[OK] Berhasil menemukan & menyimpan {len(new_added)} Keyword Baru ke Bank Ide!{RESET}")
+                if updated_bank.get("last_analysis_summary"):
+                    print(f"{YELLOW}[Insight AI]: {updated_bank['last_analysis_summary']}{RESET}\n")
+                
+                if new_added:
+                    print(f"{BOLD}Keyword Baru yang Ditemukan:{RESET}")
+                    for idx, k in enumerate(new_added, 1):
+                        type_str = f"{MAGENTA}[Pillar Baru]{RESET}" if k["type"] == "pillar_baru" else f"{CYAN}[Cluster Expansion]{RESET}"
+                        print(f"  #{idx:<2}. {type_str} {BOLD}{k['keyword']}{RESET} -> {k.get('reason')}")
+                    
+                    print("\n" + "-" * 75)
+                    action_c = get_single_key(f"{GREEN}{BOLD}Langsung kerjakan seluruh {len(new_added)} keyword baru ini via Bulk Autopilot? [Y/N atau 0]: {RESET}", valid_keys=['y', 'n', '0', '\r', '\n'])
+                    if action_c.lower() == 'y':
+                        new_kw_list = [k["keyword"] for k in new_added]
+                        bulk_silo_autopilot_flow(silo_engine, client, target_site=site, predefined_keywords=new_kw_list)
+                    else:
+                        print(f"\n{GREEN}[OK] Seluruh ide telah tersimpan aman di Bank Ide.{RESET}")
+                        press_any_key()
+            except Exception as e:
+                print(f"{RED}[X] Gagal melakukan discovery: {e}{RESET}")
+                press_any_key()
+        elif c == "4":
+            menu_view_bank_history(disc_mgr, site)
+
+
+def menu_view_bank_history(disc_mgr, site):
+    while True:
+        clear_screen()
+        print_banner()
+        bank = disc_mgr.load_bank(site)
+        keywords = bank.get("keywords", [])
+        
+        print_section(f"DATABASE RIWAYAT BANK IDE - {site['name'].upper()}")
+        print(f" [*] Total Database: {BOLD}{len(keywords)} Keyword{RESET}\n")
+        
+        if not keywords:
+            print(f"{YELLOW}Belum ada riwayat keyword di bank.{RESET}")
+            press_any_key()
+            break
+            
+        print(f"{BOLD}{'No':<4} {'Status':<14} {'Tipe':<15} {'Keyword':<32} {'Tgl Discovery'}{RESET}")
+        print("-" * 80)
+        for idx, k in enumerate(keywords, 1):
+            st_badge = f"{GREEN}[PROCESSED]{RESET}" if k.get("status") == "processed" else f"{YELLOW}[PENDING]{RESET}"
+            t_badge = "Pillar" if k.get("type") == "pillar_baru" else "Cluster"
+            kw_disp = (k["keyword"][:30] + '..') if len(k["keyword"]) > 30 else k["keyword"]
+            disc_date = k.get("discovered_at", "")[:10]
+            print(f"#{idx:<3} {st_badge:<23} {t_badge:<15} {BOLD}{kw_disp:<32}{RESET} {disc_date}")
+            
+        options = [
+            ("1", "Hapus Keyword Tertentu dari Bank"),
+            ("0", "Kembali ke Menu Discovery")
+        ]
+        opt = select_menu(options, title="AKSI DATABASE BANK IDE")
+        if opt == "0":
+            break
+        elif opt == "1":
+            del_idx = input(f"\n{BOLD}Masukkan nomor keyword yang ingin dihapus (atau 0 untuk batal):{RESET} ").strip()
+            if del_idx.isdigit() and 1 <= int(del_idx) <= len(keywords):
+                target_k = keywords[int(del_idx) - 1]
+                disc_mgr.delete_keyword(site, target_k["id"])
+                print(f"{GREEN}[OK] Keyword '{target_k['keyword']}' berhasil dihapus dari bank.{RESET}")
+                time.sleep(1)
 
 
 def menu_bulk_settings(site=None):
@@ -1346,22 +1483,28 @@ def menu_website_dashboard(site):
         prof = wp.get_business_profile(site["id"])
         brand_name = prof.get("brand_name", "-")
 
+        disc_mgr = KeywordDiscoveryManager(wp)
+        bank_data = disc_mgr.load_bank(site)
+        pending_bank_count = bank_data.get("pending_count", 0)
+
         print_section(f"[Web] PROJECT WEBSITE: {site['name'].upper()}")
         print(f"[*] {BOLD}Tipe Website  :{RESET} {CYAN}{site_type}{RESET}")
         print(f"[Web] {BOLD}URL / Target  :{RESET} {site.get('wp_url', site.get('content_dir', ''))}")
         print(f"[Business] {BOLD}Profil Bisnis :{RESET} {GREEN if brand_name != '-' else YELLOW}{brand_name}{RESET}")
         print(f"[Folder] {BOLD}Workspace     :{RESET} {DIM}{ws_dir}{RESET}")
-        print(f" {BOLD}Koleksi Silo  :{RESET} {BOLD}{total_silos} Silo{RESET} ({GREEN}{completed_articles} Artikel Selesai{RESET}, {YELLOW}{pending_articles} Pending{RESET})\n")
+        print(f" {BOLD}Koleksi Silo  :{RESET} {BOLD}{total_silos} Silo{RESET} ({GREEN}{completed_articles} Artikel Selesai{RESET}, {YELLOW}{pending_articles} Pending{RESET})")
+        print(f"[*] {BOLD}Bank Stok Ide :{RESET} {YELLOW}{BOLD}{pending_bank_count} Keyword Pending{RESET} ({len(bank_data.get('keywords', []))} Total Riwayat)\n")
 
         options = [
-            ("1", "[Target] Riset & Buat Arsitektur Silo Baru (Single Silo)"),
+            ("1", f"[Idea]   AI Keyword & Topical Gap Discovery ({pending_bank_count} Pending di Bank)"),
             ("2", "[Auto]   Bulk Autopilot Silo Generator (Multi-Keyword Non-Stop)"),
-            ("3", f"[Folder] Kelola & Lanjutkan Silo Web Ini ({total_silos} Silo)"),
-            ("4", "[Publish] Publish Artikel ke Web Ini"),
-            ("5", "[Live]   Kelola Post Live di Web Ini (WordPress)"),
-            ("6", "[Business] Profil Bisnis & Knowledge Grounding Web Ini"),
-            ("7", "[Key]    Pengaturan Kredensial & Uji Koneksi Web Ini"),
-            ("8", "[Config] Pengaturan Bulk Silo (Cluster, Bahasa, Pacing)"),
+            ("3", "[Target] Riset & Buat Arsitektur Silo Baru (Single Silo)"),
+            ("4", f"[Folder] Kelola & Lanjutkan Silo Web Ini ({total_silos} Silo)"),
+            ("5", "[Publish] Publish Artikel ke Web Ini"),
+            ("6", "[Live]   Kelola Post Live di Web Ini (WordPress)"),
+            ("7", "[Business] Profil Bisnis & Knowledge Grounding Web Ini"),
+            ("8", "[Key]    Pengaturan Kredensial & Uji Koneksi Web Ini"),
+            ("9", "[Config] Pengaturan Bulk Silo (Cluster, Bahasa, Pacing)"),
             ("0", "  Kembali ke Daftar Website")
         ]
 
@@ -1373,7 +1516,7 @@ def menu_website_dashboard(site):
                 print(f"{RED}Gemini API Client belum terhubung.{RESET}")
                 press_any_key()
                 continue
-            create_new_silo_flow(silo_engine, client, target_site=site, silos_base_dir=silos_dir)
+            menu_keyword_discovery(site, client, silo_engine)
         elif choice == "2":
             if not client:
                 print(f"{RED}Gemini API Client belum terhubung.{RESET}")
@@ -1385,20 +1528,26 @@ def menu_website_dashboard(site):
                 print(f"{RED}Gemini API Client belum terhubung.{RESET}")
                 press_any_key()
                 continue
-            menu_manage_site_silos(site, silo_engine, client)
+            create_new_silo_flow(silo_engine, client, target_site=site, silos_base_dir=silos_dir)
         elif choice == "4":
-            menu_push_wordpress(target_site=site)
+            if not client:
+                print(f"{RED}Gemini API Client belum terhubung.{RESET}")
+                press_any_key()
+                continue
+            menu_manage_site_silos(site, silo_engine, client)
         elif choice == "5":
+            menu_push_wordpress(target_site=site)
+        elif choice == "6":
             if site.get("type") == "astro":
                 print(f"{CYAN}Website ini adalah website statis Astro. Kelola konten langsung melalui folder Content Astro.{RESET}")
                 press_any_key()
             else:
                 menu_manage_live_wp(wp, target_site=site)
-        elif choice == "6":
-            manage_single_site_profile_flow(wp, site)
         elif choice == "7":
-            menu_single_site_settings(wp, site)
+            manage_single_site_profile_flow(wp, site)
         elif choice == "8":
+            menu_single_site_settings(wp, site)
+        elif choice == "9":
             menu_bulk_settings(site=site)
 
 def menu_manage_site_silos(site, silo_engine, client):
