@@ -167,6 +167,81 @@ class GeminiClient:
         self.active_model = self.get_preferred_model()
         return self.active_model
 
+    def fetch_available_models(self):
+        """
+        Fetch dynamic list of models from Google Gemini API with smart categorization & tags.
+        Returns: list of dicts with keys: 'code', 'displayName', 'tag', 'category', 'desc'
+        """
+        raw_models = []
+        try:
+            key = self.get_current_key()
+            url = f"https://generativelanguage.googleapis.com/v1beta/models?key={key}"
+            resp = requests.get(url, timeout=12)
+            if resp.status_code == 200:
+                data = resp.json()
+                for m in data.get("models", []):
+                    methods = m.get("supportedGenerationMethods", [])
+                    if "generateContent" not in methods:
+                        continue
+                    name = m.get("name", "").replace("models/", "")
+                    if any(x in name.lower() for x in ["lyria", "tts", "transcribe", "robotics", "computer-use", "banana", "-image"]):
+                        continue
+                    raw_models.append({
+                        "code": name,
+                        "displayName": m.get("displayName", name),
+                        "description": m.get("description", "")
+                    })
+        except Exception:
+            raw_models = []
+
+        if not raw_models:
+            for code, desc in DEFAULT_FLASH_MODELS:
+                raw_models.append({"code": code, "displayName": code, "description": desc})
+            for code, desc in DEFAULT_PRO_MODELS:
+                raw_models.append({"code": code, "displayName": code, "description": desc})
+
+        categorized = []
+        for item in raw_models:
+            c = item["code"]
+            c_low = c.lower()
+            
+            if "flash-lite" in c_low or "lite" in c_low:
+                cat = "hemat"
+                tag = "[Paling Hemat / Ringan]"
+                desc = item.get("description") or "Sangat hemat kuota token & respon instan"
+            elif "deep-research" in c_low or "antigravity" in c_low:
+                cat = "riset"
+                tag = "[Riset Mendalam / Agentik]"
+                desc = item.get("description") or "Riset mendalam & analisis multi-sudut pandang"
+            elif "pro" in c_low:
+                cat = "akurat"
+                tag = "[Paling Akurat / Penalaran]"
+                desc = item.get("description") or "Penalaran tinggi, riset struktur & tulisan berbobot"
+            elif "flash" in c_low:
+                cat = "cepat"
+                tag = "[Paling Cepat / Rekomendasi Utama]"
+                desc = item.get("description") or "Keseimbangan sempurna kecepatan & kualitas konten"
+            elif "gemma" in c_low:
+                cat = "open"
+                tag = "[Open Model / Gemma]"
+                desc = item.get("description") or "Model terbuka efisien"
+            else:
+                cat = "lainnya"
+                tag = "[Model Standar]"
+                desc = item.get("description") or "Model generasi teks Gemini"
+
+            categorized.append({
+                "code": c,
+                "displayName": item.get("displayName", c),
+                "tag": tag,
+                "category": cat,
+                "desc": desc
+            })
+
+        cat_priority = {"cepat": 1, "hemat": 2, "akurat": 3, "riset": 4, "open": 5, "lainnya": 6}
+        categorized.sort(key=lambda x: (cat_priority.get(x["category"], 99), x["code"]))
+        return categorized
+
     def generate_text(self, prompt, system_instruction=None, temperature=0.7, max_retries=6):
         contents = []
         if system_instruction:

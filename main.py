@@ -34,6 +34,8 @@ GREEN = "\033[92m"
 YELLOW = "\033[93m"
 RED = "\033[91m"
 MAGENTA = "\033[95m"
+BLUE = "\033[94m"
+WHITE = "\033[97m"
 BOLD = "\033[1m"
 DIM = "\033[2m"
 RESET = "\033[0m"
@@ -2050,6 +2052,8 @@ def menu_delete_website_flow(wp):
 # ==========================================
 def menu_manage_site_profiles(wp):
     while True:
+        clear_screen()
+        print_banner()
         sites = wp.get_sites()
         if not sites:
             print(f"{YELLOW}Belum ada website yang didaftarkan.{RESET}")
@@ -2665,6 +2669,8 @@ def menu_manage_wp_categories(wp=None):
 # ==========================================
 def menu_ai_settings():
     while True:
+        clear_screen()
+        print_banner()
         options = [
             ("1", "Model & API Key Gemini"),
             ("2", "Model & API Key Kie.ai (Featured Image)"),
@@ -2672,7 +2678,7 @@ def menu_ai_settings():
             ("4", "Konfigurasi Model Tiap Tahap (Pipeline Multi-Model: Gemini / Agnes AI / GPT-6 Luna)"),
             ("0", "Kembali ke Menu Utama")
         ]
-        choice = select_menu(options, title="PENGATURAN AI & API KEY")
+        choice = select_menu(options, title="PENGATURAN GLOBAL (AI MODEL, API KEY & VISUAL)")
         if choice == "0":
             break
         elif choice == "1":
@@ -3120,8 +3126,8 @@ def menu_kie_keys(gemini_client=None):
 
                 print(f"\n{GREEN}{BOLD}[!] 5 Sampel Banner Berhasil Dibuat di folder 'output/'!{RESET}")
                 try:
-                    first_sample = os.path.abspath("output/sample_layout_1_center_card.webp")
-                    webbrowser.open(f"file:///{first_sample.replace('\\', '/')}")
+                    first_sample = os.path.abspath("output/sample_layout_1_center_card.webp").replace('\\', '/')
+                    webbrowser.open(f"file:///{first_sample}")
                     print(f"{DIM}Membuka sampel #1 di image viewer...{RESET}")
                 except Exception:
                     pass
@@ -3302,7 +3308,8 @@ def menu_agnes_keys():
                 saved, url = agnes.generate_and_save(test_prompt, out_path)
                 print(f"{GREEN}[OK] Gambar berhasil dibuat & disimpan di: {saved}{RESET}")
                 try:
-                    webbrowser.open(f"file:///{os.path.abspath(saved).replace('\\', '/')}")
+                    saved_clean = os.path.abspath(saved).replace('\\', '/')
+                    webbrowser.open(f"file:///{saved_clean}")
                 except Exception:
                     pass
             except Exception as e:
@@ -3520,24 +3527,39 @@ def menu_batch_generate_missing_thumbnails(gemini_client=None):
     press_any_key()
 
 def menu_change_model_flow(client):
+    clear_screen()
+    print_banner()
+    print_section("GANTI MODEL AI GEMINI")
+    print(f"{CYAN}Menghubungi Google Gemini API untuk mengambil daftar model aktif...{RESET}\n")
+    
     current = client.get_preferred_model()
+    available_models = client.fetch_available_models()
     
     options = []
     idx_counter = 1
     model_choices = {}
     default_idx = 0
 
-    for code, desc in DEFAULT_FLASH_MODELS:
-        active_badge = f" {GREEN}[Aktif]{RESET}" if code == current else ""
-        options.append((str(idx_counter), f" {code:<22} - {desc}{active_badge}"))
-        model_choices[str(idx_counter)] = code
-        if code == current:
-            default_idx = idx_counter - 1
-        idx_counter += 1
+    for m in available_models:
+        code = m["code"]
+        tag = m["tag"]
+        cat = m.get("category", "")
+        
+        if cat == "hemat":
+            tag_colored = f"{GREEN}{tag}{RESET}"
+        elif cat == "cepat":
+            tag_colored = f"{CYAN}{tag}{RESET}"
+        elif cat == "akurat":
+            tag_colored = f"{MAGENTA}{tag}{RESET}"
+        elif cat == "riset":
+            tag_colored = f"{YELLOW}{tag}{RESET}"
+        elif cat == "open":
+            tag_colored = f"{WHITE}{tag}{RESET}"
+        else:
+            tag_colored = f"{DIM}{tag}{RESET}"
 
-    for code, desc in DEFAULT_PRO_MODELS:
-        active_badge = f" {GREEN}[Aktif]{RESET}" if code == current else ""
-        options.append((str(idx_counter), f" {code:<22} - {desc}{active_badge}"))
+        active_badge = f" {GREEN}{BOLD}[Aktif]{RESET}" if code == current else ""
+        options.append((str(idx_counter), f" {code:<34} {tag_colored}{active_badge}"))
         model_choices[str(idx_counter)] = code
         if code == current:
             default_idx = idx_counter - 1
@@ -3546,14 +3568,14 @@ def menu_change_model_flow(client):
     options.append(("C", "Ketik Nama Model Kustom"))
     options.append(("0", "Kembali"))
 
-    choice = select_menu(options, title=f"PILIH MODEL GEMINI (Aktif: {current})", default_index=default_idx)
+    choice = select_menu(options, title=f"PILIH MODEL GEMINI (Model Aktif: {current})", default_index=default_idx)
 
     if choice == "0":
         return
 
     chosen_model = None
     if choice.upper() == "C":
-        chosen_model = input("\nNama model Gemini (misal: gemini-2.5-flash): ").strip()
+        chosen_model = input("\nNama model Gemini (misal: gemini-3.7-flash): ").strip()
         if chosen_model == "0" or not chosen_model:
             return
     elif choice in model_choices:
@@ -3561,12 +3583,14 @@ def menu_change_model_flow(client):
 
     if chosen_model:
         client.set_preferred_model(chosen_model)
-        print(f"\n{GREEN}[OK] Model diubah menjadi: {BOLD}{chosen_model}{RESET}")
+        print(f"\n{GREEN}[OK] Model berhasil diubah menjadi: {BOLD}{chosen_model}{RESET}")
         
-        print(f"{CYAN}Menguji model '{chosen_model}'...{RESET}")
+        print(f"{CYAN}Menguji koneksi model '{chosen_model}'...{RESET}")
         try:
             test_resp = client.generate_text("Tes respon singkat 3 kata.", max_retries=2)
-            print(f"{GREEN}[OK] Model siap digunakan! (Respon: \"{test_resp}\"){RESET}")
+            print(f"{GREEN}[OK] Model siap & aman digunakan untuk seluruh alur Silo!{RESET}")
+            if test_resp:
+                print(f"{DIM}Respon model: \"{test_resp}\"{RESET}")
         except Exception as e:
             print(f"{YELLOW}[!] Catatan: {e}{RESET}")
     else:
@@ -3739,7 +3763,8 @@ def menu_yt_generate_new_video(ai_client, active_profile):
             if os.name == 'nt':
                 os.startfile(txt_path)
             else:
-                webbrowser.open(f"file:///{os.path.abspath(txt_path).replace('\\', '/')}")
+                txt_clean = os.path.abspath(txt_path).replace('\\', '/')
+                webbrowser.open(f"file:///{txt_clean}")
         except Exception:
             pass
 
@@ -4098,7 +4123,8 @@ def menu_yt_optimize_existing_video(ai_client, active_profile):
             if os.name == 'nt':
                 os.startfile(txt_path)
             else:
-                webbrowser.open(f"file:///{os.path.abspath(txt_path).replace('\\', '/')}")
+                txt_clean = os.path.abspath(txt_path).replace('\\', '/')
+                webbrowser.open(f"file:///{txt_clean}")
         except Exception:
             pass
 

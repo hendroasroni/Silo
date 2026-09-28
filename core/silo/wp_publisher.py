@@ -802,11 +802,13 @@ class WordPressPublisher:
             tags_str = f"[{', '.join(tags_list)}]"
 
             site_author = target_site.get("author") or target_site.get("profile", {}).get("business_name") or f"Tim {target_site.get('name', 'Redaksi')}"
+            clean_title = article_data['title'].replace('"', '')
+            clean_desc = article_data.get('description', '').replace('"', '')
 
             astro_frontmatter = (
                 f"---\n"
-                f"title: \"{article_data['title'].replace('\"', '')}\"\n"
-                f"description: \"{article_data.get('description', '').replace('\"', '')}\"\n"
+                f"title: \"{clean_title}\"\n"
+                f"description: \"{clean_desc}\"\n"
                 f"pubDate: {pub_date_iso}\n"
                 f"date: {pub_date_iso}\n"
                 f"author: \"{site_author}\"\n"
