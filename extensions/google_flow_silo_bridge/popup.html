@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Google Flow Silo Bridge</title>
+  <style>
+    body {
+      width: 320px;
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      font-size: 13px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .logo-icon {
+      font-size: 22px;
+    }
+    .title {
+      font-weight: 700;
+      font-size: 14px;
+      color: #38bdf8;
+    }
+    .status-card {
+      background: rgba(30, 41, 59, 0.7);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+    .status-row:last-child {
+      margin-bottom: 0;
+    }
+    .badge-online {
+      color: #22c55e;
+      font-weight: 700;
+    }
+    .badge-offline {
+      color: #ef4444;
+      font-weight: 700;
+    }
+    .btn {
+      width: 100%;
+      padding: 9px 12px;
+      background: linear-gradient(135deg, #2563eb, #38bdf8);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .btn:hover {
+      opacity: 0.95;
+    }
+    .hint {
+      font-size: 11px;
+      color: #94a3b8;
+      line-height: 1.4;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div class="title">AI Silo Flow Bridge</div>
+      <div style="font-size: 11px; color: #94a3b8;">Google Flow Worker</div>
+    </div>
+  </div>
+
+  <div class="status-card">
+    <div class="status-row">
+      <span style="color: #94a3b8;">Status Server:</span>
+      <span id="server-status" class="badge-offline">Memeriksa...</span>
+    </div>
+    <div class="status-row">
+      <span style="color: #94a3b8;">Sisa Antrean:</span>
+      <span id="queue-count" style="font-weight: 600;">-</span>
+    </div>
+  </div>
+
+  <button class="btn" id="btn-open-flow">🚀 Buka flow.google.com</button>
+  
+  <div class="hint">
+    Buka <b>flow.google.com</b>, tombol <b>[📸 Kirim ke Silo]</b> akan muncul otomatis pada setiap gambar hasil generate.
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

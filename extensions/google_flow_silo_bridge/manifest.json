@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Google Flow to AI Silo Bridge",
+  "version": "1.0.0",
+  "description": "Worker pendamping untuk menghubungkan flow.google.com ke AI Silo Builder (Auto-Prompt & 1-Click Image Selector).",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://flow.google.com/*",
+    "https://labs.google/*",
+    "https://aitestkitchen.withgoogle.com/*",
+    "http://localhost:7860/*",
+    "http://127.0.0.1:7860/*",
+    "http://localhost:7861/*",
+    "http://127.0.0.1:7861/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Silo Flow Bridge Status"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://flow.google.com/*",
+        "https://labs.google/*",
+        "https://aitestkitchen.withgoogle.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -19,7 +19,8 @@ from core.ai import (
     KieImageClient, DEFAULT_KIE_MODELS, DEFAULT_IMAGE_STYLES, IMAGE_STYLE_DESCS, clean_text_for_rendering,
     KieChatClient,
     AgnesClient, DEFAULT_AGNES_TEXT_MODELS, DEFAULT_AGNES_IMAGE_MODELS,
-    AIPipelineManager, AVAILABLE_ENGINES, STAGE_NAMES
+    AIPipelineManager, AVAILABLE_ENGINES, STAGE_NAMES,
+    FlowBridgeServer, FlowTask, scan_articles_for_flow_bridge, generate_flow_prompt, run_flow_bridge_session, FLOW_BRIDGE_PORT
 )
 from core.youtube import (
     YouTubeProfileManager, YouTubeGenerator, YOUTUBE_OUTPUT_DIR, CHANNELS_BASE_DIR,
@@ -1502,11 +1503,12 @@ def menu_website_dashboard(site):
             ("2", "[Auto]   Bulk Autopilot Silo Generator (Multi-Keyword Non-Stop)"),
             ("3", "[Target] Riset & Buat Arsitektur Silo Baru (Single Silo)"),
             ("4", f"[Folder] Kelola & Lanjutkan Silo Web Ini ({total_silos} Silo)"),
-            ("5", "[Publish] Publish Artikel ke Web Ini"),
-            ("6", "[Live]   Kelola Post Live di Web Ini (WordPress)"),
-            ("7", "[Business] Profil Bisnis & Knowledge Grounding Web Ini"),
-            ("8", "[Key]    Pengaturan Kredensial & Uji Koneksi Web Ini"),
-            ("9", "[Config] Pengaturan Bulk Silo (Cluster, Bahasa, Pacing)"),
+            ("5", "[Images]  Generate Gambar Artikel (Google Flow Extension Bridge)"),
+            ("6", "[Publish] Publish Artikel ke Web Ini"),
+            ("7", "[Live]   Kelola Post Live di Web Ini (WordPress)"),
+            ("8", "[Business] Profil Bisnis & Knowledge Grounding Web Ini"),
+            ("9", "[Key]    Pengaturan Kredensial & Uji Koneksi Web Ini"),
+            ("10", "[Config] Pengaturan Bulk Silo (Cluster, Bahasa, Pacing)"),
             ("0", "  Kembali ke Daftar Website")
         ]
 
@@ -1538,18 +1540,20 @@ def menu_website_dashboard(site):
                 continue
             menu_manage_site_silos(site, silo_engine, client)
         elif choice == "5":
-            menu_push_wordpress(target_site=site)
+            menu_google_flow_bridge(site=site)
         elif choice == "6":
+            menu_push_wordpress(target_site=site)
+        elif choice == "7":
             if site.get("type") == "astro":
                 print(f"{CYAN}Website ini adalah website statis Astro. Kelola konten langsung melalui folder Content Astro.{RESET}")
                 press_any_key()
             else:
                 menu_manage_live_wp(wp, target_site=site)
-        elif choice == "7":
-            manage_single_site_profile_flow(wp, site)
         elif choice == "8":
-            menu_single_site_settings(wp, site)
+            manage_single_site_profile_flow(wp, site)
         elif choice == "9":
+            menu_single_site_settings(wp, site)
+        elif choice == "10":
             menu_bulk_settings(site=site)
 
 def menu_manage_site_silos(site, silo_engine, client):
@@ -2674,8 +2678,9 @@ def menu_ai_settings():
         options = [
             ("1", "Model & API Key Gemini"),
             ("2", "Model & API Key Kie.ai (Featured Image)"),
-            ("3", "Model & API Key Agnes AI (Teks, JSON & Gambar)"),
-            ("4", "Konfigurasi Model Tiap Tahap (Pipeline Multi-Model: Gemini / Agnes AI / GPT-6 Luna)"),
+            ("3", "Google Flow Imagen 3 (Chrome Extension Bridge - 1-Click Selector)"),
+            ("4", "Model & API Key Agnes AI (Teks, JSON & Gambar)"),
+            ("5", "Konfigurasi Model Tiap Tahap (Pipeline Multi-Model: Gemini / Agnes AI / GPT-6 Luna)"),
             ("0", "Kembali ke Menu Utama")
         ]
         choice = select_menu(options, title="PENGATURAN GLOBAL (AI MODEL, API KEY & VISUAL)")
@@ -2687,8 +2692,10 @@ def menu_ai_settings():
             gemini_c = GeminiClient(key_file="apikey.txt")
             menu_kie_keys(gemini_client=gemini_c)
         elif choice == "3":
-            menu_agnes_keys()
+            menu_google_flow_bridge()
         elif choice == "4":
+            menu_agnes_keys()
+        elif choice == "5":
             menu_pipeline_settings()
 
 def menu_pipeline_settings():
@@ -2943,7 +2950,7 @@ def menu_kie_keys(gemini_client=None):
                 print(f"#{i:<3} {masked:<25} {active_tag}")
             print("")
 
-        options = [
+            options = [
             ("1", "Tambah API Key Baru"),
             ("2", "Uji Semua API Key"),
             ("3", "Hapus API Key"),
@@ -2952,6 +2959,7 @@ def menu_kie_keys(gemini_client=None):
             ("6", "Ganti Model Kie.ai (Z-Image / Flux)"),
             ("7", "Preview Sampel Banner Mesh Gradient"),
             ("8", "Generate Thumbnail untuk Artikel Lama (Batch Scan)"),
+            ("9", "Google Flow Imagen 3 (Chrome Extension Bridge - 1-Click Selector)"),
             ("0", "Kembali")
         ]
         opt = select_menu(options, title="PENGATURAN GAMBAR FEATURED")
@@ -3138,8 +3146,108 @@ def menu_kie_keys(gemini_client=None):
         elif opt == "8":
             menu_batch_generate_missing_thumbnails(gemini_client)
 
+        elif opt == "9":
+            menu_google_flow_bridge()
+
         elif opt == "0":
             break
+
+# ==========================================
+# MENU: GOOGLE FLOW CHROME EXTENSION BRIDGE
+# ==========================================
+def menu_google_flow_bridge(site=None):
+    wp = WordPressPublisher()
+    ext_dir = os.path.join(get_project_root(), "extensions", "google_flow_silo_bridge")
+
+    while True:
+        clear_screen()
+        print_banner()
+        print_section("GOOGLE FLOW IMAGEN 3 (CHROME EXTENSION BRIDGE)")
+
+        site_title = f" [{CYAN}{site['name']}{RESET}]" if site else ""
+        print(f"[Image] {BOLD}Google Flow Semi-Auto 1-Click Image Selector{RESET}{site_title}\n")
+        print(f" - {BOLD}Folder Ekstensi Chrome :{RESET} {CYAN}{ext_dir}{RESET}")
+        print(f" - {BOLD}Local Bridge Server    :{RESET} {GREEN}http://localhost:{FLOW_BRIDGE_PORT}{RESET}")
+        print(f" - {BOLD}Alur Kerja             :{RESET} {DIM}Silo mengirim antrean prompt -> Extension di flow.google.com memunculkan tombol [📸 Kirim ke Silo] pada tiap gambar hasil generate.{RESET}\n")
+
+        options = []
+        if site:
+            options.append(("1", f"Mulai Sesi Bridge untuk Website Ini ({site['name']})"))
+        else:
+            options.append(("1", "Mulai Sesi Bridge untuk Semua Proyek Silo di 'output/'"))
+
+        options.append(("2", "Mulai Sesi Bridge untuk Seluruh Proyek di 'projects_web/' (Global Multi-Web)"))
+        options.append(("3", "Panduan Pasang Ekstensi di Google Chrome (1 Menit)"))
+        options.append(("4", "Buka Folder Ekstensi di File Explorer"))
+        options.append(("5", "Buka flow.google.com di Browser"))
+        options.append(("0", "Kembali"))
+
+        c = select_menu(options, title="PENGATURAN GOOGLE FLOW BRIDGE")
+
+        if c == "0":
+            break
+
+        elif c == "1":
+            target_dir = wp.get_site_silos_dir(site) if site else os.path.join(get_project_root(), "output")
+            kie = KieImageClient()
+            style = kie.get_image_style()
+            tasks = scan_articles_for_flow_bridge(target_dir, site_info=site, default_style=style)
+
+            if not tasks:
+                print(f"\n{GREEN}[OK] Semua artikel sudah memiliki gambar fisik! Tidak ada antrean baru.{RESET}")
+                press_any_key()
+                continue
+
+            run_flow_bridge_session(tasks, site_info=site)
+            press_any_key()
+
+        elif c == "2":
+            target_dir = os.path.join(get_project_root(), "projects_web")
+            kie = KieImageClient()
+            style = kie.get_image_style()
+            tasks = scan_articles_for_flow_bridge(target_dir, default_style=style)
+
+            if not tasks:
+                print(f"\n{GREEN}[OK] Semua artikel di seluruh projects_web sudah memiliki gambar fisik!{RESET}")
+                press_any_key()
+                continue
+
+            run_flow_bridge_session(tasks)
+            press_any_key()
+
+        elif c == "3":
+            clear_screen()
+            print_banner()
+            print_section("PANDUAN PEMASANGAN CHROME EXTENSION (1 MENIT)")
+            print(f" {BOLD}Langkah-langkah Mudah:{RESET}\n")
+            print(f" 1. Buka browser {CYAN}Google Chrome{RESET}.")
+            print(f" 2. Buka URL: {YELLOW}chrome://extensions{RESET} di address bar Chrome.")
+            print(f" 3. Aktifkan sakelar {GREEN}Developer mode{RESET} (Mode Pengembang) di pojok kanan atas.")
+            print(f" 4. Klik tombol {CYAN}Load unpacked{RESET} (Muat yang belum dibongkar) di kiri atas.")
+            print(f" 5. Pilih folder ekstensi berikut:")
+            print(f"    {GREEN}{BOLD}{ext_dir}{RESET}\n")
+            print(f" 6. Selesai! Ekstensi '{CYAN}Google Flow to AI Silo Bridge{RESET}' akan aktif otomatis saat Anda membuka {CYAN}flow.google.com{RESET}.\n")
+            press_any_key()
+
+        elif c == "4":
+            try:
+                if os.name == 'nt':
+                    os.startfile(ext_dir)
+                else:
+                    ext_clean = ext_dir.replace('\\', '/')
+                    webbrowser.open(f"file:///{ext_clean}")
+                print(f"\n{GREEN}[OK] Membuka folder ekstensi di File Explorer...{RESET}")
+            except Exception as e:
+                print(f"\n{RED}[X] Gagal membuka folder: {e}{RESET}")
+            press_any_key()
+
+        elif c == "5":
+            try:
+                webbrowser.open("https://flow.google.com/")
+                print(f"\n{GREEN}[OK] Membuka flow.google.com di browser...{RESET}")
+            except Exception as e:
+                print(f"\n{RED}[X] Gagal membuka browser: {e}{RESET}")
+            press_any_key()
 
 def menu_agnes_keys():
     while True:
