@@ -10,6 +10,12 @@ from core.config_utils import get_config_path, get_web_project_dir, PROJECTS_WEB
 CONFIG_FILE = "wp_config.json"
 PUBLISH_LOG_FILE = "wp_publish_log.json"
 
+def slugify(text):
+    text = str(text).lower().strip()
+    text = re.sub(r'[^\w\s-]', '', text)
+    text = re.sub(r'[\s_-]+', '-', text)
+    return text.strip('-')
+
 class WordPressPublisher:
     def __init__(self, config_file=CONFIG_FILE):
         self.config_file = get_config_path(config_file)
@@ -805,18 +811,31 @@ class WordPressPublisher:
             clean_title = article_data['title'].replace('"', '')
             clean_desc = article_data.get('description', '').replace('"', '')
 
+            silo_id_val = article_data.get("silo_id")
+            if not silo_id_val:
+                clean_theme_lower = clean_silo_theme.lower()
+                if "cuko" in clean_theme_lower or "gula" in clean_theme_lower:
+                    silo_id_val = "cuko"
+                elif "pempek" in clean_theme_lower or "ikan" in clean_theme_lower or "goreng" in clean_theme_lower:
+                    silo_id_val = "pempek"
+                else:
+                    silo_id_val = slugify(clean_silo_theme)
+
             astro_frontmatter = (
                 f"---\n"
                 f"title: \"{clean_title}\"\n"
                 f"description: \"{clean_desc}\"\n"
-                f"pubDate: {pub_date_iso}\n"
-                f"date: {pub_date_iso}\n"
+                f"summary: \"{clean_desc}\"\n"
+                f"pubDate: \"{pub_date_iso}\"\n"
+                f"date: \"{pub_date_iso}\"\n"
+                f"readTime: \"5 mnt baca\"\n"
                 f"author: \"{site_author}\"\n"
                 f"category: \"{clean_silo_theme}\"\n"
                 f"image: \"{hero_image_rel}\"\n"
                 f"heroImage: \"{hero_image_rel}\"\n"
                 f"coverImage: \"{hero_image_rel}\"\n"
                 f"tags: {tags_str}\n"
+                f"siloId: \"{silo_id_val}\"\n"
                 f"siloRole: \"{article_data.get('silo_role', 'Cluster')}\"\n"
                 f"draft: false\n"
                 f"---\n\n"

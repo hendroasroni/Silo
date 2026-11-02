@@ -10,17 +10,10 @@ KIE_KEY_FILE = "kie_apikey.txt"
 class KieChatClient:
     def __init__(self, key_file=KIE_KEY_FILE, model="gpt-6-luna"):
         self.key_file = get_config_path(key_file)
-        self.model = model
+        self.model = model or "gpt-6-luna"
         self.api_keys = self._load_keys()
         self.current_key_idx = 0
-        self.endpoint_map = {
-            "gpt-6-luna": "https://api.kie.ai/gpt-5-2/v1/chat/completions",
-            "gpt-6": "https://api.kie.ai/gpt-5-2/v1/chat/completions",
-            "gpt-5.2": "https://api.kie.ai/gpt-5-2/v1/chat/completions",
-            "gpt-5.6": "https://api.kie.ai/gpt-5-2/v1/chat/completions",
-            "gpt-5": "https://api.kie.ai/gpt-5-2/v1/chat/completions",
-            "gpt-5-luna": "https://api.kie.ai/gpt-5-2/v1/chat/completions"
-        }
+        self.codex_endpoint = "https://api.kie.ai/codex/v1/responses"
 
     def _load_keys(self):
         keys = []
@@ -59,23 +52,35 @@ class KieChatClient:
         return False, 1, 1
 
     def get_working_model(self):
-        return f"Kie.ai GPT-6 Luna"
+        return f"Kie.ai ({self.model})"
 
     def generate_text(self, prompt, system_instruction=None, temperature=0.7, max_retries=5):
-        messages = []
+        """
+        Menjalankan chat completions menggunakan model Kie.ai (GPT-6 Luna via Codex Responses API).
+        Mendukung parsing SSE streaming & raw JSON response, serta auto-failover antar key.
+        """
+        inputs = []
         if system_instruction:
-            messages.append({"role": "system", "content": system_instruction})
-        messages.append({"role": "user", "content": prompt})
+            inputs.append({
+                "role": "system",
+                "content": [{"type": "input_text", "text": system_instruction}]
+            })
+        inputs.append({
+            "role": "user",
+            "content": [{"type": "input_text", "text": prompt}]
+        })
 
         payload = {
-            "messages": messages,
+            "model": self.model,
+            "input": inputs,
             "temperature": temperature
         }
 
-        url = self.endpoint_map.get(self.model, "https://api.kie.ai/gpt-5-2/v1/chat/completions")
+        total_keys = max(len(self.api_keys), 1)
+        actual_retries = max(max_retries, total_keys * 2)
         last_error = None
 
-        for attempt in range(max_retries):
+        for attempt in range(actual_retries):
             key = self.get_current_key()
             headers = {
                 "Authorization": f"Bearer {key}",
@@ -83,20 +88,82 @@ class KieChatClient:
             }
 
             try:
-                resp = requests.post(url, json=payload, headers=headers, timeout=120)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    choices = data.get("choices", [])
-                    if choices and "message" in choices[0]:
-                        return choices[0]["message"].get("content", "").strip()
-                    elif "data" in data and isinstance(data["data"], str):
-                        return data["data"].strip()
-                    elif data.get("code") == 422:
-                        last_error = f"Kie Error: {data.get('msg')}"
-                    else:
-                        return resp.text.strip()
+                resp = requests.post(
+                    self.codex_endpoint,
+                    json=payload,
+                    headers=headers,
+                    stream=True,
+                    timeout=60
+                )
 
-                elif resp.status_code in [401, 403, 429]:
+                if resp.status_code == 200:
+                    collected_deltas = []
+                    final_text = None
+                    error_detected = None
+
+                    for line in resp.iter_lines(decode_unicode=True):
+                        if not line:
+                            continue
+                        line_str = line.strip()
+
+                        # 1. Deteksi respons error raw JSON (tanpa prefix data:)
+                        if line_str.startswith("{") and line_str.endswith("}"):
+                            try:
+                                raw_obj = json.loads(line_str)
+                                if raw_obj.get("code") in [401, 402, 403, 422, 429, 500] or "insufficient" in str(raw_obj.get("msg", "")).lower():
+                                    error_detected = f"Kredit Habis / Limit ({raw_obj.get('msg', 'Code ' + str(raw_obj.get('code')))})"
+                                    break
+                            except Exception:
+                                pass
+
+                        # 2. Deteksi respons SSE data:
+                        if line_str.startswith("data:"):
+                            data_str = line_str[5:].strip()
+                            if not data_str or data_str == "[DONE]":
+                                continue
+                            try:
+                                ev = json.loads(data_str)
+                                if ev.get("code") in [401, 402, 403, 429] or "insufficient" in str(ev.get("msg", "")).lower():
+                                    error_detected = f"Kredit Habis / Limit ({ev.get('msg', 'Code ' + str(ev.get('code')))})"
+                                    break
+                                elif ev.get("code") in [422, 500]:
+                                    error_detected = f"Kie Error ({ev.get('msg')})"
+                                    break
+                                
+                                ev_type = ev.get("type", "")
+                                if ev_type == "response.completed":
+                                    resp_obj = ev.get("response", {})
+                                    for out in resp_obj.get("output", []):
+                                        if out.get("type") == "message":
+                                            for c in out.get("content", []):
+                                                if c.get("type") == "output_text" and c.get("text"):
+                                                    final_text = c.get("text").strip()
+                                elif ev_type == "response.output_text.delta":
+                                    d = ev.get("delta")
+                                    if isinstance(d, str):
+                                        collected_deltas.append(d)
+                                    elif isinstance(d, dict) and d.get("text"):
+                                        collected_deltas.append(d["text"])
+                                elif "delta" in ev and isinstance(ev["delta"], str):
+                                    collected_deltas.append(ev["delta"])
+                            except Exception:
+                                pass
+
+                    if error_detected:
+                        rotated, old_k, new_k = self.rotate_key()
+                        last_error = f"Key #{old_k} ({error_detected})"
+                        if rotated:
+                            print(f" [Auto-Failover: Kie Key #{old_k} limit/habis -> Beralih ke Key #{new_k}]", flush=True)
+                        time.sleep(1)
+                        continue
+
+                    full_res = final_text or "".join(collected_deltas).strip()
+                    if full_res:
+                        return full_res
+                    else:
+                        last_error = "Respons kosong dari Kie.ai Codex API"
+
+                elif resp.status_code in [401, 402, 403, 429]:
                     rotated, old_k, new_k = self.rotate_key()
                     last_error = f"Key #{old_k} (HTTP {resp.status_code})"
                     if rotated:
@@ -105,14 +172,20 @@ class KieChatClient:
 
                 else:
                     last_error = f"HTTP {resp.status_code}: {resp.text[:120]}"
-                    time.sleep(2)
+                    self.rotate_key()
+                    time.sleep(1)
 
+            except requests.exceptions.Timeout:
+                rotated, old_k, new_k = self.rotate_key()
+                last_error = f"Timeout 60s pada Key #{old_k}"
+                print(f" [Kie.ai Timeout -> Mencoba Key #{new_k}]", flush=True)
+                time.sleep(1)
             except Exception as e:
                 rotated, old_k, new_k = self.rotate_key()
                 last_error = f"Error: {str(e)}"
-                time.sleep(2)
+                time.sleep(1)
 
-        raise Exception(f"Gagal memanggil Kie.ai GPT-5 setelah {max_retries} percobaan ({last_error})")
+        raise Exception(f"Gagal memanggil Kie.ai {self.model} setelah {actual_retries} percobaan ({last_error})")
 
     def generate_json(self, prompt, system_instruction=None, temperature=0.3):
         json_guide = (
@@ -140,4 +213,4 @@ class KieChatClient:
                     return json.loads(match.group(1))
                 except Exception:
                     pass
-            raise Exception(f"Gagal parse JSON dari Kie.ai GPT-5. Respons: {raw_text[:200]}...")
+            raise Exception(f"Gagal parse JSON dari Kie.ai {self.model}. Respons: {raw_text[:200]}...")

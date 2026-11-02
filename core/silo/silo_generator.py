@@ -346,9 +346,10 @@ PANDUAN PENULISAN UMUM:
 2. Paragraf Pembuka (Hook): Langsung jawab inti pertanyaan pembaca dalam 2 kalimat pertama. Berikan alasan mengapa artikel ini adalah panduan paling berbobot.
 3. Struktur Konten: Ikuti seluruh outline H2 dan H3 pada brief. Bahas setiap poin secara mendalam dan berikan contoh nyata, tips praktis, atau data logis.
 4. Elemen Visual & Skimmable:
-   - Buat minimal 1 TABEL dalam format Markdown sesuai arketipe di atas.
-   - Gunakan bullet points atau numbered lists pada langkah-langkah / tips.
-   - Gunakan blockquote (`>  **Pro Tip:** ...` atau `>  **Catatan Penting:** ...`) untuk informasi krusial.
+   - Buat minimal 1 TABEL dalam format Markdown rapi dan terstruktur sesuai arketipe di atas.
+   - Jika artikel memuat Resep/Bahan Baku: Bagi bahan ke dalam sub-kategori yang jelas (misal: Bahan Utama, Bumbu Halus, Bumbu Pelengkap) dengan bullet point takaran presisi tebal (**Nama Bahan:** `Takaran`), serta lengkapi dengan Tabel Ringkasan Bahan.
+   - Gunakan bullet points atau numbered lists pada langkah-langkah / tips agar mudah dibaca (skimmable).
+   - Gunakan blockquote (`> 💡 **Pro Tip:** ...` atau `> ⚠️ **Catatan Penting:** ...`) untuk informasi krusial.
 5. Arsitektur Silo & Variasi Anchor Text (Anti-Overoptimization):
    - Sisipkan internal link ke artikel pilar atau cluster pendukung secara kontekstual di dalam paragraf.
    - WAJIB gunakan variasi anchor text (campuran exact keyword, sinonim LSI, dan frasa mengalir natural). Jangan gunakan kata kunci kaku berulang-ulang. Format: `[Variasi Anchor Text](slug-artikel)`.
@@ -404,7 +405,7 @@ Lakukan 2 hal:
    - Hapus kalimat pengisi (fluff) atau bahasa kaku.
    - Pastikan TIDAK ADA nomor telepon palsu atau alamat fiktif.
    - Perbaiki alur transisi antar paragraf.
-   - Pastikan tabel dan format Markdown rapi dan konsisten.
+   - Pastikan tabel, daftar bahan/resep, dan format Markdown tersusun rapi, berkategori jelas, dan konsisten.
    - Pastikan tautan internal link berada di kalimat yang mengalir natural.
 
 Kembalikan hasil dalam format JSON:
@@ -669,4 +670,137 @@ Kembalikan hasil dalam format JSON:
                 os.rmdir(ckpt_dir)
         except Exception:
             pass
+
+    def get_completed_articles_details(self, silo_folder_path):
+        """
+        Mengambil rincian seluruh artikel yang ada di folder silo tertentu:
+        - Membaca metadata json, file markdown, skor kurasi, dan status gambar.
+        """
+        meta_path = os.path.join(silo_folder_path, "silo_metadata.json")
+        silo_plan = {}
+        meta_articles = {}
+        if os.path.exists(meta_path):
+            try:
+                with open(meta_path, "r", encoding="utf-8") as f:
+                    meta = json.load(f)
+                    silo_plan = meta.get("silo_plan", {})
+                    for a in meta.get("articles", []):
+                        meta_articles[a.get("item_id")] = a
+            except Exception:
+                pass
+
+        plan_items = {it["id"]: it for it in silo_plan.get("items", [])}
+        articles_list = []
+
+        if os.path.exists(silo_folder_path):
+            for file in os.listdir(silo_folder_path):
+                if file.endswith(".md") and file != "SILO_BLUEPRINT.md":
+                    file_path = os.path.join(silo_folder_path, file)
+                    try:
+                        item_id = None
+                        parts = file.split("_", 1)
+                        if parts[0].isdigit():
+                            item_id = int(parts[0])
+                        
+                        from core.silo.wp_publisher import WordPressPublisher
+                        wp = WordPressPublisher()
+                        fm, body = wp.parse_markdown_file(file_path)
+                        
+                        title = fm.get("title", file)
+                        slug = fm.get("url_slug", file.replace(".md", ""))
+                        role = fm.get("silo_role", "Cluster")
+                        score = fm.get("curation_score", "-")
+                        
+                        meta_art = meta_articles.get(item_id, {})
+                        if score == "-" and "curation_score" in meta_art:
+                            score = meta_art["curation_score"]
+
+                        img_path = os.path.join(silo_folder_path, "images", f"{slug}.webp")
+                        has_image = os.path.exists(img_path) and os.path.getsize(img_path) > 1024
+
+                        articles_list.append({
+                            "item_id": item_id,
+                            "file_name": file,
+                            "file_path": file_path,
+                            "title": title,
+                            "slug": slug,
+                            "role": role,
+                            "curation_score": score,
+                            "critique": meta_art.get("editorial_critique", []),
+                            "has_image": has_image,
+                            "image_path": img_path if has_image else None,
+                            "item_info": plan_items.get(item_id, {}),
+                            "word_count": len(body.split())
+                        })
+                    except Exception:
+                        pass
+
+        articles_list.sort(key=lambda x: (x["item_id"] if x["item_id"] is not None else 999))
+        return articles_list, silo_plan
+
+    def delete_single_article(self, silo_folder_path, item_id, delete_from_plan=False):
+        """
+        Menghapus artikel secara selektif dari folder Silo:
+        - Menghapus file .md
+        - Menghapus checkpoint
+        - Menghapus gambar (jika ada)
+        - Memperbarui silo_metadata.json
+        - Jika delete_from_plan=True, menghapus item dari blueprint items
+        """
+        meta_path = os.path.join(silo_folder_path, "silo_metadata.json")
+        silo_plan = {}
+        existing_articles = []
+        if os.path.exists(meta_path):
+            try:
+                with open(meta_path, "r", encoding="utf-8") as f:
+                    meta = json.load(f)
+                    silo_plan = meta.get("silo_plan", {})
+                    existing_articles = meta.get("articles", [])
+            except Exception:
+                pass
+
+        target_slug = None
+        if os.path.exists(silo_folder_path):
+            for file in os.listdir(silo_folder_path):
+                if file.endswith(".md") and file != "SILO_BLUEPRINT.md":
+                    if file.startswith(f"{item_id:02d}_") or file.startswith(f"{item_id}_"):
+                        target_slug = file.split("_", 1)[1].replace(".md", "") if "_" in file else ""
+                        try:
+                            os.remove(os.path.join(silo_folder_path, file))
+                        except Exception:
+                            pass
+
+        if target_slug:
+            img_path = os.path.join(silo_folder_path, "images", f"{target_slug}.webp")
+            if os.path.exists(img_path):
+                try:
+                    os.remove(img_path)
+                except Exception:
+                    pass
+
+        self.clear_stage_checkpoint(silo_folder_path, item_id)
+
+        updated_articles = [a for a in existing_articles if a.get("item_id") != item_id]
+        if delete_from_plan and "items" in silo_plan:
+            silo_plan["items"] = [it for it in silo_plan["items"] if it.get("id") != item_id]
+
+        meta_data = {
+            "silo_plan": silo_plan,
+            "articles": updated_articles,
+            "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        with open(meta_path, "w", encoding="utf-8") as f:
+            json.dump(meta_data, f, ensure_ascii=False, indent=2)
+
+        blueprint_path = os.path.join(silo_folder_path, "SILO_BLUEPRINT.md")
+        if os.path.exists(blueprint_path):
+            try:
+                blueprint_content = self.render_silo_blueprint_markdown(silo_plan)
+                with open(blueprint_path, "w", encoding="utf-8") as f:
+                    f.write(blueprint_content)
+            except Exception:
+                pass
+
+        return True
+
 

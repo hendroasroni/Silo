@@ -320,23 +320,43 @@ class KieImageClient:
         except requests.exceptions.RequestException as e:
             return False, f"Koneksi Gagal: {str(e)[:100]}", None
 
-    def test_all_keys(self):
+    def test_all_keys(self, auto_sort=True):
+        """
+        Menguji semua API key dan saldo kredit Kie.ai.
+        Jika auto_sort=True, otomatis mengurutkan API key dari saldo terkecil ke terbesar
+        dan menyimpan urutan baru tersebut ke file kie_apikey.txt agar key dengan saldo terkecil
+        digunakan lebih dulu saat proses generate.
+        """
         results = []
         keys = self.reload_keys()
         if not keys:
             return results
 
-        for i, k in enumerate(keys, 1):
+        for k in keys:
             masked = f"{k[:8]}...{k[-4:]}" if len(k) >= 12 else k
             is_valid, msg, credit_num = self.check_key_validity(k)
             results.append({
-                "index": i,
                 "key": k,
                 "masked": masked,
                 "is_valid": is_valid,
                 "message": msg,
                 "credit": credit_num
             })
+
+        if auto_sort and len(results) > 1:
+            # Urutkan saldo dari terkecil ke terbesar
+            # Key yang tidak valid / error diberi bobot -999999 agar berada di paling atas (mudah dibersihkan)
+            results.sort(key=lambda r: r["credit"] if (r.get("credit") is not None and r["is_valid"]) else -999999)
+            
+            # Simpan urutan baru ke file key dan refresh memori
+            sorted_keys = [r["key"] for r in results]
+            self._save_keys(sorted_keys)
+            self.reload_keys()
+
+        # Update penomoran index 1..N setelah diurutkan
+        for i, r in enumerate(results, 1):
+            r["index"] = i
+
         return results
 
     def build_image_prompt(self, article_title, keyword, silo_theme, gemini_client=None, style=None):

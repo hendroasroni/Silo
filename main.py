@@ -1360,44 +1360,150 @@ def menu_export_silo_wxr():
 # MENU: VIEW INVENTORY / STATUS
 # ==========================================
 def menu_view_inventory():
-    clear_screen()
-    print_banner()
-    print_section("INVENTORI ARTIKEL SILO")
+    search_query = ""
+    filter_mode = "all"
+    
+    while True:
+        clear_screen()
+        print_banner()
+        print_section("INVENTORI & PENCARIAN SELURUH ARTIKEL SILO")
 
-    wp = WordPressPublisher()
-    pending, sent = wp.scan_articles_global("output")
+        wp = WordPressPublisher()
+        pending, sent = wp.scan_articles_global()
 
-    total = len(pending) + len(sent)
-    print(f" {BOLD}Ringkasan Inventori Global:{RESET}")
-    print(f" - Total Artikel Dibuat          : {BOLD}{total}{RESET}")
-    print(f" - Belum Dikirim (Pending Global): {BOLD}{YELLOW}{len(pending)}{RESET}")
-    print(f" - Sudah Terkirim ke Web (Sent)  : {BOLD}{GREEN}{len(sent)}{RESET}\n")
+        all_articles = []
+        for p in pending:
+            p_copy = dict(p)
+            p_copy["is_sent"] = False
+            all_articles.append(p_copy)
+        for s in sent:
+            s_copy = dict(s)
+            s_copy["is_sent"] = True
+            all_articles.append(s_copy)
 
-    if pending:
-        print(f"{YELLOW}{BOLD} DAFTAR ARTIKEL PENDING (BELUM PERNAH DIKIRIM KE WEB MANAPUN):{RESET}")
-        print(f"{BOLD}{'No':<4} {'Tema Silo':<20} {'Role':<10} {'Judul Artikel':<38} {'Skor'}{RESET}")
-        print("-" * 78)
-        for i, art in enumerate(pending, 1):
-            role_str = f"{MAGENTA} Pillar{RESET}" if art["silo_role"].lower() == "pillar" else f"{CYAN} Cluster{RESET}"
-            title_disp = (art["title"][:35] + '...') if len(art["title"]) > 35 else art["title"]
-            silo_disp = (art["silo_theme"][:18] + '...') if len(art["silo_theme"]) > 18 else art["silo_theme"]
-            score_disp = f"{art['curation_score']}/100" if art['curation_score'] != '-' else '-'
-            print(f"#{i:<3} {silo_disp:<20} {role_str:<18} {title_disp:<38} {score_disp}")
+        filtered = all_articles
+        if filter_mode == "pending":
+            filtered = [a for a in filtered if not a["is_sent"]]
+        elif filter_mode == "sent":
+            filtered = [a for a in filtered if a["is_sent"]]
+        elif filter_mode == "low_score":
+            filtered = [a for a in filtered if str(a.get("curation_score", "")).isdigit() and int(a.get("curation_score", 100)) < 85]
 
-    if sent:
-        print(f"\n{GREEN}{BOLD} DAFTAR ARTIKEL YANG SUDAH DIKIRIM KE WEB:{RESET}")
-        print(f"{BOLD}{'No':<4} {'Judul Artikel':<33} {'Target Web':<18} {'WP ID':<8} {'Waktu Kirim'}{RESET}")
-        print("-" * 78)
-        for i, art in enumerate(sent, 1):
+        if search_query:
+            q = search_query.lower()
+            filtered = [
+                a for a in filtered
+                if q in a["title"].lower() or q in str(a.get("keyword", "")).lower() or q in str(a.get("silo_theme", "")).lower() or q in str(a.get("folder_name", "")).lower()
+            ]
+
+        print(f" {BOLD}Statistik Inventori Global:{RESET}")
+        print(f" - Total Dibuat : {BOLD}{len(all_articles)}{RESET} | Pending: {YELLOW}{len(pending)}{RESET} | Terbit (Sent): {GREEN}{len(sent)}{RESET}")
+        if search_query:
+            print(f" - Filter Pencarian : {CYAN}'{search_query}'{RESET} ({len(filtered)} hasil ditemukan)")
+        if filter_mode != "all":
+            print(f" - Filter Status    : {MAGENTA}{filter_mode.upper()}{RESET}")
+        print("")
+
+        if not filtered:
+            print(f"{YELLOW}Tidak ada artikel yang cocok dengan kriteria filter/pencarian.{RESET}\n")
+        else:
+            print(f"{BOLD}{'No':<4} {'Status':<11} {'Role':<10} {'Judul Artikel':<38} {'Skor':<8} {'Silo / Folder'}{RESET}")
+            print("-" * 88)
+            for i, art in enumerate(filtered, 1):
+                status_str = f"{GREEN}[Sent]{RESET}" if art["is_sent"] else f"{YELLOW}[Pending]{RESET}"
+                role_str = f"{MAGENTA}Pillar{RESET}" if art["silo_role"].lower() == "pillar" else f"{CYAN}Cluster{RESET}"
+                title_disp = (art["title"][:35] + '...') if len(art["title"]) > 35 else art["title"]
+                silo_disp = (art["silo_theme"][:16] + '..') if len(art["silo_theme"]) > 16 else art["silo_theme"]
+                
+                sc_val = art.get("curation_score", "-")
+                if str(sc_val).isdigit():
+                    sc_int = int(sc_val)
+                    sc_str = f"{GREEN}{sc_int}/100{RESET}" if sc_int >= 85 else f"{YELLOW}{sc_int}/100{RESET}"
+                else:
+                    sc_str = f"{DIM}-{RESET}"
+                    
+                print(f"#{i:<3} {status_str:<19} {role_str:<18} {title_disp:<38} {sc_str:<16} {DIM}{silo_disp}{RESET}")
+
+        print(f"\n{BOLD}Pilihan Aksi & Navigasi:{RESET}")
+        if filtered:
+            print(f" [1-{len(filtered)}] Pilih Nomor Artikel untuk Rincian")
+        print(f" [S] {'Reset Pencarian' if search_query else 'Cari Kata Kunci (Search)'}")
+        print(f" [F] Ganti Filter Status ({filter_mode.upper()})")
+        print(f" [0] Kembali ke Hub Utama")
+        
+        c = input(f"\n{BOLD}Pilihan Anda:{RESET} ").strip()
+        if c == "0":
+            break
+        elif c.lower() == "s":
+            if search_query:
+                search_query = ""
+            else:
+                search_query = input(f"{BOLD}Masukkan kata kunci pencarian (judul/keyword/folder):{RESET} ").strip()
+        elif c.lower() == "f":
+            f_opts = [
+                ("1", "Semua Artikel (All)"),
+                ("2", "Hanya Artikel Pending (Belum Terbit)"),
+                ("3", "Hanya Artikel Sent (Sudah Terbit ke Web)"),
+                ("4", "Hanya Artikel Skor Rendah (< 85 / Perlu Kurasi)"),
+                ("0", "Batal")
+            ]
+            fc = select_menu(f_opts, title="PILIH FILTER INVENTORI")
+            if fc == "1": filter_mode = "all"
+            elif fc == "2": filter_mode = "pending"
+            elif fc == "3": filter_mode = "sent"
+            elif fc == "4": filter_mode = "low_score"
+        elif c.isdigit() and 1 <= int(c) <= len(filtered):
+            selected_art = filtered[int(c) - 1]
+            menu_single_inventory_article_detail(selected_art)
+
+def menu_single_inventory_article_detail(art):
+    while True:
+        clear_screen()
+        print_banner()
+        print_section(f"RINCIAN ARTIKEL: {art['title']}")
+        
+        print(f" - {BOLD}Judul Artikel :{RESET} {art['title']}")
+        print(f" - {BOLD}Keyword Utama :{RESET} {art.get('keyword', '-')}")
+        print(f" - {BOLD}Peran Silo    :{RESET} {art.get('silo_role', 'Cluster')}")
+        print(f" - {BOLD}Tema Silo     :{RESET} {art.get('silo_theme', '-')}")
+        print(f" - {BOLD}Skor Kurasi   :{RESET} {art.get('curation_score', '-')}/100")
+        print(f" - {BOLD}Lokasi File   :{RESET} {CYAN}{art.get('file_path', '-')}{RESET}")
+        
+        if art.get("is_sent"):
             wp_info = art.get("wp_info", {})
-            title_disp = (art["title"][:30] + '...') if len(art["title"]) > 30 else art["title"]
-            sname = str(wp_info.get("site_name", "WordPress"))
-            pid = str(wp_info.get("post_id", "-"))
-            p_time = str(wp_info.get("published_at", "-"))
-            print(f"#{i:<3} {title_disp:<33} {sname:<18} {pid:<8} {p_time}")
+            print(f" - {BOLD}Status Terbit :{RESET} {GREEN}PUBLISHED{RESET} ke {BOLD}{wp_info.get('site_name', 'Web')}{RESET}")
+            print(f" - {BOLD}URL Post Live :{RESET} {BLUE}{wp_info.get('post_url', '-')}{RESET}")
+            print(f" - {BOLD}Waktu Kirim   :{RESET} {wp_info.get('published_at', '-')}")
+        else:
+            print(f" - {BOLD}Status Terbit :{RESET} {YELLOW}PENDING (Belum Terbit){RESET}")
 
-    if total == 0:
-        print(f"{DIM}Belum ada artikel yang dibuat. Gunakan Menu [1] untuk membuat artikel Silo baru.{RESET}")
+        body = art.get("body_markdown", "")
+        word_count = len(body.split())
+        print(f" - {BOLD}Total Kata    :{RESET} {word_count} kata\n")
+
+        print(f"{YELLOW}{BOLD}PREVIEW KONTEN (Paragraf Awal):{RESET}")
+        preview_lines = [l for l in body.split("\n") if l.strip() and not l.startswith("#")][:4]
+        for pl in preview_lines:
+            print(f"  {DIM}{pl[:110]}...{RESET}")
+        print("")
+
+        opts = [
+            ("1", " Buka Folder Lokasi File di File Explorer"),
+            ("0", " Kembali ke Daftar Inventori")
+        ]
+
+        c = select_menu(opts, title="AKSI ARTIKEL")
+        if c == "0":
+            break
+        elif c == "1":
+            f_dir = os.path.dirname(art.get("file_path", ""))
+            if os.path.exists(f_dir):
+                if os.name == 'nt':
+                    os.startfile(f_dir)
+                else:
+                    import subprocess
+                    subprocess.run(["xdg-open", f_dir])
+            press_any_key("Folder dibuka. Tekan tombol apa saja untuk lanjut...")
 
 # ==========================================
 # MENU 1: WEBSITE PROJECTS (PROJECT-CENTRIC WORKSPACES)
@@ -1608,16 +1714,237 @@ def menu_manage_site_silos(site, silo_engine, client):
 
                 act_options = [
                     ("1", f"Tulis Sisa Cluster ({len(pending_items)} artikel tersisa)"),
-                    ("2", "Ubah / Tambah Jumlah Cluster"),
+                    ("2", "Kelola / Regenerate / Hapus Artikel Silo"),
+                    ("3", "Ubah / Tambah Jumlah Cluster"),
                     ("0", "Kembali")
                 ]
                 act = select_menu(act_options, title=f"SILO: {selected_silo['silo_theme']}")
                 if act == "1":
                     process_silo_items_generation(silo_engine, silo_plan, completed_existing_ids=completed_ids, language="Bahasa Indonesia", tone="Informatif, Mengalir Natural & Profesional, Solutif, Bebas Klise AI", client=client, silos_base_dir=silos_dir, target_site=site)
                 elif act == "2":
+                    menu_manage_silo_articles(silo_engine, selected_silo, client, silos_base_dir=silos_dir, target_site=site)
+                elif act == "3":
                     expand_silo_flow(silo_engine, silo_plan, completed_ids, client, silos_base_dir=silos_dir, target_site=site)
             except Exception:
                 pass
+
+def menu_manage_silo_articles(silo_engine, selected_silo, client, silos_base_dir="output", target_site=None):
+    silo_dir = selected_silo["dir_path"]
+    silo_plan = selected_silo["silo_plan"]
+    
+    while True:
+        clear_screen()
+        print_banner()
+        print_section(f"KELOLA & REGENERASI ARTIKEL: {selected_silo['silo_theme']}")
+        
+        articles, updated_plan = silo_engine.get_completed_articles_details(silo_dir)
+        if updated_plan:
+            silo_plan = updated_plan
+
+        if not articles:
+            print(f"{YELLOW}Belum ada artikel yang selesai dibuat dalam Silo ini.{RESET}\n")
+            press_any_key()
+            break
+
+        print(f"{BOLD}Daftar Artikel di Folder Silo ({len(articles)} Artikel):{RESET}")
+        print(f"{BOLD}{'No':<4} {'Role':<10} {'Judul Artikel':<38} {'Skor':<10} {'Gambar'}{RESET}")
+        print("-" * 75)
+        for i, art in enumerate(articles, 1):
+            role_str = f"{MAGENTA} Pillar{RESET}" if art["role"].lower() == "pillar" else f"{CYAN} Cluster{RESET}"
+            title_disp = (art["title"][:35] + '...') if len(art["title"]) > 35 else art["title"]
+            score_val = art["curation_score"]
+            if score_val != "-" and str(score_val).isdigit():
+                sc_int = int(score_val)
+                score_str = f"{GREEN}{sc_int}/100{RESET}" if sc_int >= 85 else f"{YELLOW}{sc_int}/100{RESET}"
+            else:
+                score_str = f"{DIM}-{RESET}"
+            
+            img_str = f"{GREEN}✓ Ada{RESET}" if art["has_image"] else f"{RED}✗ Belum{RESET}"
+            print(f"#{i:<3} {role_str:<18} {title_disp:<38} {score_str:<18} {img_str}")
+
+        print(f"\n{BOLD}Pilih nomor artikel untuk tindakan (atau 0 untuk kembali):{RESET}")
+        c = input(f"Pilihan [1-{len(articles)} / 0]: ").strip()
+        if c == "0" or not c:
+            break
+        if not c.isdigit() or not (1 <= int(c) <= len(articles)):
+            continue
+
+        selected_art = articles[int(c) - 1]
+        item_id = selected_art["item_id"]
+        
+        # Submenu tindakan artikel
+        while True:
+            clear_screen()
+            print_banner()
+            print_section(f"TINDAKAN ARTIKEL #{c}: {selected_art['title']}")
+            print(f" - {BOLD}Keyword:{RESET} {selected_art['item_info'].get('keyword', selected_art['title'])}")
+            print(f" - {BOLD}Peran Silo:{RESET} {selected_art['role']}")
+            print(f" - {BOLD}Skor Kurasi:{RESET} {selected_art['curation_score']}/100")
+            print(f" - {BOLD}Panjang Kata:{RESET} {selected_art['word_count']} kata")
+            print(f" - {BOLD}File:{RESET} {selected_art['file_name']}")
+            print(f" - {BOLD}Status Gambar:{RESET} {'Ada' if selected_art['has_image'] else 'Tidak Ada'}\n")
+
+            if selected_art.get("critique"):
+                print(f"{YELLOW}Catatan Evaluasi Redaksi:{RESET}")
+                for cr in selected_art["critique"][:3]:
+                    print(f"  • {cr}")
+                print("")
+
+            sub_opts = [
+                ("1", "✨ Regenerate Tahap 3 (Kurasi & Redaksi Ulang) -> Naikkan Skor Kualitas"),
+                ("2", "🔄 Regenerate Penuh (Tahap 2 Draf + Tahap 3 Kurasi) -> Tulis Ulang"),
+                ("3", "🎨 Regenerate Featured Image Saja"),
+                ("4", "⚠️  Reset Status ke Pending (Hapus File Artikel, Siap Dibuat Ulang)"),
+                ("5", "🗑️  Hapus Permanen dari Silo Blueprint & Disk"),
+                ("0", "   Kembali ke Daftar Artikel")
+            ]
+
+            act_c = select_menu(sub_opts, title="PILIH TINDAKAN REGENERASI / HAPUS")
+            if act_c == "0":
+                break
+            
+            pipeline_mgr = AIPipelineManager()
+            stage1_client = pipeline_mgr.get_client_for_stage(1, default_gemini_client=client)
+            stage2_client = pipeline_mgr.get_client_for_stage(2, default_gemini_client=client)
+            stage3_client = pipeline_mgr.get_client_for_stage(3, default_gemini_client=client)
+
+            if act_c == "1":
+                # Regenerate Tahap 3 (Kurasi & Redaksi)
+                print_section("REGENERASI TAHAP 3: KURASI & POLISHING KUALITAS")
+                print(f"Model Kurasi Aktif: {GREEN}{pipeline_mgr.get_stage_display_name(3)}{RESET}")
+                
+                from core.silo.wp_publisher import WordPressPublisher
+                wp = WordPressPublisher()
+                fm, body = wp.parse_markdown_file(selected_art["file_path"])
+                
+                item_info = selected_art["item_info"] or {
+                    "id": item_id,
+                    "keyword": selected_art["title"],
+                    "suggested_title": selected_art["title"],
+                    "role": selected_art["role"]
+                }
+                
+                ckpt = silo_engine.load_stage_checkpoint(silo_dir, item_id) or {}
+                brief = ckpt.get("brief") or silo_engine.generate_content_brief(item_info, silo_plan, client=stage1_client)
+                
+                print(f"[*] Melakukan kurasi & pemolesan ulang...", end="", flush=True)
+                try:
+                    curation = silo_engine.curate_and_polish_article(
+                        body,
+                        brief,
+                        silo_plan,
+                        business_profile=silo_plan.get("business_profile"),
+                        client=stage3_client
+                    )
+                    new_score = curation.get("overall_score", 90)
+                    new_status = curation.get("curation_status", "LULUS")
+                    print(f" {GREEN}OK{RESET} (Skor Baru: {BOLD}{new_score}/100{RESET} - {new_status})")
+                    
+                    new_art_obj = [{
+                        "item_id": item_id,
+                        "item": item_info,
+                        "brief": brief,
+                        "draft": body,
+                        "curation": curation
+                    }]
+                    silo_engine.save_silo_project(silo_plan, new_art_obj, output_base_dir=silos_base_dir or "output")
+                    print(f"\n{GREEN}[✓] Artikel berhasil diperbarui dengan versi kurasi baru!{RESET}")
+                except Exception as e:
+                    print(f" {RED}FAILED ({e}){RESET}")
+                press_any_key()
+                break
+
+            elif act_c == "2":
+                # Regenerate Penuh (Tahap 2 & 3)
+                print_section("REGENERASI PENUH: DRAF ULANG + KURASI")
+                print(f"Model Draf Aktif   : {GREEN}{pipeline_mgr.get_stage_display_name(2)}{RESET}")
+                print(f"Model Kurasi Aktif : {GREEN}{pipeline_mgr.get_stage_display_name(3)}{RESET}")
+
+                item_info = selected_art["item_info"] or {
+                    "id": item_id,
+                    "keyword": selected_art["title"],
+                    "suggested_title": selected_art["title"],
+                    "role": selected_art["role"]
+                }
+                
+                print(f"[*] [1/2] Menyusun Draf Baru...", end="", flush=True)
+                try:
+                    brief = silo_engine.generate_content_brief(item_info, silo_plan, client=stage1_client)
+                    draft = silo_engine.write_article_draft(
+                        brief,
+                        silo_plan,
+                        business_profile=silo_plan.get("business_profile"),
+                        client=stage2_client
+                    )
+                    w_count = len(draft.split())
+                    print(f" {GREEN}OK{RESET} ({w_count} kata)")
+
+                    print(f"[*] [2/2] Mengurasi & Memoles Redaksi...", end="", flush=True)
+                    curation = silo_engine.curate_and_polish_article(
+                        draft,
+                        brief,
+                        silo_plan,
+                        business_profile=silo_plan.get("business_profile"),
+                        client=stage3_client
+                    )
+                    new_score = curation.get("overall_score", 90)
+                    print(f" {GREEN}OK{RESET} (Skor: {BOLD}{new_score}/100{RESET})")
+
+                    new_art_obj = [{
+                        "item_id": item_id,
+                        "item": item_info,
+                        "brief": brief,
+                        "draft": draft,
+                        "curation": curation
+                    }]
+                    silo_engine.save_silo_project(silo_plan, new_art_obj, output_base_dir=silos_base_dir or "output")
+                    print(f"\n{GREEN}[✓] Artikel berhasil ditulis ulang dari awal dan disimpan!{RESET}")
+                except Exception as e:
+                    print(f" {RED}FAILED ({e}){RESET}")
+                press_any_key()
+                break
+
+            elif act_c == "3":
+                # Regenerate Featured Image
+                print_section("REGENERASI FEATURED IMAGE")
+                kie_client = KieImageClient()
+                slug = selected_art["slug"]
+                img_path = os.path.join(silo_dir, "images", f"{slug}.webp")
+                cat_label = silo_plan.get("silo_theme", "Silo Article")
+                
+                print(f"[*] Men-generate gambar baru untuk: '{selected_art['title']}'...")
+                try:
+                    saved_path, method = kie_client.generate_featured_image_auto(
+                        title=selected_art["title"],
+                        keyword=selected_art["item_info"].get("keyword", selected_art["title"]),
+                        category=cat_label,
+                        save_path=img_path,
+                        gemini_client=client
+                    )
+                    print(f"{GREEN}[✓] Gambar berhasil diperbarui di: {saved_path} ({method}){RESET}")
+                except Exception as e:
+                    print(f"{RED}[X] Gagal generate gambar: {e}{RESET}")
+                press_any_key()
+                break
+
+            elif act_c == "4":
+                # Reset status ke Pending
+                confirm = get_single_key(f"\n{RED}Yakin ingin menghapus file artikel #{c} dan mereset statusnya ke PENDING? [Y/N]: {RESET}", valid_keys=['y', 'n', '\r', '\n'])
+                if confirm.lower() == 'y':
+                    silo_engine.delete_single_article(silo_dir, item_id, delete_from_plan=False)
+                    print(f"\n{GREEN}[✓] Artikel #{c} berhasil direset ke status PENDING! File lokal telah dihapus.{RESET}")
+                    press_any_key()
+                    break
+
+            elif act_c == "5":
+                # Hapus permanen
+                confirm = get_single_key(f"\n{RED}{BOLD}PERINGATAN: Yakin ingin MENGHAPUS PERMANEN artikel ini dari Silo Blueprint? [Y/N]: {RESET}", valid_keys=['y', 'n', '\r', '\n'])
+                if confirm.lower() == 'y':
+                    silo_engine.delete_single_article(silo_dir, item_id, delete_from_plan=True)
+                    print(f"\n{GREEN}[✓] Artikel #{c} berhasil dihapus permanen dari Blueprint dan Disk!{RESET}")
+                    press_any_key()
+                    break
+
 
 def menu_single_site_settings(wp, site):
     while True:
@@ -2979,8 +3306,8 @@ def menu_kie_keys(gemini_client=None):
 
         elif opt == "2":
             print_section("UJI API KEY & KREDIT KIE.AI")
-            print(f"{CYAN}Menguji status API key & mengecek sisa saldo/kredit Kie.ai...{RESET}\n")
-            results = kie.test_all_keys()
+            print(f"{CYAN}Menguji status API key & mengurutkan otomatis dari saldo terkecil ke terbesar...{RESET}\n")
+            results = kie.test_all_keys(auto_sort=True)
             valid_keys = []
             zero_or_invalid_keys = []
 
@@ -3002,6 +3329,8 @@ def menu_kie_keys(gemini_client=None):
             
             print("-" * 60)
             print(f" {BOLD}Ringkasan:{RESET} {GREEN}{len(valid_keys)} Valid / Ada Kredit{RESET} | {RED}{len(zero_or_invalid_keys)} Habis / Minus / Invalid{RESET}")
+            if len(valid_keys) > 1:
+                print(f" {CYAN}💡 Urutan key telah otomatis ditata dari saldo terkecil ke terbesar untuk efisiensi kuota.{RESET}")
 
             if zero_or_invalid_keys:
                 print(f"\n{YELLOW}[!]  Ditemukan {len(zero_or_invalid_keys)} key yang kreditnya 0, minus, atau tidak valid.{RESET}")
